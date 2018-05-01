@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "B5CA1AC72090CE0F00C81085"
-               BuildableName = "mobile_to_local.app"
-               BlueprintName = "mobile_to_local"
-               ReferencedContainer = "container:mobile_to_local.xcodeproj">
+               BuildableName = "Mobile to Local.app"
+               BlueprintName = "Mobile to Local"
+               ReferencedContainer = "container:Mobile to Local.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B5CA1AC72090CE0F00C81085"
-            BuildableName = "mobile_to_local.app"
-            BlueprintName = "mobile_to_local"
-            ReferencedContainer = "container:mobile_to_local.xcodeproj">
+            BuildableName = "Mobile to Local.app"
+            BlueprintName = "Mobile to Local"
+            ReferencedContainer = "container:Mobile to Local.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -56,9 +56,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B5CA1AC72090CE0F00C81085"
-            BuildableName = "mobile_to_local.app"
-            BlueprintName = "mobile_to_local"
-            ReferencedContainer = "container:mobile_to_local.xcodeproj">
+            BuildableName = "Mobile to Local.app"
+            BlueprintName = "Mobile to Local"
+            ReferencedContainer = "container:Mobile to Local.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -75,9 +75,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "B5CA1AC72090CE0F00C81085"
-            BuildableName = "mobile_to_local.app"
-            BlueprintName = "mobile_to_local"
-            ReferencedContainer = "container:mobile_to_local.xcodeproj">
+            BuildableName = "Mobile to Local.app"
+            BlueprintName = "Mobile to Local"
+            ReferencedContainer = "container:Mobile to Local.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

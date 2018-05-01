@@ -11,15 +11,21 @@
 		B5CA1ACE2090CE0F00C81085 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CA1ACD2090CE0F00C81085 /* ViewController.swift */; };
 		B5CA1AD02090CE0F00C81085 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1ACF2090CE0F00C81085 /* Assets.xcassets */; };
 		B5CA1AD32090CE0F00C81085 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1AD12090CE0F00C81085 /* Main.storyboard */; };
+		B5CA1ADB2090CF4D00C81085 /* scripts in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1ADA2090CF4D00C81085 /* scripts */; };
+		B5CA1ADF209120EA00C81085 /* MigrateAsst.png in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1ADE209120EA00C81085 /* MigrateAsst.png */; };
+		B5CA1AE12091215700C81085 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1AE02091215700C81085 /* logo.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		B5CA1AC82090CE0F00C81085 /* mobile_to_local.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mobile_to_local.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5CA1AC82090CE0F00C81085 /* Mobile to Local.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mobile to Local.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B5CA1ACD2090CE0F00C81085 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		B5CA1ACF2090CE0F00C81085 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B5CA1AD22090CE0F00C81085 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B5CA1AD42090CE0F00C81085 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5CA1ADA2090CF4D00C81085 /* scripts */ = {isa = PBXFileReference; lastKnownFileType = folder; path = scripts; sourceTree = "<group>"; };
+		B5CA1ADE209120EA00C81085 /* MigrateAsst.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MigrateAsst.png; sourceTree = "<group>"; };
+		B5CA1AE02091215700C81085 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,7 +50,7 @@
 		B5CA1AC92090CE0F00C81085 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				B5CA1AC82090CE0F00C81085 /* mobile_to_local.app */,
+				B5CA1AC82090CE0F00C81085 /* Mobile to Local.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -57,6 +63,9 @@
 				B5CA1ACF2090CE0F00C81085 /* Assets.xcassets */,
 				B5CA1AD12090CE0F00C81085 /* Main.storyboard */,
 				B5CA1AD42090CE0F00C81085 /* Info.plist */,
+				B5CA1ADE209120EA00C81085 /* MigrateAsst.png */,
+				B5CA1AE02091215700C81085 /* logo.png */,
+				B5CA1ADA2090CF4D00C81085 /* scripts */,
 			);
 			path = mobile_to_local;
 			sourceTree = "<group>";
@@ -64,9 +73,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		B5CA1AC72090CE0F00C81085 /* mobile_to_local */ = {
+		B5CA1AC72090CE0F00C81085 /* Mobile to Local */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = B5CA1AD72090CE0F00C81085 /* Build configuration list for PBXNativeTarget "mobile_to_local" */;
+			buildConfigurationList = B5CA1AD72090CE0F00C81085 /* Build configuration list for PBXNativeTarget "Mobile to Local" */;
 			buildPhases = (
 				B5CA1AC42090CE0F00C81085 /* Sources */,
 				B5CA1AC52090CE0F00C81085 /* Frameworks */,
@@ -76,9 +85,9 @@
 			);
 			dependencies = (
 			);
-			name = mobile_to_local;
+			name = "Mobile to Local";
 			productName = mobile_to_local;
-			productReference = B5CA1AC82090CE0F00C81085 /* mobile_to_local.app */;
+			productReference = B5CA1AC82090CE0F00C81085 /* Mobile to Local.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -98,7 +107,7 @@
 					};
 				};
 			};
-			buildConfigurationList = B5CA1AC32090CE0F00C81085 /* Build configuration list for PBXProject "mobile_to_local" */;
+			buildConfigurationList = B5CA1AC32090CE0F00C81085 /* Build configuration list for PBXProject "Mobile to Local" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -111,7 +120,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				B5CA1AC72090CE0F00C81085 /* mobile_to_local */,
+				B5CA1AC72090CE0F00C81085 /* Mobile to Local */,
 			);
 		};
 /* End PBXProject section */
@@ -121,7 +130,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B5CA1ADB2090CF4D00C81085 /* scripts in Resources */,
+				B5CA1AE12091215700C81085 /* logo.png in Resources */,
 				B5CA1AD02090CE0F00C81085 /* Assets.xcassets in Resources */,
+				B5CA1ADF209120EA00C81085 /* MigrateAsst.png in Resources */,
 				B5CA1AD32090CE0F00C81085 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -248,12 +260,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = PS2F6S478M;
 				INFOPLIST_FILE = mobile_to_local/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamf.pse.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -262,12 +276,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = PS2F6S478M;
 				INFOPLIST_FILE = mobile_to_local/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamf.pse.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
@@ -275,7 +291,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B5CA1AC32090CE0F00C81085 /* Build configuration list for PBXProject "mobile_to_local" */ = {
+		B5CA1AC32090CE0F00C81085 /* Build configuration list for PBXProject "Mobile to Local" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B5CA1AD52090CE0F00C81085 /* Debug */,
@@ -284,13 +300,14 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B5CA1AD72090CE0F00C81085 /* Build configuration list for PBXNativeTarget "mobile_to_local" */ = {
+		B5CA1AD72090CE0F00C81085 /* Build configuration list for PBXNativeTarget "Mobile to Local" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B5CA1AD82090CE0F00C81085 /* Debug */,
 				B5CA1AD92090CE0F00C81085 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
