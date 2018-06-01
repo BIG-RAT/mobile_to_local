@@ -135,7 +135,9 @@ chown -R "$id:staff" "$mobileUserHome" &> /dev/null
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: killing jamfHelper and loginwindow" >> /var/log/jamf.log
 
 sudo killall jamfHelper
-sudo killall loginwindow &
+#sudo killall loginwindow &
+loggedInUser=`/bin/ls -l /dev/console | /usr/bin/awk '{ print $3 }' | grep -v root`
+ps -Ajc | grep loginwindow | grep "$loggedInUser" | grep -v grep | awk '{print $2}' | sudo xargs kill &
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: loginwindow restarted." >> /var/log/jamf.log &
 
 #rm -fr $0

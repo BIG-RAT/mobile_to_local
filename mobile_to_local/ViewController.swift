@@ -150,13 +150,19 @@ class ViewController: NSViewController {
         }
         
         // Verify we're the only account logged in - start
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq")
+        // remove blank entry in array
+        var loggedInUserArray = shellResult.dropLast()
+        if let index = loggedInUserArray.index(of:"_mbsetupuser") {
+            loggedInUserArray.remove(at: index)
+        }
 //        let loggedInUserCountArray = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")[1] as! [String]
-        let loggedInUserCount = Int(shellResult[0].replacingOccurrences(of: " ", with: ""))
+        let loggedInUserCount = loggedInUserArray.count
 //        let loggedInUserCount = Int(loggedInUserCountArray[0].replacingOccurrences(of: " ", with: ""))
-        if loggedInUserCount! > 1 {
+        if loggedInUserCount > 1 {
             NSApplication.shared().mainWindow?.setIsVisible(false)
             writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
+            writeToLog(theMessage: "Logged in users: \(shellResult)")
             alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
             NSApplication.shared().terminate(self)
         }
