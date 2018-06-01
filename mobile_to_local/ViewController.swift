@@ -83,7 +83,7 @@ class ViewController: NSViewController {
     }
     
     func shell(cmd: String, args: String...) -> [AnyObject] {
-        var localStatus  = [String]()
+        var localStatus     = [String]()
         let pipe            = Pipe()
         let task            = Process()
         task.launchPath     = cmd
@@ -100,6 +100,7 @@ class ViewController: NSViewController {
         
         task.waitUntilExit()
         let returnArray = [task.terminationStatus,localStatus] as [Any]
+        
         return(returnArray as [AnyObject])
     }
     
@@ -127,15 +128,34 @@ class ViewController: NSViewController {
             NSApplication.shared().terminate(self)
         }
         
-//        // Verify we're not logged in with a local account
+        // Verify we're the only account logged in - start
+        let loggedInUserCountArray = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")[1] as! [String]
+        let loggedInUserCount = Int(loggedInUserCountArray[0].replacingOccurrences(of: " ", with: ""))
+        if loggedInUserCount! > 1 {
+            NSApplication.shared().mainWindow?.setIsVisible(false)
+            alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
+            writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
+            NSApplication.shared().terminate(self)
+        }
+        // Verify we're the only account logged in - end
+
+        
+        // Verify we're not logged in with a local account
         let accountIdArray = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")[1] as! [String]
-        if let accountId = Int32(accountIdArray[0]) {
-            if accountId < 1000 {
-                NSApplication.shared().mainWindow?.setIsVisible(false)
-                alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
-                writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
-                NSApplication.shared().terminate(self)
-            }
+        if accountIdArray.count > 1 {
+            if let accountId = Int32(accountIdArray[0]) {
+                if accountId < 1000 {
+                    NSApplication.shared().mainWindow?.setIsVisible(false)
+                    alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
+                    writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
+                    NSApplication.shared().terminate(self)
+                }
+            }   // if let accountId = Int32(accountIdArray[0]) - end
+        } else {
+            NSApplication.shared().mainWindow?.setIsVisible(false)
+            alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
+            writeToLog(theMessage: "Unable to locate account information.  You may be logged in with a network managed account.")
+            NSApplication.shared().terminate(self)
         }
         // Do any additional setup after loading the view.
     }
