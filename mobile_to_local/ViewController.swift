@@ -21,6 +21,11 @@ class ViewController: NSViewController {
     let passCheckScript  = Bundle.main.bundlePath+"/Contents/Resources/scripts/passCheck.sh"
     
     let myNotification = Notification.Name(rawValue:"MyNotification")
+    
+    // variables used in shell function
+    var shellResult = [String]()
+    var errorResult = [String]()
+    var exitResult:Int32 = 0
 
     @IBAction func migrate(_ sender: Any) {
         var allowedCharacters = CharacterSet.alphanumerics
@@ -30,11 +35,14 @@ class ViewController: NSViewController {
             alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
             return
         }
-        let verifyPassword = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")[0] as! Int32
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")
+//        let verifyPassword = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")[0] as! Int32
 
-        if verifyPassword == 0 {
-            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
-            switch result {
+        if exitResult == 0 {
+//            if verifyPassword == 0 {
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")
+//            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
+            switch exitResult {
             case 0:
                 writeToLog(theMessage: "successfully migrated account.")
                 NSApplication.shared().terminate(self)
@@ -45,7 +53,7 @@ class ViewController: NSViewController {
                 alert_dialog(header: "Alert", message: "You are not logged in with a mobile account.")
                 NSApplication.shared().terminate(self)
             default:
-                alert_dialog(header: "Alert", message: "An unknown error has occured: \(result).")
+                alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
                 return
                 
             }
@@ -82,27 +90,38 @@ class ViewController: NSViewController {
         return stringDate
     }
     
-    func shell(cmd: String, args: String...) -> [AnyObject] {
-        var localStatus     = [String]()
-        let pipe            = Pipe()
-        let task            = Process()
+    func shell(cmd: String, args: String...) -> (exitCode: Int32, errorStatus: [String], localResult: [String]) {
+        var localResult  = [String]()
+        var errorStatus  = [String]()
+        
+        let pipe        = Pipe()
+        let errorPipe   = Pipe()
+        let task        = Process()
+        
         task.launchPath     = cmd
         task.arguments      = args
         task.standardOutput = pipe
+        task.standardError  = errorPipe
         
         task.launch()
         
         let outData = pipe.fileHandleForReading.readDataToEndOfFile()
         if let result = String(data: outData, encoding: .utf8) {
-//          result = result.trimmingCharacters(in: .newlines)
-            localStatus = result.components(separatedBy: "\n")
+            localResult = result.components(separatedBy: "\n")
+        }
+        
+        let errorData = errorPipe.fileHandleForReading.readDataToEndOfFile()
+        if var result = String(data: errorData, encoding: .utf8) {
+            result = result.trimmingCharacters(in: .newlines)
+            errorStatus = result.components(separatedBy: "\n")
         }
         
         task.waitUntilExit()
-        let returnArray = [task.terminationStatus,localStatus] as [Any]
+        let exitStatus = task.terminationStatus
         
-        return(returnArray as [AnyObject])
+        return(exitStatus,errorStatus, localResult)
     }
+
     
     func writeToLog(theMessage: String) {
         LogFileW?.seekToEndOfFile()
@@ -114,8 +133,10 @@ class ViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let userArray = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")[1] as! [String]
-        newUser = userArray[0]
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
+//        let userArray = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")[1] as! [String]
+        newUser = shellResult[0]
+//        newUser = userArray[0]
         newUser_TextField.stringValue = newUser
         
         
@@ -129,32 +150,38 @@ class ViewController: NSViewController {
         }
         
         // Verify we're the only account logged in - start
-        let loggedInUserCountArray = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")[1] as! [String]
-        let loggedInUserCount = Int(loggedInUserCountArray[0].replacingOccurrences(of: " ", with: ""))
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")
+//        let loggedInUserCountArray = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")[1] as! [String]
+        let loggedInUserCount = Int(shellResult[0].replacingOccurrences(of: " ", with: ""))
+//        let loggedInUserCount = Int(loggedInUserCountArray[0].replacingOccurrences(of: " ", with: ""))
         if loggedInUserCount! > 1 {
             NSApplication.shared().mainWindow?.setIsVisible(false)
-            alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
             writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
+            alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
             NSApplication.shared().terminate(self)
         }
         // Verify we're the only account logged in - end
 
         
         // Verify we're not logged in with a local account
-        let accountIdArray = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")[1] as! [String]
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")
+//        let dsclLookup = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")
+        let accountIdArray = shellResult
+//        let accountIdArray = dsclLookup[1] as! [String]
         if accountIdArray.count > 1 {
             if let accountId = Int32(accountIdArray[0]) {
                 if accountId < 1000 {
                     NSApplication.shared().mainWindow?.setIsVisible(false)
-                    alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
                     writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
+                    alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
                     NSApplication.shared().terminate(self)
                 }
             }   // if let accountId = Int32(accountIdArray[0]) - end
         } else {
             NSApplication.shared().mainWindow?.setIsVisible(false)
-            alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
+            writeToLog(theMessage: "\(errorResult[0])")
             writeToLog(theMessage: "Unable to locate account information.  You may be logged in with a network managed account.")
+            alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
             NSApplication.shared().terminate(self)
         }
         // Do any additional setup after loading the view.
