@@ -14,11 +14,11 @@ class ViewController: NSViewController {
     @IBOutlet weak var password: NSSecureTextField!
     
     var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
-    var newUser = ""
+    var newUser         = ""
     
     let fm = FileManager()
-    let migrationScript  = Bundle.main.bundlePath+"/Contents/Resources/scripts/mobileToLocal.sh"
-    let passCheckScript  = Bundle.main.bundlePath+"/Contents/Resources/scripts/passCheck.sh"
+    let migrationScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/mobileToLocal.sh"
+    let passCheckScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/passCheck.sh"
     
     let myNotification = Notification.Name(rawValue:"MyNotification")
     
@@ -146,7 +146,7 @@ class ViewController: NSViewController {
             NSApplication.shared().mainWindow?.setIsVisible(false)
             alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
             writeToLog(theMessage: "Assistant must be run with elevated privileges.")
-            NSApplication.shared().terminate(self)
+//            NSApplication.shared().terminate(self)
         }
         
         // Verify we're the only account logged in - start
@@ -200,9 +200,28 @@ class ViewController: NSViewController {
     }
     
     override func viewDidAppear() {
+        // read commandline args
+        var numberOfArgs = 0
+        
+        //        debug = true
+        
+        numberOfArgs = CommandLine.arguments.count - 2  // subtract 2 since we start counting at 0, another 1 for the app itself
+        if numberOfArgs >= 0 {
+            //            print("all arguments: \(CommandLine.arguments)")
+            for i in stride(from: 1, through: numberOfArgs+1, by: 1) {
+                //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
+                switch CommandLine.arguments[i]{
+                case "-allowNewUser":
+                    newUser_TextField.isEditable = true
+                default:
+                    print("unknown switch passed: \(CommandLine.arguments[i])")
+                }
+            }
+        }
         self.view.layer?.backgroundColor = CGColor(red: 0xF2/255.0, green: 0xF2/255.0, blue: 0xF2/255.0, alpha: 1.0)
 //      Make sure the window is not restorable, to get the cursor in the username field
         NSApplication.shared().mainWindow?.makeFirstResponder(newUser_TextField)
+        
     }
 
 }
