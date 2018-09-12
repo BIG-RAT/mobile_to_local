@@ -11,6 +11,7 @@ import Cocoa
 class ViewController: NSViewController {
     
     @IBOutlet weak var newUser_TextField: NSTextField!
+    @IBOutlet weak var updateHomeDir_button: NSButton!
     @IBOutlet weak var password: NSSecureTextField!
     
     var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
@@ -40,7 +41,9 @@ class ViewController: NSViewController {
 
         if exitResult == 0 {
 //            if verifyPassword == 0 {
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")
+//            let migrateCommand = "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(updateHomeDir_button.state)"
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'  \(updateHomeDir_button.state)")
+//            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", migrateCommand)
 //            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
             switch exitResult {
             case 0:
@@ -146,7 +149,7 @@ class ViewController: NSViewController {
             NSApplication.shared().mainWindow?.setIsVisible(false)
             alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
             writeToLog(theMessage: "Assistant must be run with elevated privileges.")
-//            NSApplication.shared().terminate(self)
+            NSApplication.shared().terminate(self)
         }
         
         // Verify we're the only account logged in - start
@@ -212,7 +215,9 @@ class ViewController: NSViewController {
                 //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
                 switch CommandLine.arguments[i]{
                 case "-allowNewUser":
-                    newUser_TextField.isEditable = true
+                    newUser_TextField.isEditable    = true
+                    updateHomeDir_button.isEnabled  = true
+                    updateHomeDir_button.isHidden   = false
                 default:
                     print("unknown switch passed: \(CommandLine.arguments[i])")
                 }

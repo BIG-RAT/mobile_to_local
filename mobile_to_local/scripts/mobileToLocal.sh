@@ -37,6 +37,9 @@ fi
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: current user: $currentName" >> /var/log/jamf.log
 password="$2"
 
+## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
+renameHomeDir="$3"
+
 "$jamfH" -windowType fs -iconSize 512 -icon /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns -description "Completing account migration.  This process may take a few minutes, please stand by..." -alignDescription center -startlaunchd &
 
 sleep 1
@@ -88,8 +91,8 @@ dsexport "/tmp/${tmpName}.dse" /Local/Default dsRecTypeStandard:Users -r "${curr
 realName=$($dsclBin . -read "/Users/$currentName" RealName | tail -n1 | cut -c 2-)
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: mobile user RealName: $realName" >> /var/log/jamf.log
 
-mobileUserHome=$($dsclBin . -read "/Users/$currentName" NFSHomeDirectory | awk -F': ' '{print $2}')
-echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: mobile user home: $mobileUserHome" >> /var/log/jamf.log
+currentMobileUserHome=$($dsclBin . -read "/Users/$currentName" NFSHomeDirectory | awk -F': ' '{print $2}')
+echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: mobile user home: $currentMobileUserHome" >> /var/log/jamf.log
 
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: renaming mobile account to ${tmpName}" >> /var/log/jamf.log
 $dsclBin . -change "/Users/$currentName" RecordName "$currentName" "${tmpName}"
@@ -108,29 +111,42 @@ while read theAttribute;do
     dscl . -delete "/Users/${tmpName}" $theAttribute
 #    echo $?
 done << EOL
-$(dscl -raw . -read "/Users/${tmpName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v "$attribsToKeep")
+$($dsclBin -raw . -read "/Users/${tmpName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v "$attribsToKeep")
 EOL
 ## remove attributes from mobile account - end
 
 mkdir -p "/tmp/exported/"
 dsexport "/tmp/exported/${newName}.dse" /Local/Default dsRecTypeStandard:Users -r "${newName}" -e "$attribsToSkip"
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: attributes to write to new account: $(cat /tmp/exported/${newName}.dse)" >> /var/log/jamf.log
-dscl . -delete "/Users/${newName}"
+$dsclBin . -delete "/Users/${newName}"
 sleep 1
-dscl . -change "/Users/${tmpName}" RecordName "${tmpName}" "${newName}"
+$dsclBin . -change "/Users/${tmpName}" RecordName "${tmpName}" "${newName}"
 sleep 1
 dsimport "/tmp/exported/${newName}.dse" /Local/Default M
 
 sleep 1
 ## ensure we have the correct password
-dscl . -passwd "/Users/${newName}" "$password"
-dscl . -delete "/Users/${newName}" "PrimaryDomain"
-dscl . -delete "/Users/${newName}" "AppleMetaRecordName"
+$dsclBin . -passwd "/Users/${newName}" "$password"
+$dsclBin . -delete "/Users/${newName}" "PrimaryDomain"
+$dsclBin . -delete "/Users/${newName}" "AppleMetaRecordName"
+
+## ensure proper owner/group on home directory
+chown -R "$id:staff" "$currentMobileUserHome" &> /dev/null
+echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: updated owner:group for home directory" >> /var/log/jamf.log
+echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: chown -R $id:staff $currentMobileUserHome" >> /var/log/jamf.log
+
 ## if we changed shortnames, add the old one as an alias
-if [ ! "$newName" = "$currentName" ];then
+if [ "${newName}" != "${currentName}" ];then
+    echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: login name has changed" >> /var/log/jamf.log
+    echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: adding alias for old username: ${currentName}" >> /var/log/jamf.log
     $dsclBin . -append "/Users/${newName}" RecordName "$currentName"
+    if [ "${renameHomeDir}" == "1" ];then
+        echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: setting home directory to /Users/${newName}" >> /var/log/jamf.log
+        $dsclBin . -change "/Users/${newName}" NFSHomeDirectory "${currentMobileUserHome}" "/Users/${newName}"
+        mv "${currentMobileUserHome}" "/Users/${newName}"
+    fi
 fi
-chown -R "$id:staff" "$mobileUserHome" &> /dev/null
+
 
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: killing jamfHelper and loginwindow" >> /var/log/jamf.log
 
