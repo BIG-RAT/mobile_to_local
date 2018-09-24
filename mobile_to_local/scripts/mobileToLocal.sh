@@ -63,9 +63,7 @@ dsconfigad -remove -force -username "$currentName" -password "$password"
 rm '/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist'
 
 ## remove hidden accounts file if present
-if [ -f "/Users/{currentName}/.account" ];then
-    rm "/Users/{currentName}/.account"
-fi
+rm -f /Users/${currentName}/.account || true
 
 pid=$(ps -ax | grep opendir | grep -v grep | awk '/ / {print $1}')
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: restarting opendirectoryd with pid $pid" >> /var/log/jamf.log
