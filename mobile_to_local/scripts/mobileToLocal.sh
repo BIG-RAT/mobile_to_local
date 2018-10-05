@@ -44,7 +44,7 @@ renameHomeDir="$3"
 
 sleep 1
 
-## find first available id
+## find first available id above 500
 id="501"
 allUsers=$(dscl . -list /Users UniqueID | awk '{ print $2 }')
 isUnique=$(echo "$allUsers" | grep "^$id$")
@@ -62,8 +62,8 @@ echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: new id
 dsconfigad -remove -force -username "$currentName" -password "$password"
 rm '/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist'
 
-## remove hidden accounts file if present
-rm -f /Users/${currentName}/.account || true
+## remove .accounts file if present
+rm -f "/Users/${currentName}/.account" || true
 
 pid=$(ps -ax | grep opendir | grep -v grep | awk '/ / {print $1}')
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: restarting opendirectoryd with pid $pid" >> /var/log/jamf.log
@@ -132,6 +132,19 @@ $dsclBin . -delete "/Users/${newName}" "AppleMetaRecordName"
 chown -R "$id:staff" "$currentMobileUserHome" &> /dev/null
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: updated owner:group for home directory" >> /var/log/jamf.log
 echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: chown -R $id:staff $currentMobileUserHome" >> /var/log/jamf.log
+
+## set permissions on user owned folders outside the /Users folder
+# BEGIN PERMISSIONS LOOKUP
+# No loop required, Find executes the chown command on every line result by nature. Only sets the owner, leaves group 'as is'
+# SUDO FOR TESTING PURPOSES ONLY, REMOVE IF RUNNING AS ROOT
+#echo "Searching inside /usr/local"
+##        id of AD account: $idCheck
+## id of new local account: $id
+sudo find /usr/local -user $idCheck -exec chown $id {} \;
+#echo "Searching inside /opt"
+sudo find /opt/ -user $idCheck -exec chown $id {} \;
+#echo "Searching inside /Users/Shared"
+sudo find /Users/Shared -user $idCheck -exec chown $id {} \;
 
 ## if we changed shortnames, add the old one as an alias
 if [ "${newName}" != "${currentName}" ];then
