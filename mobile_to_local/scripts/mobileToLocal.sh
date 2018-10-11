@@ -136,15 +136,14 @@ echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: chown 
 ## set permissions on user owned folders outside the /Users folder
 # BEGIN PERMISSIONS LOOKUP
 # No loop required, Find executes the chown command on every line result by nature. Only sets the owner, leaves group 'as is'
-# SUDO FOR TESTING PURPOSES ONLY, REMOVE IF RUNNING AS ROOT
 #echo "Searching inside /usr/local"
 ##        id of AD account: $idCheck
 ## id of new local account: $id
-sudo find /usr/local -user $idCheck -exec chown $id {} \;
+find /usr/local -user $idCheck -exec chown $id {} \;
 #echo "Searching inside /opt"
-sudo find /opt/ -user $idCheck -exec chown $id {} \;
+find /opt/ -user $idCheck -exec chown $id {} \;
 #echo "Searching inside /Users/Shared"
-sudo find /Users/Shared -user $idCheck -exec chown $id {} \;
+find /Users/Shared -user $idCheck -exec chown $id {} \;
 
 ## if we changed shortnames, add the old one as an alias
 if [ "${newName}" != "${currentName}" ];then
