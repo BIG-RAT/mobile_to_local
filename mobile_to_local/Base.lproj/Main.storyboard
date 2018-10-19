@@ -313,6 +313,6 @@ Click migrate to convert your mobile account to a local one.</string>
     </scenes>
     <resources>
         <image name="MigrateAsst" width="256" height="256"/>
-        <image name="logo" width="328" height="114"/>
+        <image name="logo" width="200" height="50"/>
     </resources>
 </document>
