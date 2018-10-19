@@ -1,4 +1,4 @@
-# mobile_to_local
+# Mobile to Local
 Migrate mobile Active Directory account to a local account:
 
 Wanted to create an easy to use method to migrate mobile accounts to local accounts.  One item in particular I wanted to address was ensuring a FileVault 2 enabled mobile account was migrated to a FileVault 2 enabled local account and have arrived at the following.
