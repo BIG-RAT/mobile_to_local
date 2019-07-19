@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -17,6 +17,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B53AD9D422E1EC7E00C7CD02 /* Mobile to Local.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Mobile to Local.entitlements"; sourceTree = "<group>"; };
 		B5CA1AC82090CE0F00C81085 /* Mobile to Local.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mobile to Local.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B5CA1ACD2090CE0F00C81085 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -42,6 +43,7 @@
 		B5CA1ABF2090CE0F00C81085 = {
 			isa = PBXGroup;
 			children = (
+				B53AD9D422E1EC7E00C7CD02 /* Mobile to Local.entitlements */,
 				B5CA1ACA2090CE0F00C81085 /* mobile_to_local */,
 				B5CA1AC92090CE0F00C81085 /* Products */,
 			);
@@ -103,15 +105,22 @@
 					B5CA1AC72090CE0F00C81085 = {
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = PS2F6S478M;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.HardenedRuntime = {
+								enabled = 1;
+							};
+						};
 					};
 				};
 			};
 			buildConfigurationList = B5CA1AC32090CE0F00C81085 /* Build configuration list for PBXProject "Mobile to Local" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -252,7 +261,8 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.12;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
-				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
 			name = Release;
 		};
@@ -263,12 +273,16 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = PS2F6S478M;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = mobile_to_local/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamf.pse.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -279,12 +293,16 @@
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = PS2F6S478M;
+				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = mobile_to_local/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jamf.pse.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
