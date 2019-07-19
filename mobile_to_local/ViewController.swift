@@ -42,19 +42,19 @@ class ViewController: NSViewController {
         if exitResult == 0 {
 //            if verifyPassword == 0 {
 //            let migrateCommand = "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(updateHomeDir_button.state)"
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'  \(updateHomeDir_button.state)")
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'  \(convertFromNSControlStateValue(updateHomeDir_button.state))")
 //            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", migrateCommand)
 //            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
             switch exitResult {
             case 0:
                 writeToLog(theMessage: "successfully migrated account.")
-                NSApplication.shared().terminate(self)
+                NSApplication.shared.terminate(self)
             case 244:
                 alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
                 return
             case 232:
                 alert_dialog(header: "Alert", message: "You are not logged in with a mobile account.")
-                NSApplication.shared().terminate(self)
+                NSApplication.shared.terminate(self)
             default:
                 alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
                 return
@@ -67,14 +67,14 @@ class ViewController: NSViewController {
     }
 
     @IBAction func cancel(_ sender: Any) {
-        NSApplication.shared().terminate(self)
+        NSApplication.shared.terminate(self)
     }
     
     func alert_dialog(header: String, message: String) {
         let dialog: NSAlert = NSAlert()
         dialog.messageText = header
         dialog.informativeText = message
-        dialog.alertStyle = NSAlertStyle.warning
+        dialog.alertStyle = NSAlert.Style.warning
         dialog.addButton(withTitle: "OK")
         dialog.runModal()
         //return true
@@ -143,31 +143,31 @@ class ViewController: NSViewController {
         newUser_TextField.stringValue = newUser
         
         
-        NSApplication.shared().activate(ignoringOtherApps: true)
+        NSApplication.shared.activate(ignoringOtherApps: true)
         // Verify we're running with elevated privileges.
         if NSUserName() != "root" {
-            NSApplication.shared().mainWindow?.setIsVisible(false)
+            NSApplication.shared.mainWindow?.setIsVisible(false)
             alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
             writeToLog(theMessage: "Assistant must be run with elevated privileges.")
-            NSApplication.shared().terminate(self)
+            NSApplication.shared.terminate(self)
         }
         
         // Verify we're the only account logged in - start
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq")
         // remove blank entry in array
         var loggedInUserArray = shellResult.dropLast()
-        if let index = loggedInUserArray.index(of:"_mbsetupuser") {
+        if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
             loggedInUserArray.remove(at: index)
         }
 //        let loggedInUserCountArray = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")[1] as! [String]
         let loggedInUserCount = loggedInUserArray.count
 //        let loggedInUserCount = Int(loggedInUserCountArray[0].replacingOccurrences(of: " ", with: ""))
         if loggedInUserCount > 1 {
-            NSApplication.shared().mainWindow?.setIsVisible(false)
+            NSApplication.shared.mainWindow?.setIsVisible(false)
             writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
             writeToLog(theMessage: "Logged in users: \(shellResult)")
             alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
-            NSApplication.shared().terminate(self)
+            NSApplication.shared.terminate(self)
         }
         // Verify we're the only account logged in - end
 
@@ -180,18 +180,18 @@ class ViewController: NSViewController {
         if accountIdArray.count > 1 {
             if let accountId = Int32(accountIdArray[0]) {
                 if accountId < 1000 {
-                    NSApplication.shared().mainWindow?.setIsVisible(false)
+                    NSApplication.shared.mainWindow?.setIsVisible(false)
                     writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
                     alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
-                    NSApplication.shared().terminate(self)
+                    NSApplication.shared.terminate(self)
                 }
             }   // if let accountId = Int32(accountIdArray[0]) - end
         } else {
-            NSApplication.shared().mainWindow?.setIsVisible(false)
+            NSApplication.shared.mainWindow?.setIsVisible(false)
             writeToLog(theMessage: "\(errorResult[0])")
             writeToLog(theMessage: "Unable to locate account information.  You may be logged in with a network managed account.")
             alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
-            NSApplication.shared().terminate(self)
+            NSApplication.shared.terminate(self)
         }
         // Do any additional setup after loading the view.
     }
@@ -225,8 +225,13 @@ class ViewController: NSViewController {
         }
         self.view.layer?.backgroundColor = CGColor(red: 0xF2/255.0, green: 0xF2/255.0, blue: 0xF2/255.0, alpha: 1.0)
 //      Make sure the window is not restorable, to get the cursor in the username field
-        NSApplication.shared().mainWindow?.makeFirstResponder(newUser_TextField)
+        NSApplication.shared.mainWindow?.makeFirstResponder(newUser_TextField)
         
     }
 
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromNSControlStateValue(_ input: NSControl.StateValue) -> Int {
+	return input.rawValue
 }
