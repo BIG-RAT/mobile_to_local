@@ -6,7 +6,9 @@
 //  Copyright © 2018 jamf. All rights reserved.
 //
 
+import AppKit
 import Cocoa
+import Foundation
 
 class ViewController: NSViewController {
     
@@ -15,7 +17,8 @@ class ViewController: NSViewController {
     @IBOutlet weak var password: NSSecureTextField!
     
     var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
-    var newUser         = ""
+    var newUser                = ""
+    var userType               = ""
     
     let fm = FileManager()
     let migrationScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/mobileToLocal.sh"
@@ -27,6 +30,13 @@ class ViewController: NSViewController {
     var shellResult = [String]()
     var errorResult = [String]()
     var exitResult:Int32 = 0
+    
+    let userDefaults = UserDefaults.standard
+    // determine if we're using dark mode
+    var isDarkMode: Bool {
+        let mode = userDefaults.string(forKey: "AppleInterfaceStyle")
+        return mode == "Dark"
+    }
 
     @IBAction func migrate(_ sender: Any) {
         var allowedCharacters = CharacterSet.alphanumerics
@@ -42,7 +52,7 @@ class ViewController: NSViewController {
         if exitResult == 0 {
 //            if verifyPassword == 0 {
 //            let migrateCommand = "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(updateHomeDir_button.state)"
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'  \(convertFromNSControlStateValue(updateHomeDir_button.state))")
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType)
 //            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", migrateCommand)
 //            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
             switch exitResult {
@@ -136,6 +146,16 @@ class ViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+        
+        // OS version info
+        let os = ProcessInfo().operatingSystemVersion
+
+        if os.minorVersion >= 14 {
+//            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+        }
+        
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
 //        let userArray = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")[1] as! [String]
         newUser = shellResult[0]
@@ -173,19 +193,19 @@ class ViewController: NSViewController {
 
         
         // Verify we're not logged in with a local account
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard")
 //        let dsclLookup = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")
-        let accountIdArray = shellResult
+        let accountTypeArray = shellResult
 //        let accountIdArray = dsclLookup[1] as! [String]
-        if accountIdArray.count > 1 {
-            if let accountId = Int32(accountIdArray[0]) {
-                if accountId < 1000 {
+        if accountTypeArray.count != 0 {
+//            let accountType = accountTypeArray[0] {
+                if accountTypeArray[0] == "" {
                     NSApplication.shared.mainWindow?.setIsVisible(false)
                     writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
                     alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
                     NSApplication.shared.terminate(self)
                 }
-            }   // if let accountId = Int32(accountIdArray[0]) - end
+//            }   // if let accountId = Int32(accountIdArray[0]) - end
         } else {
             NSApplication.shared.mainWindow?.setIsVisible(false)
             writeToLog(theMessage: "\(errorResult[0])")
@@ -208,22 +228,32 @@ class ViewController: NSViewController {
         
         //        debug = true
         
-        numberOfArgs = CommandLine.arguments.count - 2  // subtract 2 since we start counting at 0, another 1 for the app itself
-        if numberOfArgs >= 0 {
-            //            print("all arguments: \(CommandLine.arguments)")
-            for i in stride(from: 1, through: numberOfArgs+1, by: 1) {
+        numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
+        if numberOfArgs > 0 {
+            if (numberOfArgs % 2) == 0 {
+                print("correct number of arguments")
+            } else {
+                alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
+                NSApplication.shared.terminate(self)
+            }
+            
+            for i in stride(from: 1, through: numberOfArgs, by: 2) {
                 //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
-                switch CommandLine.arguments[i]{
-                case "-allowNewUser":
-                    newUser_TextField.isEditable    = true
-                    updateHomeDir_button.isEnabled  = true
-                    updateHomeDir_button.isHidden   = false
+                switch CommandLine.arguments[i] {
+                case "-allowNewUsername":
+                    if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
+                        newUser_TextField.isEditable    = true
+                        updateHomeDir_button.isEnabled  = true
+                        updateHomeDir_button.isHidden   = false
+                    }
+                case "-userType":
+                    userType                        = CommandLine.arguments[i+1]
                 default:
                     print("unknown switch passed: \(CommandLine.arguments[i])")
                 }
             }
         }
-        self.view.layer?.backgroundColor = CGColor(red: 0xF2/255.0, green: 0xF2/255.0, blue: 0xF2/255.0, alpha: 1.0)
+
 //      Make sure the window is not restorable, to get the cursor in the username field
         NSApplication.shared.mainWindow?.makeFirstResponder(newUser_TextField)
         
