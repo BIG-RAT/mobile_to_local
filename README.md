@@ -67,7 +67,16 @@ The local account retains the uniqueID of the mobile account, this removes the n
 To allow the user to change their login name launch the app with the -allowNewUsername switch:
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -allowNewUsername true```
+
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/nameChange.png "nameChange")
+
+To specify the type of local account to create use the -userType switch:
+
+```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -userType admin```
+
+The switches can be used together (order doesn't matter):
+
+```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -allowNewUsername true -userType admin```
 
 
 Thanks for aiding in the project:
