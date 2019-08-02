@@ -75,8 +75,8 @@ fi
 #    xxd -plain -revert "/tmp/$currentName.hex" > "/tmp/$currentName.png")
 
 ## unbind
-/usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
-/bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
+#/usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
+#/bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
 
 ## remove .accounts file if present
 /bin/rm -f "/Users/${currentName}/.account" || true
