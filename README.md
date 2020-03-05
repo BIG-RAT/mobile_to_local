@@ -5,7 +5,7 @@ Wanted to create an easy to use method to migrate mobile accounts to local accou
 
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/main.png "Mobile to Local")
 
-Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/download/v2.0.0/Mobile.to.Local_v2.0.0.zip)
+Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/download/current/Mobile.to.Local_v2.0.0.zip)
 
 The app should be launched with elevated privileges:
 
