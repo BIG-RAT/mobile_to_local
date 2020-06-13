@@ -31,6 +31,8 @@ class ViewController: NSViewController {
     var errorResult = [String]()
     var exitResult:Int32 = 0
     
+    var unbind = "true"
+    
     let userDefaults = UserDefaults.standard
     // determine if we're using dark mode
     var isDarkMode: Bool {
@@ -40,7 +42,7 @@ class ViewController: NSViewController {
 
     @IBAction func migrate(_ sender: Any) {
         var allowedCharacters = CharacterSet.alphanumerics
-        allowedCharacters.insert(charactersIn: "-_")
+        allowedCharacters.insert(charactersIn: "-_.")
         newUser = newUser_TextField.stringValue
         if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
             alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
@@ -52,7 +54,7 @@ class ViewController: NSViewController {
         if exitResult == 0 {
 //            if verifyPassword == 0 {
 //            let migrateCommand = "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(updateHomeDir_button.state)"
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType)
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
 //            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", migrateCommand)
 //            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
             switch exitResult {
@@ -248,6 +250,10 @@ class ViewController: NSViewController {
                     }
                 case "-userType":
                     userType                        = CommandLine.arguments[i+1]
+                case "-unbind":
+                    if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
+                        unbind = "false"
+                    }
                 default:
                     print("unknown switch passed: \(CommandLine.arguments[i])")
                 }
