@@ -5,6 +5,7 @@
 ## $2 - password for user
 ## $3 - indicate if we're changing the home directory name; 0 - no change, 1 - change
 ## $4 - type of user to create; standard or admin
+## $5 - whether or not to unbind
 
 log() {
     /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> /var/log/jamf.log
@@ -58,6 +59,9 @@ renameHomeDir="$3"
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
 userType="$4"
 
+## set the unbind var; 'true' or 'false'
+unbind="$5"
+
 "$jamfH" -windowType fs -iconSize 512 -icon /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns -description "Completing account migration.  This process may take a few minutes, please stand by..." -alignDescription center -startlaunchd &
 
 sleep 1
@@ -74,9 +78,11 @@ fi
 #    JpegPhoto=$(dscl . -read "/Users/$currentName" JPEGPhoto > "/tmp/$currentName.hex"
 #    xxd -plain -revert "/tmp/$currentName.hex" > "/tmp/$currentName.png")
 
+if [ "$unbind" == "true" ];then
 ## unbind
-#/usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
-#/bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
+    /usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
+    /bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
+fi
 
 ## remove .accounts file if present
 /bin/rm -f "/Users/${currentName}/.account" || true
