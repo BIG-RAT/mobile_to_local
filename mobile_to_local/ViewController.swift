@@ -20,6 +20,9 @@ class ViewController: NSViewController {
     var newUser                = ""
     var userType               = ""
     
+    // OS version info
+    let os = ProcessInfo().operatingSystemVersion
+    
     let fm = FileManager()
     let migrationScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/mobileToLocal.sh"
     let passCheckScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/passCheck.sh"
@@ -52,11 +55,9 @@ class ViewController: NSViewController {
 //        let verifyPassword = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")[0] as! Int32
 
         if exitResult == 0 {
-//            if verifyPassword == 0 {
-//            let migrateCommand = "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(updateHomeDir_button.state)"
+            
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
-//            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", migrateCommand)
-//            let result = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"'")[0] as! Int32
+
             switch exitResult {
             case 0:
                 writeToLog(theMessage: "successfully migrated account.")
@@ -152,7 +153,7 @@ class ViewController: NSViewController {
         self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
         
         // OS version info
-        let os = ProcessInfo().operatingSystemVersion
+//        let os = ProcessInfo().operatingSystemVersion
 
         if os.minorVersion >= 14 {
 //            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
@@ -245,11 +246,16 @@ class ViewController: NSViewController {
                 case "-allowNewUsername":
                     if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
                         newUser_TextField.isEditable    = true
-                        updateHomeDir_button.isEnabled  = true
-                        updateHomeDir_button.isHidden   = false
+                        // Privacy restrictions are preventing changing NSHomeDirectory in 10.15 and above
+                        if os.minorVersion < 14 {
+                            DispatchQueue.main.async {
+                                self.updateHomeDir_button.isEnabled = true
+                                self.updateHomeDir_button.isHidden  = false
+                            }
+                        }
                     }
                 case "-userType":
-                    userType                        = CommandLine.arguments[i+1]
+                    userType = CommandLine.arguments[i+1]
                 case "-unbind":
                     if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                         unbind = "false"
