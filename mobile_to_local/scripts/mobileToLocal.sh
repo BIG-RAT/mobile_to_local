@@ -1,11 +1,13 @@
 #!/bin/bash
 
+## set -x
+
 ## passed variables
 ## $1 - new username
 ## $2 - password for user
 ## $3 - indicate if we're changing the home directory name; 0 - no change, 1 - change
 ## $4 - type of user to create; standard or admin
-## $5 - whether or not to unbind
+## $5 - whether or not to unbind - true or false
 
 log() {
     /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> /var/log/jamf.log
@@ -43,10 +45,10 @@ if [ "${mobileUserCheck}" = "" ];then
 fi
 
 ## verify we're either keeping the same username or new name doesn't exist
-nameCheck=$(dscl . -read "/Users/$newName" RealName &> /dev/null;echo $?)
-if [ "$nameCheck" = "0" ] && [ ! "$newName" = "$currentName" ];then
+nameCheck=$(dscl . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
+if [ "$nameCheck" = "0" ] && [ ! "${newName}" = "${currentName}" ];then
     ## account already exists and belongs to a different user
-    log "$newName belongs to another user."
+    log "${newName} belongs to another user."
     exit 500
 fi
 
@@ -55,14 +57,38 @@ password="$2"
 
 ## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
 renameHomeDir="$3"
+if [ "${renameHomeDir}" = "1" ];then
+    log "Home directory will be renamed"
+else
+    log "Home directory will not be renamed"
+fi
+
 
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
 userType="$4"
+if [ "${userType}" = "standatd" ];then
+    log "User will be migrated as a $userType user"
+else
+    log "User will be migrated as an $userType user"
+fi
 
 ## set the unbind var; 'true' or 'false'
 unbind="$5"
+if [ "${unbind}" = "true" ];then
+    log "machine will be unbound from Active Directory"
+else
+    log "no change to current bind status will be performed"
+fi
 
-"$jamfH" -windowType fs -iconSize 512 -icon /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns -description "Completing account migration.  This process may take a few minutes, please stand by..." -alignDescription center -startlaunchd &
+## define icon location
+if [ -e /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns ];then
+    theIcon="/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
+else
+    theIcon="/System/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
+fi
+
+## lock the screen with JamfHelper
+"$jamfH" -windowType fs -iconSize 512 -icon "${theIcon}" -description "Completing account migration.  This process may take a few minutes, please stand by..." -alignDescription center -startlaunchd &
 
 sleep 1
 
@@ -80,11 +106,12 @@ fi
 
 if [ "$unbind" == "true" ];then
 ## unbind
+    log "performing machine unbind"
     /usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
     /bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
 fi
 
-## remove .accounts file if present
+## remove .account file if present
 /bin/rm -f "/Users/${currentName}/.account" || true
 
 aa=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
@@ -110,7 +137,8 @@ echo "opendirectoryd restarted with pid $pid"
 
 
 ## export updated AuthenticationAuthority for the account
-localAuthenticationAuthority=$($dsclBin . -read /Users/"${currentName}" AuthenticationAuthority)
+log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
+## localAuthenticationAuthority=$($dsclBin . -read /Users/"${currentName}" AuthenticationAuthority)
 log "AuthenticationAuthority for local account:"
 localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
 log "${localAuthenticationAuthority}"
@@ -156,20 +184,32 @@ fi
 
 ## if we changed shortnames update the RecordName attribute and add the old name as an alias
 if [ "${newName}" != "${currentName}" ];then
-    log "login name has changed"
-    log "Changing the Record name to ${newName}"
-    $dsclBin . -change "/Users/${currentName}" RecordName "${currentName} ${newName}"
+    ## get current home directory
+    homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
+    log "Current home directory: ${homeDir}"
+    
+    log "Change in login name has been requested"
+    log "Changing the Record name from ${currentName} to ${newName}"
+    $dsclBin . -change "/Users/${currentName}" RecordName "${currentName}" "${newName}"
     log "adding alias for old username: ${currentName}"
     $dsclBin . -append "/Users/${newName}" RecordName "${currentName}"
     if [ "${renameHomeDir}" = "1" ];then
-        log "setting home directory to /Users/${newName}"
-        $dsclBin . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
-        mv "${homeDir}" "/Users/${newName}"
+        log "Moving (renaming) current home directory ${homeDir} to /Users/${newName}"
+        /bin/mv "${homeDir}" "/Users/${newName}"
+        
+        ##log "killing jamfHelper for home directory change"
+        ##sudo killall jamfHelper
+        
+        log "setting home directory (NFSHomeDirectory) to /Users/${newName}"
+        ##log "$dsclBin . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"${homeDir}\""
+        ##$dsclBin . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "${homeDir}"
+        ##sleep 1
+        log "$dsclBin . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"/Users/${newName}\""
+        $dsclBin -u "${currentName}" -P "${password}" . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
     fi
 fi
 
 log "killing jamfHelper and loginwindow"
-
 sudo killall jamfHelper
 
 loggedInUser=$(stat -f%Su /dev/console)
