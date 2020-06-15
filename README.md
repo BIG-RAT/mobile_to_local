@@ -1,5 +1,6 @@
 # Mobile to Local
-Migrate mobile Active Directory account to a local account:
+Migrate mobile Active Directory account to a local account.<br>
+Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/download/current/Mobile.to.Local.zip)
 
 Wanted to create an easy to use method to migrate mobile accounts to local accounts.  One item in particular I wanted to address was ensuring a FileVault 2 enabled mobile account was migrated to a FileVault 2 enabled local account and have arrived at the following.
 
