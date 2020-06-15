@@ -99,7 +99,8 @@ The switches can be used together (order doesn't matter):
 Create a script with the desired options to launch the app (located in /Applications/Utilities).  You'll have to already deployed the app of course.
 
 Create an ongoing policy with no triggers.  Make the policy available in Self Service, scoped appropriately, perhaps to machines that report as bound to Active Directory.
-
+ <hr>
+ 
 Thanks for aiding in the project:
 * @matthewsphillips
 * @ryanslater_uk
