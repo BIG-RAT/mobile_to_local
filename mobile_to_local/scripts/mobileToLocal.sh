@@ -66,7 +66,7 @@ fi
 
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
 userType="$4"
-if [ "${userType}" = "standatd" ];then
+if [ "${userType}" = "standard" ];then
     log "User will be migrated as a $userType user"
 else
     log "User will be migrated as an $userType user"
