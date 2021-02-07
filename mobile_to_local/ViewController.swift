@@ -33,7 +33,8 @@ class ViewController: NSViewController {
     var shellResult = [String]()
     var errorResult = [String]()
     var exitResult:Int32 = 0
-    
+
+    var silent = false
     var unbind = "true"
     
     let userDefaults = UserDefaults.standard
@@ -58,21 +59,22 @@ class ViewController: NSViewController {
             
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
 
-            switch exitResult {
-            case 0:
-                writeToLog(theMessage: "successfully migrated account.")
-                NSApplication.shared.terminate(self)
-            case 244:
-                alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
-                return
-            case 232:
-                alert_dialog(header: "Alert", message: "You are not logged in with a mobile account.")
-                NSApplication.shared.terminate(self)
-            default:
-                alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
-                return
-                
-            }
+//            switch exitResult {
+//            case 0:
+//                writeToLog(theMessage: "successfully migrated account.")
+//                NSApplication.shared.terminate(self)
+//            case 244:
+//                alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
+//                return
+//            case 232:
+//                alert_dialog(header: "Alert", message: "You are not logged in with a mobile account.")
+//                NSApplication.shared.terminate(self)
+//            default:
+//                alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
+//                return
+//
+//            }
+            logMigrationResult(exitValue: exitResult)
         } else {
             alert_dialog(header: "Alert", message: "Unable to verify password.")
             return
@@ -104,6 +106,38 @@ class ViewController: NSViewController {
         let stringDate = date_formatter.string(from: date)
         
         return stringDate
+    }
+
+    func logMigrationResult(exitValue: Int32) {
+        switch exitValue {
+        case 0:
+            writeToLog(theMessage: "successfully migrated account.")
+            NSApplication.shared.terminate(self)
+        case 244:
+            writeToLog(theMessage: "Account \(newUser) already exists and belongs to another user.")
+            if !silent {
+                alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
+            } else {
+                NSApplication.shared.terminate(self)
+            }
+            return
+        case 232:
+            writeToLog(theMessage: "You are not logged in with a mobile account: \(newUser)")
+            if !silent {
+                alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(newUser)")
+            } else {
+                NSApplication.shared.terminate(self)
+            }
+            NSApplication.shared.terminate(self)
+        default:
+            writeToLog(theMessage: "An unknown error has occured: \(exitResult).")
+            if !silent {
+                alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
+            } else {
+                NSApplication.shared.terminate(self)
+            }
+            return
+        }
     }
     
     func shell(cmd: String, args: String...) -> (exitCode: Int32, errorStatus: [String], localResult: [String]) {
@@ -150,19 +184,65 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
-        
-        // OS version info
-//        let os = ProcessInfo().operatingSystemVersion
+        // read commandline args
+        var numberOfArgs = 0
 
-        if os.minorVersion >= 14 {
-//            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+        //        debug = true
+
+        numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
+        if numberOfArgs > 0 {
+            if (numberOfArgs % 2) == 0 {
+                print("correct number of arguments")
+            } else {
+                alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
+                NSApplication.shared.terminate(self)
+            }
+
+            for i in stride(from: 1, through: numberOfArgs, by: 2) {
+                //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
+                switch CommandLine.arguments[i] {
+                case "-allowNewUsername":
+                    if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
+                        newUser_TextField.isEditable    = true
+                        // Privacy restrictions are preventing changing NSHomeDirectory in 10.15 and above
+                        if os.majorVersion == 10 && os.minorVersion < 14 {
+                            DispatchQueue.main.async {
+                                self.updateHomeDir_button.isEnabled = true
+                                self.updateHomeDir_button.isHidden  = false
+                            }
+                        }
+                    }
+                case "-mode":
+                    if (CommandLine.arguments[i+1].lowercased() == "silent") {
+                        silent = true
+                        // hide the app UI
+                        NSApplication.shared.mainWindow?.setIsVisible(false)
+                    }
+                case "-userType":
+                    userType = CommandLine.arguments[i+1]
+                case "-unbind":
+                    if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
+                        unbind = "false"
+                    }
+                default:
+                    print("unknown switch passed: \(CommandLine.arguments[i])")
+                }
+            }
+        }
+
+        if !silent {
+            // hide the dock icon
+            NSApp.setActivationPolicy(.regular)
         }
         
+        self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+
+//        if os.minorVersion >= 14 {
+//            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+//        }
+        
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
-//        let userArray = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")[1] as! [String]
         newUser = shellResult[0]
-//        newUser = userArray[0]
         newUser_TextField.stringValue = newUser
         
         
@@ -182,9 +262,9 @@ class ViewController: NSViewController {
         if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
             loggedInUserArray.remove(at: index)
         }
-//        let loggedInUserCountArray = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq | wc -l")[1] as! [String]
+
         let loggedInUserCount = loggedInUserArray.count
-//        let loggedInUserCount = Int(loggedInUserCountArray[0].replacingOccurrences(of: " ", with: ""))
+
         if loggedInUserCount > 1 {
             NSApplication.shared.mainWindow?.setIsVisible(false)
             writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
@@ -197,18 +277,16 @@ class ViewController: NSViewController {
         
         // Verify we're not logged in with a local account
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard")
-//        let dsclLookup = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" UniqueID | awk '/: / {print $2}'")
+
         let accountTypeArray = shellResult
-//        let accountIdArray = dsclLookup[1] as! [String]
+
         if accountTypeArray.count != 0 {
-//            let accountType = accountTypeArray[0] {
                 if accountTypeArray[0] == "" {
                     NSApplication.shared.mainWindow?.setIsVisible(false)
                     writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
                     alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
                     NSApplication.shared.terminate(self)
                 }
-//            }   // if let accountId = Int32(accountIdArray[0]) - end
         } else {
             NSApplication.shared.mainWindow?.setIsVisible(false)
             writeToLog(theMessage: "\(errorResult[0])")
@@ -217,6 +295,14 @@ class ViewController: NSViewController {
             NSApplication.shared.terminate(self)
         }
         // Do any additional setup after loading the view.
+
+        if silent {
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind+" \(silent)")
+
+            logMigrationResult(exitValue: exitResult)
+
+            NSApplication.shared.terminate(self)
+        }
     }
     
     override var representedObject: Any? {
@@ -224,47 +310,24 @@ class ViewController: NSViewController {
             // Update the view, if already loaded.
         }
     }
+
+
+//    override func viewWillAppear() {
+//        if silent {
+//            print("value of silent: \(silent)")
+//            print("running silently")
+//            // hide the app UI
+//            NSApplication.shared.mainWindow?.setIsVisible(false)
+//
+//            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind+" \(silent)")
+//
+//            logMigrationResult(exitValue: exitResult)
+//
+//            NSApplication.shared.terminate(self)
+//        }
+//    }
     
     override func viewDidAppear() {
-        // read commandline args
-        var numberOfArgs = 0
-        
-        //        debug = true
-        
-        numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
-        if numberOfArgs > 0 {
-            if (numberOfArgs % 2) == 0 {
-                print("correct number of arguments")
-            } else {
-                alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
-                NSApplication.shared.terminate(self)
-            }
-            
-            for i in stride(from: 1, through: numberOfArgs, by: 2) {
-                //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
-                switch CommandLine.arguments[i] {
-                case "-allowNewUsername":
-                    if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
-                        newUser_TextField.isEditable    = true
-                        // Privacy restrictions are preventing changing NSHomeDirectory in 10.15 and above
-                        if os.minorVersion < 14 {
-                            DispatchQueue.main.async {
-                                self.updateHomeDir_button.isEnabled = true
-                                self.updateHomeDir_button.isHidden  = false
-                            }
-                        }
-                    }
-                case "-userType":
-                    userType = CommandLine.arguments[i+1]
-                case "-unbind":
-                    if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
-                        unbind = "false"
-                    }
-                default:
-                    print("unknown switch passed: \(CommandLine.arguments[i])")
-                }
-            }
-        }
 
 //      Make sure the window is not restorable, to get the cursor in the username field
         NSApplication.shared.mainWindow?.makeFirstResponder(newUser_TextField)

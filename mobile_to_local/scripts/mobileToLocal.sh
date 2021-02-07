@@ -8,6 +8,7 @@
 ## $3 - indicate if we're changing the home directory name; 0 - no change, 1 - change
 ## $4 - type of user to create; standard or admin
 ## $5 - whether or not to unbind - true or false
+## $6 - whether or not the app runs silently - true or false
 
 log() {
     /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> /var/log/jamf.log
@@ -27,10 +28,10 @@ fi
 ## grab the computer name to use in the log
 computerName=$(scutil --get ComputerName)
 
-## new new logon name
-newName="$1"
 ## get logged in user
 currentName=$(stat -f%Su /dev/console)
+## new new logon name
+newName="$1"
 
 ## check admin status
 isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
@@ -44,16 +45,18 @@ if [ "${mobileUserCheck}" = "" ];then
     exit 1000
 fi
 
-## verify we're either keeping the same username or new name doesn't exist
-nameCheck=$(dscl . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
-if [ "$nameCheck" = "0" ] && [ ! "${newName}" = "${currentName}" ];then
-    ## account already exists and belongs to a different user
-    log "${newName} belongs to another user."
-    exit 500
+if [ $6 != "true" ];then
+    ## verify we're either keeping the same username or new name doesn't exist
+    nameCheck=$(dscl . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
+    if [ "$nameCheck" = "0" ] && [ ! "${newName}" = "${currentName}" ];then
+        ## account already exists and belongs to a different user
+        log "${newName} belongs to another user."
+        exit 500
+    fi
+    password="$2"
 fi
 
 log "current user: ${currentName}"
-password="$2"
 
 ## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
 renameHomeDir="$3"
@@ -62,7 +65,6 @@ if [ "${renameHomeDir}" = "1" ];then
 else
     log "Home directory will not be renamed"
 fi
-
 
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
 userType="$4"
@@ -81,11 +83,13 @@ else
 fi
 
 ## define icon location
-if [ -e /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns ];then
-    theIcon="/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
-else
-    theIcon="/System/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
-fi
+#if [ -e /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns ];then
+#    theIcon="/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
+#elif [ -e /System/Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns ];then
+#    theIcon="/System/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
+#else
+theIcon="${BASH_SOURCE%/*}/../MigrateAsst.png"
+#fi
 
 ## lock the screen with JamfHelper
 "$jamfH" -windowType fs -iconSize 512 -icon "${theIcon}" -description "Completing account migration.  This process may take a few minutes, please stand by..." -alignDescription center -startlaunchd &
