@@ -27,8 +27,7 @@ class ViewController: NSViewController {
     
     let fm = FileManager()
     let migrationScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/mobileToLocal.sh"
-    let passCheckScript = Bundle.main.bundlePath+"/Contents/Resources/scripts/passCheck.sh"
-    
+
     let myNotification = Notification.Name(rawValue:"MyNotification")
     
     // variables used in shell function
@@ -47,46 +46,41 @@ class ViewController: NSViewController {
     }
 
     @IBAction func migrate(_ sender: Any) {
-            var allowedCharacters = CharacterSet.alphanumerics
-            allowedCharacters.insert(charactersIn: "-_.")
-            newUser = newUser_TextField.stringValue
-            if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
-                writeToLog(theMessage: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
-                alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
-                return
+        var allowedCharacters = CharacterSet.alphanumerics
+        allowedCharacters.insert(charactersIn: "-_.")
+        newUser = newUser_TextField.stringValue
+        if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
+            writeToLog(theMessage: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
+            alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
+            return
+        }
+
+        if authCheck(password: "\(password.stringValue)") {
+
+            writeToLog(theMessage: "Password verified.")
+
+            DispatchQueue.main.async {
+                self.completeMigration()
             }
 
+            showLockWindow()
 
-//        showLockWindow()
-        LockWindowController().show()
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")
+        } else {
+            writeToLog(theMessage: "Unable to verify password.")
+            alert_dialog(header: "Alert", message: "Unable to verify password.  Please re-enter your credentials.")
+            view.window?.makeKeyAndOrderFront(self)
+            return
+        }
+    }
 
-//            if exitResult == 0 {
-            if authCheck(password: "\(password.stringValue)") {
+    func completeMigration() {
+//        print("migration script - start")
 
-                let windowsCount = NSApp.windows.count
-                for i in (0..<windowsCount) {
-                    print("window name: "+NSApp.windows[i].title)
-                    if NSApp.windows[i].title == "Migrate" {
-                        NSApplication.shared.mainWindow?.setIsVisible(false)
-//                        NSApp.setActivationPolicy(.accessory)
-                        print("[ViewController][migrate] hide window \(NSApp.windows[i].title)")
-                        break
-                    }
-                }
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
 
-                writeToLog(theMessage: "Password verified.")
+//        print("migration script - end")
+        logMigrationResult(exitValue: exitResult)
 
-                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
-
-                        logMigrationResult(exitValue: exitResult)
-    //            }
-            } else {
-                writeToLog(theMessage: "Unable to verify password.")
-                alert_dialog(header: "Alert", message: "Unable to verify password.  Please re-enter your credentials.")
-                view.window?.makeKeyAndOrderFront(self)
-                return
-            }
     }
 
     @IBAction func cancel(_ sender: Any) {
@@ -205,19 +199,20 @@ class ViewController: NSViewController {
         return(exitStatus,errorStatus, localResult)
     }
 
-//    func showLockWindow() {
+    func showLockWindow() {
 //        print("[showLockWindow] enter function")
-//
-//        let storyboard = NSStoryboard(name: "Main", bundle: nil)
-//        let LockScreenController = storyboard.instantiateController(withIdentifier: "LockScreen") as! NSWindowController
-//        LockScreenController.showWindow(self)
+
+        let storyboard = NSStoryboard(name: "Main", bundle: nil)
+        let LockScreenWindowController = storyboard.instantiateController(withIdentifier: "LockScreen") as! NSWindowController
+        if let lockWindow = LockScreenWindowController.window {
+
+            let application = NSApplication.shared
+            application.runModal(for: lockWindow)
+            lockWindow.close()
+        }
+
 //        print("[showLockWindow] lock window shown")
-//    }
-//    func hideLockWindow() {
-//        print("[hideLockWindow] enter function")
-//        LockScreenController().hideScreen()
-//        print("[hideLockWindow] lock window closed")
-//    }
+    }
     
     func writeToLog(theMessage: String) {
         LogFileW?.seekToEndOfFile()
@@ -237,9 +232,8 @@ class ViewController: NSViewController {
 
         numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
         if numberOfArgs > 0 {
-            if (numberOfArgs % 2) == 0 {
-                print("correct number of arguments")
-            } else {
+            if (numberOfArgs % 2) != 0 {
+                writeToLog(theMessage: "Argument error occured - Contact IT for help.")
                 alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
                 NSApplication.shared.terminate(self)
             }
@@ -271,6 +265,7 @@ class ViewController: NSViewController {
                         unbind = "false"
                     }
                 default:
+                    writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
                     print("unknown switch passed: \(CommandLine.arguments[i])")
                 }
             }
@@ -279,75 +274,75 @@ class ViewController: NSViewController {
         // bring app to foreground
         NSApplication.shared.activate(ignoringOtherApps: true)
 
+        DispatchQueue.main.async { [self] in
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
+            newUser = shellResult[0]
+            newUser_TextField.stringValue = newUser
+
+            // Verify we're running with elevated privileges.
+            if NSUserName() != "root" {
+                NSApplication.shared.mainWindow?.setIsVisible(false)
+                alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
+                writeToLog(theMessage: "Assistant must be run with elevated privileges.")
+                NSApplication.shared.terminate(self)
+            }
+
+            // Verify we're the only account logged in - start
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq")
+            // remove blank entry in array
+            var loggedInUserArray = shellResult.dropLast()
+            if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
+                loggedInUserArray.remove(at: index)
+            }
+
+            let loggedInUserCount = loggedInUserArray.count
+
+            if loggedInUserCount > 1 {
+                NSApplication.shared.mainWindow?.setIsVisible(false)
+                writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
+                writeToLog(theMessage: "Logged in users: \(shellResult)")
+                alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
+                NSApplication.shared.terminate(self)
+            }
+            // Verify we're the only account logged in - end
+            writeToLog(theMessage: "No other logins detected.")
+
+
+            // Verify we're not logged in with a local account
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard")
+
+            let accountTypeArray = shellResult
+
+            if accountTypeArray.count != 0 {
+                    if accountTypeArray[0] == "" {
+                        NSApplication.shared.mainWindow?.setIsVisible(false)
+                        writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
+                        alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
+                        NSApplication.shared.terminate(self)
+                    }
+            } else {
+                NSApplication.shared.mainWindow?.setIsVisible(false)
+                writeToLog(theMessage: "\(errorResult[0])")
+                writeToLog(theMessage: "Unable to locate account information.  You may be logged in with a network managed account.")
+                alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
+                NSApplication.shared.terminate(self)
+            }
+            // Do any additional setup after loading the view.
+
+            if silent {
+                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind+" \(silent)")
+
+                logMigrationResult(exitValue: exitResult)
+
+                NSApplication.shared.terminate(self)
+            }
+        }
         if !silent {
             // show the dock icon
             NSApp.setActivationPolicy(.regular)
             self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
         } else {
-//            showLockWindow()
-            LockWindowController().show()
-        }
-        
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
-        newUser = shellResult[0]
-        newUser_TextField.stringValue = newUser
-
-        // Verify we're running with elevated privileges.
-        if NSUserName() != "root" {
-            NSApplication.shared.mainWindow?.setIsVisible(false)
-            alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
-            writeToLog(theMessage: "Assistant must be run with elevated privileges.")
-            NSApplication.shared.terminate(self)
-        }
-        
-        // Verify we're the only account logged in - start
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq")
-        // remove blank entry in array
-        var loggedInUserArray = shellResult.dropLast()
-        if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
-            loggedInUserArray.remove(at: index)
-        }
-
-        let loggedInUserCount = loggedInUserArray.count
-
-        if loggedInUserCount > 1 {
-            NSApplication.shared.mainWindow?.setIsVisible(false)
-            writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
-            writeToLog(theMessage: "Logged in users: \(shellResult)")
-            alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
-            NSApplication.shared.terminate(self)
-        }
-        // Verify we're the only account logged in - end
-        writeToLog(theMessage: "No other logins detected.")
-
-        
-        // Verify we're not logged in with a local account
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard")
-
-        let accountTypeArray = shellResult
-
-        if accountTypeArray.count != 0 {
-                if accountTypeArray[0] == "" {
-                    NSApplication.shared.mainWindow?.setIsVisible(false)
-                    writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
-                    alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
-                    NSApplication.shared.terminate(self)
-                }
-        } else {
-            NSApplication.shared.mainWindow?.setIsVisible(false)
-            writeToLog(theMessage: "\(errorResult[0])")
-            writeToLog(theMessage: "Unable to locate account information.  You may be logged in with a network managed account.")
-            alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
-            NSApplication.shared.terminate(self)
-        }
-        // Do any additional setup after loading the view.
-
-        if silent {
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind+" \(silent)")
-
-            logMigrationResult(exitValue: exitResult)
-
-            NSApplication.shared.terminate(self)
+            self.showLockWindow()
         }
     }
     
@@ -356,22 +351,6 @@ class ViewController: NSViewController {
             // Update the view, if already loaded.
         }
     }
-
-
-//    override func viewWillAppear() {
-//        if silent {
-//            print("value of silent: \(silent)")
-//            print("running silently")
-//            // hide the app UI
-//            NSApplication.shared.mainWindow?.setIsVisible(false)
-//
-//            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind+" \(silent)")
-//
-//            logMigrationResult(exitValue: exitResult)
-//
-//            NSApplication.shared.terminate(self)
-//        }
-//    }
     
     override func viewDidAppear() {
 
