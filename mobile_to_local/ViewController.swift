@@ -9,6 +9,8 @@
 import AppKit
 import Cocoa
 import Foundation
+import OpenDirectory
+import SystemConfiguration
 
 class ViewController: NSViewController {
     
@@ -45,40 +47,46 @@ class ViewController: NSViewController {
     }
 
     @IBAction func migrate(_ sender: Any) {
-        var allowedCharacters = CharacterSet.alphanumerics
-        allowedCharacters.insert(charactersIn: "-_.")
-        newUser = newUser_TextField.stringValue
-        if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
-            alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
-            return
-        }
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")
-//        let verifyPassword = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")[0] as! Int32
+            var allowedCharacters = CharacterSet.alphanumerics
+            allowedCharacters.insert(charactersIn: "-_.")
+            newUser = newUser_TextField.stringValue
+            if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
+                writeToLog(theMessage: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
+                alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
+                return
+            }
 
-        if exitResult == 0 {
-            
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
 
-//            switch exitResult {
-//            case 0:
-//                writeToLog(theMessage: "successfully migrated account.")
-//                NSApplication.shared.terminate(self)
-//            case 244:
-//                alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
-//                return
-//            case 232:
-//                alert_dialog(header: "Alert", message: "You are not logged in with a mobile account.")
-//                NSApplication.shared.terminate(self)
-//            default:
-//                alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
-//                return
-//
-//            }
-            logMigrationResult(exitValue: exitResult)
-        } else {
-            alert_dialog(header: "Alert", message: "Unable to verify password.")
-            return
-        }
+//        showLockWindow()
+        LockWindowController().show()
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+passCheckScript+"' '"+password.stringValue+"'")
+
+//            if exitResult == 0 {
+            if authCheck(password: "\(password.stringValue)") {
+
+                let windowsCount = NSApp.windows.count
+                for i in (0..<windowsCount) {
+                    print("window name: "+NSApp.windows[i].title)
+                    if NSApp.windows[i].title == "Migrate" {
+                        NSApplication.shared.mainWindow?.setIsVisible(false)
+//                        NSApp.setActivationPolicy(.accessory)
+                        print("[ViewController][migrate] hide window \(NSApp.windows[i].title)")
+                        break
+                    }
+                }
+
+                writeToLog(theMessage: "Password verified.")
+
+                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
+
+                        logMigrationResult(exitValue: exitResult)
+    //            }
+            } else {
+                writeToLog(theMessage: "Unable to verify password.")
+                alert_dialog(header: "Alert", message: "Unable to verify password.  Please re-enter your credentials.")
+                view.window?.makeKeyAndOrderFront(self)
+                return
+            }
     }
 
     @IBAction func cancel(_ sender: Any) {
@@ -94,6 +102,31 @@ class ViewController: NSViewController {
         dialog.runModal()
         //return true
     }   // func alert_dialog - end
+
+    func authCheck(password: String) -> Bool {
+        do {
+            var uid: uid_t = 0
+            var gid: gid_t = 0
+            var username = ""
+
+            if let theResult = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid) {
+                username     = "\(theResult)"
+            } else {
+                writeToLog(theMessage: "Unable to identify logged in user.")
+                view.wantsLayer = true
+                return false
+            }
+
+            writeToLog(theMessage: "Verifying authentication for: \(username)")
+            let session = ODSession()
+            let node = try ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes))
+            let record = try node.record(withRecordType: kODRecordTypeUsers, name: username, attributes: nil)
+            try record.verifyPassword(password)
+            return true
+        } catch {
+            return false
+        }
+    }
     
     func getDateTime(x: Int8) -> String {
         let date = Date()
@@ -172,6 +205,19 @@ class ViewController: NSViewController {
         return(exitStatus,errorStatus, localResult)
     }
 
+//    func showLockWindow() {
+//        print("[showLockWindow] enter function")
+//
+//        let storyboard = NSStoryboard(name: "Main", bundle: nil)
+//        let LockScreenController = storyboard.instantiateController(withIdentifier: "LockScreen") as! NSWindowController
+//        LockScreenController.showWindow(self)
+//        print("[showLockWindow] lock window shown")
+//    }
+//    func hideLockWindow() {
+//        print("[hideLockWindow] enter function")
+//        LockScreenController().hideScreen()
+//        print("[hideLockWindow] lock window closed")
+//    }
     
     func writeToLog(theMessage: String) {
         LogFileW?.seekToEndOfFile()
@@ -230,23 +276,22 @@ class ViewController: NSViewController {
             }
         }
 
-        if !silent {
-            // hide the dock icon
-            NSApp.setActivationPolicy(.regular)
-        }
-        
-        self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+        // bring app to foreground
+        NSApplication.shared.activate(ignoringOtherApps: true)
 
-//        if os.minorVersion >= 14 {
-//            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
-//        }
+        if !silent {
+            // show the dock icon
+            NSApp.setActivationPolicy(.regular)
+            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+        } else {
+//            showLockWindow()
+            LockWindowController().show()
+        }
         
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
         newUser = shellResult[0]
         newUser_TextField.stringValue = newUser
-        
-        
-        NSApplication.shared.activate(ignoringOtherApps: true)
+
         // Verify we're running with elevated privileges.
         if NSUserName() != "root" {
             NSApplication.shared.mainWindow?.setIsVisible(false)
@@ -273,6 +318,7 @@ class ViewController: NSViewController {
             NSApplication.shared.terminate(self)
         }
         // Verify we're the only account logged in - end
+        writeToLog(theMessage: "No other logins detected.")
 
         
         // Verify we're not logged in with a local account
