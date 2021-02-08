@@ -74,7 +74,8 @@ Available switches that can be passed:
 <pre>
 -allowNewUsername: whether or not to allow the user to change their current shortname.  Either true of false.
         -userType: type of account to migrate to.  Either standard or admin.
-          -unbind: whether or not to unbind after migrating.  Either true of false.
+          -unbind: whether or not to unbind after migrating.  Either true or false.
+            -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
 </pre>
 
 #### Examples:
@@ -89,6 +90,10 @@ Note, for macOS 10.14 and above the user home directory will not be renamed when
 To specify the type of local account to create and unbind the machine from Active Directory use the -userType and -unbind switches:
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -userType admin -unbind true```
+
+To migrate a mobile account to local and set them as a standard user:
+
+```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -mode silent -userType standard```
 
 The switches can be used together (order doesn't matter):
 
