@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B5604F2625D066CB0043DFBD /* LockWindow.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B5604F2525D066CB0043DFBD /* LockWindow.storyboard */; };
+		B579195D25D0769500387324 /* LockViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B579195C25D0769500387324 /* LockViewController.swift */; };
+		B579196C25D0F8F900387324 /* LockScreenController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B579196B25D0F8F900387324 /* LockScreenController.swift */; };
+		B5B29E9E25D06C8F00CAFA67 /* LockWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B29E9D25D06C8F00CAFA67 /* LockWindowController.swift */; };
 		B5CA1ACC2090CE0F00C81085 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */; };
 		B5CA1ACE2090CE0F00C81085 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5CA1ACD2090CE0F00C81085 /* ViewController.swift */; };
 		B5CA1AD02090CE0F00C81085 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1ACF2090CE0F00C81085 /* Assets.xcassets */; };
@@ -18,6 +22,10 @@
 
 /* Begin PBXFileReference section */
 		B53AD9D422E1EC7E00C7CD02 /* Mobile to Local.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Mobile to Local.entitlements"; sourceTree = "<group>"; };
+		B5604F2525D066CB0043DFBD /* LockWindow.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LockWindow.storyboard; sourceTree = "<group>"; };
+		B579195C25D0769500387324 /* LockViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockViewController.swift; sourceTree = "<group>"; };
+		B579196B25D0F8F900387324 /* LockScreenController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockScreenController.swift; sourceTree = "<group>"; };
+		B5B29E9D25D06C8F00CAFA67 /* LockWindowController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LockWindowController.swift; sourceTree = "<group>"; };
 		B5CA1AC82090CE0F00C81085 /* Mobile to Local.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Mobile to Local.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B5CA1ACD2090CE0F00C81085 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -40,6 +48,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		B5604F2425D0669D0043DFBD /* LockWindow */ = {
+			isa = PBXGroup;
+			children = (
+				B5604F2525D066CB0043DFBD /* LockWindow.storyboard */,
+				B5B29E9D25D06C8F00CAFA67 /* LockWindowController.swift */,
+				B579195C25D0769500387324 /* LockViewController.swift */,
+			);
+			path = LockWindow;
+			sourceTree = "<group>";
+		};
 		B5CA1ABF2090CE0F00C81085 = {
 			isa = PBXGroup;
 			children = (
@@ -60,7 +78,9 @@
 		B5CA1ACA2090CE0F00C81085 /* mobile_to_local */ = {
 			isa = PBXGroup;
 			children = (
+				B5604F2425D0669D0043DFBD /* LockWindow */,
 				B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */,
+				B579196B25D0F8F900387324 /* LockScreenController.swift */,
 				B5CA1ACD2090CE0F00C81085 /* ViewController.swift */,
 				B5CA1ACF2090CE0F00C81085 /* Assets.xcassets */,
 				B5CA1AD12090CE0F00C81085 /* Main.storyboard */,
@@ -142,6 +162,7 @@
 				B5CA1ADB2090CF4D00C81085 /* scripts in Resources */,
 				B5CA1AE12091215700C81085 /* logo.png in Resources */,
 				B5CA1AD02090CE0F00C81085 /* Assets.xcassets in Resources */,
+				B5604F2625D066CB0043DFBD /* LockWindow.storyboard in Resources */,
 				B5CA1ADF209120EA00C81085 /* MigrateAsst.png in Resources */,
 				B5CA1AD32090CE0F00C81085 /* Main.storyboard in Resources */,
 			);
@@ -155,7 +176,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5CA1ACE2090CE0F00C81085 /* ViewController.swift in Sources */,
+				B579196C25D0F8F900387324 /* LockScreenController.swift in Sources */,
+				B5B29E9E25D06C8F00CAFA67 /* LockWindowController.swift in Sources */,
 				B5CA1ACC2090CE0F00C81085 /* AppDelegate.swift in Sources */,
+				B579195D25D0769500387324 /* LockViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

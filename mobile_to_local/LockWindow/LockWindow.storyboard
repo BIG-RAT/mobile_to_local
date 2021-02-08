@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="YsY-be-U7v">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Window Controller-->
+        <scene sceneID="SHh-Xb-Iry">
+            <objects>
+                <windowController storyboardIdentifier="LockWindow" id="YsY-be-U7v" customClass="LockWindowController" customModule="Mobile_to_Local" customModuleProvider="target" sceneMemberID="viewController">
+                    <window key="window" title="LockWindow" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" hasShadow="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="CIb-KP-l9p">
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="1406" y="1212" width="37" height="12"/>
+                        <rect key="screenRect" x="669" y="900" width="1920" height="1057"/>
+                        <view key="contentView" hidden="YES" id="9MC-pc-pg6">
+                            <rect key="frame" x="0.0" y="0.0" width="37" height="12"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="YsY-be-U7v" id="iFK-zi-hMw"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="3z0-cc-D0d" kind="relationship" relationship="window.shadowedContentViewController" id="vYv-Wk-Dha"/>
+                    </connections>
+                </windowController>
+                <customObject id="fqE-kE-WMf" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="340.5" y="-63"/>
+        </scene>
+        <!--Lock View Controller-->
+        <scene sceneID="a7a-hT-XHH">
+            <objects>
+                <viewController id="3z0-cc-D0d" customClass="LockViewController" customModule="Mobile_to_Local" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="fK1-mE-Upk">
+                        <rect key="frame" x="0.0" y="0.0" width="609" height="270"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cEk-Bg-KAP">
+                                <rect key="frame" x="241" y="71" width="128" height="128"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="128" id="W7N-G9-rlR"/>
+                                    <constraint firstAttribute="height" constant="128" id="rjL-WQ-dqy"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="MigrateAsst" id="Mf6-GY-M3I"/>
+                            </imageView>
+                            <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="v36-Ia-jMJ">
+                                <rect key="frame" x="18" y="20" width="573" height="43"/>
+                                <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" id="vI1-1K-fwB">
+                                    <font key="font" metaFont="system" size="16"/>
+                                    <string key="title">Completing account migration.  
+This process may take a few minutes, please stand by...</string>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="cEk-Bg-KAP" firstAttribute="centerX" secondItem="fK1-mE-Upk" secondAttribute="centerX" id="33a-Fq-HwE"/>
+                            <constraint firstItem="v36-Ia-jMJ" firstAttribute="top" secondItem="cEk-Bg-KAP" secondAttribute="bottom" constant="8" id="8jU-g8-Sy9"/>
+                            <constraint firstAttribute="trailing" secondItem="v36-Ia-jMJ" secondAttribute="trailing" constant="20" id="LaG-dI-pzF"/>
+                            <constraint firstItem="cEk-Bg-KAP" firstAttribute="centerX" secondItem="fK1-mE-Upk" secondAttribute="centerX" id="SKN-dn-sdB"/>
+                            <constraint firstItem="cEk-Bg-KAP" firstAttribute="centerY" secondItem="fK1-mE-Upk" secondAttribute="centerY" id="YFs-CJ-55M"/>
+                            <constraint firstItem="v36-Ia-jMJ" firstAttribute="leading" secondItem="fK1-mE-Upk" secondAttribute="leading" constant="20" id="sOK-RZ-IhK"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="jbg-q3-JOW" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="825.5" y="40"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="MigrateAsst" width="256" height="256"/>
+    </resources>
+</document>

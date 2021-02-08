@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="16096"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17156"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -254,20 +254,6 @@ Gw
                                     <action selector="cancel:" target="XfG-lQ-9wD" id="66u-tF-uJu"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="efA-ce-JpW">
-                                <rect key="frame" x="408" y="9" width="87" height="32"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="push" title="Migrate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="wPz-hf-ty4">
-                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                    <string key="keyEquivalent" base64-UTF8="YES">
-DQ
-</string>
-                                </buttonCell>
-                                <connections>
-                                    <action selector="migrate:" target="XfG-lQ-9wD" id="PEE-DI-Ezx"/>
-                                </connections>
-                            </button>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JoB-f9-LF3">
                                 <rect key="frame" x="117" y="134" width="376" height="76"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
@@ -298,7 +284,28 @@ Click migrate to convert your mobile account to a local one.</string>
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                             </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MKp-LH-sXa">
+                                <rect key="frame" x="412" y="9" width="87" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="75" id="P1X-08-AZX"/>
+                                    <constraint firstAttribute="height" constant="21" id="ZsU-Q3-7xz"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" title="Migrate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6XM-7M-6j4">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                    <string key="keyEquivalent" base64-UTF8="YES">
+DQ
+</string>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="migrate:" target="XfG-lQ-9wD" id="zrV-GD-EYZ"/>
+                                </connections>
+                            </button>
                         </subviews>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="MKp-LH-sXa" secondAttribute="bottom" constant="16" id="YP0-o3-2L2"/>
+                            <constraint firstAttribute="trailing" secondItem="MKp-LH-sXa" secondAttribute="trailing" constant="20" symbolic="YES" id="oJ4-PS-l61"/>
+                        </constraints>
                     </view>
                     <connections>
                         <outlet property="newUser_TextField" destination="L2H-tX-wvN" id="jm9-5i-3gj"/>
@@ -309,6 +316,78 @@ Click migrate to convert your mobile account to a local one.</string>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="91.5" y="664"/>
+        </scene>
+        <!--Window Controller-->
+        <scene sceneID="fwK-My-1wl">
+            <objects>
+                <windowController storyboardIdentifier="LockScreen" id="0W0-tu-Auy" sceneMemberID="viewController">
+                    <window key="window" title="LockScreen" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="e6u-Zc-ppm">
+                        <windowStyleMask key="styleMask" titled="YES"/>
+                        <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+                        <rect key="contentRect" x="294" y="1213" width="480" height="270"/>
+                        <rect key="screenRect" x="0.0" y="900" width="1920" height="1057"/>
+                        <view key="contentView" id="Ecr-jZ-ZCv">
+                            <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </view>
+                        <connections>
+                            <outlet property="delegate" destination="0W0-tu-Auy" id="MPV-LE-jIY"/>
+                        </connections>
+                    </window>
+                    <connections>
+                        <segue destination="ump-GV-xR9" kind="relationship" relationship="window.shadowedContentViewController" id="XWR-AX-dsU"/>
+                    </connections>
+                </windowController>
+                <customObject id="96d-IH-gkh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="52" y="1118"/>
+        </scene>
+        <!--Lock Screen Controller-->
+        <scene sceneID="DEj-4I-aJy">
+            <objects>
+                <viewController id="ump-GV-xR9" customClass="LockScreenController" customModule="Mobile_to_Local" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="G8r-ZQ-Q3j">
+                        <rect key="frame" x="0.0" y="0.0" width="623" height="270"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <imageView horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="vNC-zM-ej0">
+                                <rect key="frame" x="248" y="71" width="128" height="128"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="128" id="5C3-SB-RKl"/>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="128" id="SLN-rR-gNq"/>
+                                    <constraint firstAttribute="width" constant="128" id="SZe-H3-UR5"/>
+                                    <constraint firstAttribute="height" constant="128" id="ycO-0h-Hye"/>
+                                </constraints>
+                                <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="MigrateAsst" id="lId-Nw-JNj"/>
+                            </imageView>
+                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lXP-vj-NAf">
+                                <rect key="frame" x="25" y="25" width="573" height="38"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="38" id="qvY-zU-nZe"/>
+                                </constraints>
+                                <textFieldCell key="cell" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" id="VUn-2U-0Wr">
+                                    <font key="font" metaFont="system" size="16"/>
+                                    <string key="title">Completing account migration.  
+This process may take a few minutes, please stand by...</string>
+                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="vNC-zM-ej0" firstAttribute="centerY" secondItem="G8r-ZQ-Q3j" secondAttribute="centerY" id="8aA-TY-k4x"/>
+                            <constraint firstItem="lXP-vj-NAf" firstAttribute="top" secondItem="vNC-zM-ej0" secondAttribute="bottom" constant="8" id="AEc-5V-MGR"/>
+                            <constraint firstItem="vNC-zM-ej0" firstAttribute="centerX" secondItem="G8r-ZQ-Q3j" secondAttribute="centerX" id="D0h-aD-xra"/>
+                            <constraint firstItem="lXP-vj-NAf" firstAttribute="top" secondItem="vNC-zM-ej0" secondAttribute="bottom" constant="8" id="cdm-Yz-FgF"/>
+                            <constraint firstItem="lXP-vj-NAf" firstAttribute="leading" secondItem="G8r-ZQ-Q3j" secondAttribute="leading" constant="27" id="fcF-w5-k3I"/>
+                            <constraint firstItem="lXP-vj-NAf" firstAttribute="top" secondItem="vNC-zM-ej0" secondAttribute="bottom" constant="8" id="hRD-qb-ZtJ"/>
+                            <constraint firstAttribute="trailing" secondItem="lXP-vj-NAf" secondAttribute="trailing" constant="27" id="wxY-hv-Xb5"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <customObject id="nb8-VK-kWh" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="729.5" y="1118"/>
         </scene>
     </scenes>
     <resources>

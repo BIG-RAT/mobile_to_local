@@ -83,18 +83,7 @@ else
 fi
 
 ## define icon location
-#if [ -e /Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns ];then
-#    theIcon="/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
-#elif [ -e /System/Applications/Utilities/Migration\ Assistant.app/Contents/Resources/MigrateAsst.icns ];then
-#    theIcon="/System/Applications/Utilities/Migration Assistant.app/Contents/Resources/MigrateAsst.icns"
-#else
 theIcon="${BASH_SOURCE%/*}/../MigrateAsst.png"
-#fi
-
-## lock the screen with JamfHelper
-"$jamfH" -windowType fs -iconSize 512 -icon "${theIcon}" -description "Completing account migration.  This process may take a few minutes, please stand by..." -alignDescription center -startlaunchd &
-
-sleep 1
 
 ## see if account is FileVault enabled
 FileVaultUserCheck=$(fdesetup list | grep -w "${currentName}")
