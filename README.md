@@ -91,7 +91,7 @@ To specify the type of local account to create and unbind the machine from Activ
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -userType admin -unbind true```
 
-To migrate a mobile account to local and set them as a standard user:
+To migrate a mobile account to local and set them as a standard user without prompting for input:
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -mode silent -userType standard```
 
