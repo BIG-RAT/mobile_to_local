@@ -17,7 +17,6 @@ class LockScreenController: NSViewController {
         .disableAppleMenu,
         .disableSessionTermination,
         .disableHideApplication,
-        .autoHideToolbar
     ]
     /*These are all of the options for NSApplicationPresentationOptions
      .autoHideDock
@@ -51,9 +50,9 @@ class LockScreenController: NSViewController {
     }
     
     func hideScreen() {
-            view.exitFullScreenMode()
+        view.exitFullScreenMode()
         dismiss(self)
-            view.wantsLayer = false
+        view.wantsLayer = false
     }
     
 }
