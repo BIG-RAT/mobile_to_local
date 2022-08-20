@@ -61,7 +61,7 @@ Attributes not needed for the local account are removed, currently these are the
 Mobile account shortname is added as an alias to the local account RecordName, if they differ.
 
 
-The process is relatively quick, under 30 seconds, and logs to /var/log/jamf.log.  The resulting local account is FileVault 2 enabled (if enabled to begin with) and retains local group membership.
+The process is relatively quick, under 30 seconds, and logs to /var/log/mobile.to.local.log.  The resulting local account is FileVault 2 enabled (if enabled to begin with) and retains local group membership.
 
 The local account retains the uniqueID of the mobile account, this removes the need to reset permissions.  Group permissions are not updated on the users folder, this is to avoid PPPC issues.  Lastly, the shortname can only contain the following:<pre>
      numbers
