@@ -10,27 +10,34 @@
 ## $5 - whether or not to unbind - true or false
 ## $6 - whether or not the app runs silently - true or false
 
+logFile="/private/var/log/mobile.to.local.log"
+
 log() {
-    /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> /var/log/jamf.log
+    /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> $logFile
+#    /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> /private/var/log/jamf.log
 }
 
-jamfH="/Library/Application Support/JAMF/bin/jamfHelper.app/Contents/MacOS/jamfHelper"
 dsclBin="/usr/bin/dscl"
 
 ## standard attributes for a local account - these will not be deleted from the mobile account
 attribsToKeep="_writers_AvatarRepresentation\|_writers_hint\|_writers_jpegphoto\|_writers_passwd\|_writers_picture\|_writers_unlockOptions\|_writers_UserCertificate\|accountPolicyData\|AvatarRepresentation\|HeimdalSRPKey\|KerberosKeys\|LinkedIdentity\|record_daemon_version\|ShadowHashData\|unlockOptions\|AltSecurityIdentities\|AppleMetaNodeLocation\|AuthenticationAuthority\|GeneratedUID\|JPEGPhoto\|NFSHomeDirectory\|Password\|Picture\|PrimaryGroupID\|RealName\|RecordName\|RecordType\|UniqueID\|UserShell"
 
-## in case the jamf.log does not exist
-if [ ! -f /var/log/jamf.log ];then
-    /usr/bin/touch /var/log/jamf.log
+attribsToRemove=(_writers_LinkedIdentity account_instance cached_auth_policy cached_groups original_realname original_shell original_smb_home preserved_attributes AppleMetaRecordName CopyTimestamp MCXFlags MCXSettings OriginalAuthenticationAuthority OriginalNodeName PasswordPolicyOptions PrimaryNTDomain SMBGroupRID SMBHome SMBHomeDrive SMBPasswordLastSet SMBPrimaryGroupSID SMBSID)
+
+## in case the log file does not exist
+if [ ! -f $logFile ];then
+    /usr/bin/touch $logFile
+    /bin/chmod 644 $logFile
 fi
 
 ## grab the computer name to use in the log
 computerName=$(scutil --get ComputerName)
 
-## get logged in user
-currentName=$(stat -f%Su /dev/console)
-## new new logon name
+## get logged in username and UniqueID (id can no longer be reset)
+currentName=$( stat -f%Su /dev/console )
+#oldID=$( dscl . -read /Users/"$currentName" UniqueID | awk '/UniqueID: / {print $2}' )
+
+## new username
 newName="$1"
 
 ## check admin status
@@ -44,6 +51,7 @@ if [ "${mobileUserCheck}" = "" ];then
     log "$currentName is a local account."
     exit 1000
 fi
+log "current user: ${currentName} is a mobile user."
 
 if [ $6 != "true" ];then
     ## verify we're either keeping the same username or new name doesn't exist
@@ -56,7 +64,6 @@ if [ $6 != "true" ];then
     password="$2"
 fi
 
-log "current user: ${currentName}"
 
 ## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
 renameHomeDir="$3"
@@ -101,6 +108,7 @@ if [ "$unbind" == "true" ];then
 ## unbind
     log "performing machine unbind"
     /usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
+    log "result of unbind operation: $?"
     /bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
 fi
 
@@ -128,6 +136,17 @@ while [ "$pid" = "" ];do
 done
 echo "opendirectoryd restarted with pid $pid"
 
+## find first available id
+## can no longer reset id
+#newID="501"
+#allUsers=$(dscl . -list /Users UniqueID | awk '{ print $2 }')
+#isUnique=$(echo "$allUsers" | grep "^$newID$")
+#while [ "$isUnique" != "" ];do
+#    ((newID++))
+#    isUnique=$(echo "$allUsers" | grep "^$newID$")
+#done
+#echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: new id: $newID" >> /var/log/jamf.log
+
 
 ## export updated AuthenticationAuthority for the account
 log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
@@ -137,14 +156,20 @@ localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" A
 log "${localAuthenticationAuthority}"
 
 ## remove attributes from mobile account - start
-while read theAttribute;do
+#while read theAttribute;do
+#    log "deleting attribute: $theAttribute"
+#    $dsclBin . -delete "/Users/${currentName}" $theAttribute
+#    #    echo $?
+#done << EOL
+#$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v -w "${attribsToKeep}")
+#EOL
+log "------------- Start deleting attributes --------------"
+for theAttribute in "${attribsToRemove[@]}";do
     log "deleting attribute: $theAttribute"
-    $dsclBin . -delete "/Users/${currentName}" $theAttribute
-    #    echo $?
-done << EOL
-$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v -w "${attribsToKeep}")
-EOL
+    $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
+done
 ## remove attributes from mobile account - end
+log "------------ Finished deleting attributes ------------"
 
 #### for testing to pause the script ####
 #touch /Users/Shared/pause.txt
@@ -153,14 +178,18 @@ EOL
 #done
 
 ## ensure proper group on home directory
-## skipping the change of group permissions on the user folder to avoide PPPC prompts for contacts and calendars
-#homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
-#log "Setting group and permissions for ${homeDir}"
-#result=$(chown -R ":staff" "${homeDir}" &> /dev/null;echo "$?")
-#if [ "$result" = "0" ];then
-#    log "updated group for home directory"
-#    log "chown -R :staff ${homeDir}"
-#fi
+## skipping the change of group permissions on the user folder to avoide PPPC prompts for contacts and calendars??
+## handle later, fixing permissions on all files/folders
+homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
+log "Setting group and permissions for ${homeDir}"
+    log "chown -R :staff ${homeDir}"
+result=$(chown -R ":staff" "${homeDir}" &> /dev/null;echo "$?")
+if [ "$result" = "0" ];then
+    log "updated group for home directory"
+else
+    log "failed to updated group for home directory"
+fi
+
 
 ## add to the admins group, if appropriate
 if (([ "${isAdmin}" = "yes" ] && [ "$userType" != "standard" ]) || [ "$userType" = "admin" ]);then
@@ -190,23 +219,25 @@ if [ "${newName}" != "${currentName}" ];then
         log "Moving (renaming) current home directory ${homeDir} to /Users/${newName}"
         /bin/mv "${homeDir}" "/Users/${newName}"
         
-        ##log "killing jamfHelper for home directory change"
-        ##sudo killall jamfHelper
-        
         log "setting home directory (NFSHomeDirectory) to /Users/${newName}"
-        ##log "$dsclBin . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"${homeDir}\""
-        ##$dsclBin . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "${homeDir}"
-        ##sleep 1
-        log "$dsclBin . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"/Users/${newName}\""
-        $dsclBin -u "${currentName}" -P "${password}" . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
+        log "$dsclBin -u ${newName} -P '********' . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"/Users/${newName}\""
+        $dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
     fi
 fi
 
-log "killing jamfHelper and loginwindow"
-sudo killall jamfHelper
+## update user id
+#log "Changing UniqueID from $oldID to $newID"
+#log "$dsclBin -u \"${newName}\" -P '*******' . -change \"/Users/${newName}\" UniqueID $oldID $newID"
+#$dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" UniqueID $oldID $newID
 
-loggedInUser=$(stat -f%Su /dev/console)
-ps -Ajc | grep loginwindow | grep "$loggedInUser" | grep -v grep | awk '{print $2}' | sudo xargs kill &
-log "loginwindow restarted." &
+## fix permissions for all items owned by the previous name/id
+#log "Fix permissions for new UniqueID"
+#find / -uid $oldID -exec chown -h $newID {} \; 2>/dev/null
+
+if [ $6 != "true" ];then
+    loggedInUser=$(stat -f%Su /dev/console)
+    ps -Ajc | grep loginwindow | grep "$loggedInUser" | grep -v grep | awk '{print $2}' | sudo xargs kill &
+    log "loginwindow restarted." &
+fi
 
 #rm -fr $0

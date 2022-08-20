@@ -48,6 +48,7 @@
 				B53AD9D422E1EC7E00C7CD02 /* Mobile to Local.entitlements */,
 				B5CA1ACA2090CE0F00C81085 /* mobile_to_local */,
 				B5CA1AC92090CE0F00C81085 /* Products */,
+				B5ED9E9D28B0493C00ECA90E /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +74,13 @@
 				B5CA1ADA2090CF4D00C81085 /* scripts */,
 			);
 			path = mobile_to_local;
+			sourceTree = "<group>";
+		};
+		B5ED9E9D28B0493C00ECA90E /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -283,8 +291,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.jamf.pse.mobile-to-local";
+				MARKETING_VERSION = 2.5.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -304,8 +312,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.jamf.pse.mobile-to-local";
+				MARKETING_VERSION = 2.5.2;
+				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
