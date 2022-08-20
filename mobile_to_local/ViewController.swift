@@ -18,9 +18,16 @@ class ViewController: NSViewController {
     @IBOutlet weak var updateHomeDir_button: NSButton!
     @IBOutlet weak var password: NSSecureTextField!
     
-    var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
+    var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
+    var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
+//    var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
     var newUser                = ""
     var userType               = ""
+    var allowNewUsername = false
+    var mode             = "interactive"
+    var silent           = false
+    var unbind           = true
+    var plistData        = [String:Any]()
     
     // OS version info
     let os = ProcessInfo().operatingSystemVersion
@@ -35,8 +42,6 @@ class ViewController: NSViewController {
     var errorResult = [String]()
     var exitResult:Int32 = 0
 
-    var silent = false
-    var unbind = "true"
     
     let userDefaults = UserDefaults.standard
     // determine if we're using dark mode
@@ -76,7 +81,7 @@ class ViewController: NSViewController {
     func completeMigration() {
 //        print("migration script - start")
 
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind)
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind) \(silent)")
 
 //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
@@ -202,79 +207,131 @@ class ViewController: NSViewController {
     func showLockWindow() {
 //        print("[showLockWindow] enter function")
 
-        let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let LockScreenWindowController = storyboard.instantiateController(withIdentifier: "LockScreen") as! NSWindowController
-        if let lockWindow = LockScreenWindowController.window {
+        if !silent {
+            let storyboard = NSStoryboard(name: "Main", bundle: nil)
+            let LockScreenWindowController = storyboard.instantiateController(withIdentifier: "LockScreen") as! NSWindowController
+            if let lockWindow = LockScreenWindowController.window {
 
-            let application = NSApplication.shared
-            application.runModal(for: lockWindow)
-            lockWindow.close()
+                let application = NSApplication.shared
+                application.runModal(for: lockWindow)
+                lockWindow.close()
+            }
         }
 
 //        print("[showLockWindow] lock window shown")
     }
     
     func writeToLog(theMessage: String) {
-        LogFileW?.seekToEndOfFile()
-        let fullMessage = getDateTime(x: 2) + " \(newUser)[Migration]: " + theMessage + "\n"
-        let LogText = (fullMessage as NSString).data(using: String.Encoding.utf8.rawValue)
-        LogFileW?.write(LogText!)
+        writeToLogQ.sync {
+            LogFileW?.seekToEndOfFile()
+            let fullMessage = getDateTime(x: 2) + " \(newUser) [Migration]: " + theMessage + "\n"
+            let LogText = (fullMessage as NSString).data(using: String.Encoding.utf8.rawValue)
+            LogFileW?.write(LogText!)
+        }
     }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        // read commandline args
-        var numberOfArgs = 0
-
-        //        debug = true
-
-        numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
-        if numberOfArgs > 0 {
-            if (numberOfArgs % 2) != 0 {
-                writeToLog(theMessage: "Argument error occured - Contact IT for help.")
-                alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
-                NSApplication.shared.terminate(self)
+        DispatchQueue.main.async { [self] in
+            if !FileManager.default.fileExists(atPath: "/private/var/log/mobile.to.local.log") {
+                var secondsWaited = 0
+                FileManager.default.createFile(atPath: "/private/var/log/mobile.to.local.log", contents: nil, attributes: [.ownerAccountID:0, .groupOwnerAccountID:0, .posixPermissions:0o644])
+                while !FileManager.default.fileExists(atPath: "/private/var/log/mobile.to.local.log") {
+                    if secondsWaited < 10 {
+                        secondsWaited+=1
+                    } else {
+                        break
+                    }
+                }
+                LogFileW = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
+                if FileManager.default.isWritableFile(atPath: "/private/var/log/mobile.to.local.log") {
+                    print("log is writeable")
+                } else {
+                    print("log is not writeable")
+                }
+                writeToLog(theMessage: "New log file created.")
             }
+            
+            // read environment settings - start
+            if FileManager.default.fileExists(atPath: "/Library/Managed Preferences/pse.jamf.mobile-to-local.plist") {
+                plistData = (NSDictionary(contentsOf: URL(fileURLWithPath: "/Library/Managed Preferences/pse.jamf.mobile-to-local.plist")) as? [String : Any])!
+            }
+            if plistData.count == 0 {
+    //            if LogLevel.debug { WriteToLog().message(stringOfText: "Error reading plist\n") }
+                print("plist not found")
+            } else {
+    //            print("settings: \(plistData)")
+                allowNewUsername = plistData["allowNewUsername"] as? Bool ?? false
+                userType         = plistData["userType"] as? String ?? "standard"
+                unbind           = plistData["unbind"] as? Bool ?? true
+                mode             = plistData["mode"] as? String ?? "interactive"
+                if mode == "silent" {
+                    silent = true
+                }
+                print("allowNewUsername: \(allowNewUsername)")
+                print("        userType: \(userType)")
+                print("          unbind: \(unbind)")
+                print("          silent: \(silent)")
+            }
+            
+            // read commandline args
+            var numberOfArgs = 0
 
-            for i in stride(from: 1, through: numberOfArgs, by: 2) {
-                //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
-                switch CommandLine.arguments[i] {
-                case "-allowNewUsername":
-                    if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
-                        newUser_TextField.isEditable    = true
-                        // Privacy restrictions are preventing changing NSHomeDirectory in 10.15 and above
-                        if os.majorVersion == 10 && os.minorVersion < 14 {
-                            DispatchQueue.main.async {
-                                self.updateHomeDir_button.isEnabled = true
-                                self.updateHomeDir_button.isHidden  = false
-                            }
+            //        debug = true
+
+            numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
+            if numberOfArgs > 0 {
+                if (numberOfArgs % 2) != 0 {
+                    writeToLog(theMessage: "Argument error occured - Contact IT for help.")
+                    alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
+                    NSApplication.shared.terminate(self)
+                }
+
+                for i in stride(from: 1, through: numberOfArgs, by: 2) {
+                    //print("i: \(i)\t argument: \(CommandLine.arguments[i])")
+                    switch CommandLine.arguments[i] {
+                    case "-allowNewUsername":
+                        if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
+                            allowNewUsername = true
                         }
+                    case "-mode":
+                        if (CommandLine.arguments[i+1].lowercased() == "silent") {
+                            silent = true
+                        }
+                    case "-userType":
+                        userType = CommandLine.arguments[i+1]
+                    case "-unbind":
+                        if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
+                            unbind = false
+                        }
+                    default:
+                        writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
+                        print("unknown switch passed: \(CommandLine.arguments[i])")
                     }
-                case "-mode":
-                    if (CommandLine.arguments[i+1].lowercased() == "silent") {
-                        silent = true
-                        // hide the app UI
-                        NSApplication.shared.mainWindow?.setIsVisible(false)
-                    }
-                case "-userType":
-                    userType = CommandLine.arguments[i+1]
-                case "-unbind":
-                    if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
-                        unbind = "false"
-                    }
-                default:
-                    writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
-                    print("unknown switch passed: \(CommandLine.arguments[i])")
                 }
             }
-        }
 
-        // bring app to foreground
-        NSApplication.shared.activate(ignoringOtherApps: true)
-
-        DispatchQueue.main.async { [self] in
+//          DispatchQueue.main.async { [self] in
+            if allowNewUsername {
+//                DispatchQueue.main.async {
+                    self.newUser_TextField.isEditable   = true
+                    self.updateHomeDir_button.isEnabled = true
+                    self.updateHomeDir_button.isHidden  = false
+//                }
+                // Privacy restrictions are preventing changing NSHomeDirectory in 10.15 and above
+//                        if os.majorVersion == 10 && os.minorVersion < 14 {
+//                            DispatchQueue.main.async {
+//                                self.updateHomeDir_button.isEnabled = true
+//                                self.updateHomeDir_button.isHidden  = false
+//                            }
+//                        }
+            }
+            if silent {
+                allowNewUsername = false
+                // hide the app UI
+                NSApplication.shared.mainWindow?.setIsVisible(false)
+            }
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
             newUser = shellResult[0]
             newUser_TextField.stringValue = newUser
@@ -282,8 +339,8 @@ class ViewController: NSViewController {
             // Verify we're running with elevated privileges.
             if NSUserName() != "root" {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
-                alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
                 writeToLog(theMessage: "Assistant must be run with elevated privileges.")
+                alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
                 NSApplication.shared.terminate(self)
             }
 
@@ -330,20 +387,22 @@ class ViewController: NSViewController {
             // Do any additional setup after loading the view.
 
             if silent {
-                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" "+unbind+" \(silent)")
+                self.showLockWindow()
+                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent)")
 
                 logMigrationResult(exitValue: exitResult)
 
                 NSApplication.shared.terminate(self)
+            } else {
+                // show the dock icon
+                view.wantsLayer = true
+                NSApp.setActivationPolicy(.regular)
+                view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
+                NSApplication.shared.setActivationPolicy(.regular)
+                NSApplication.shared.activate(ignoringOtherApps: true)
             }
         }
-        if !silent {
-            // show the dock icon
-            NSApp.setActivationPolicy(.regular)
-            self.view.layer?.backgroundColor = CGColor(red: 0x5C/255.0, green: 0x78/255.0, blue: 0x94/255.0, alpha: 1.0)
-        } else {
-            self.showLockWindow()
-        }
+
     }
     
     override var representedObject: Any? {
