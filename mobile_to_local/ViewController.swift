@@ -311,8 +311,12 @@ class ViewController: NSViewController {
                     }
                 }
             }
-
-//          DispatchQueue.main.async { [self] in
+            
+            if silent {
+                allowNewUsername = false
+                // hide the app UI
+                NSApplication.shared.mainWindow?.setIsVisible(false)
+            }
             if allowNewUsername {
 //                DispatchQueue.main.async {
                     self.newUser_TextField.isEditable   = true
@@ -326,11 +330,6 @@ class ViewController: NSViewController {
 //                                self.updateHomeDir_button.isHidden  = false
 //                            }
 //                        }
-            }
-            if silent {
-                allowNewUsername = false
-                // hide the app UI
-                NSApplication.shared.mainWindow?.setIsVisible(false)
             }
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
             newUser = shellResult[0]
