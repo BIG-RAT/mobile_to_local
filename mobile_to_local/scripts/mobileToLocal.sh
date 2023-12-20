@@ -9,20 +9,23 @@
 ## $4 - type of user to create; standard or admin
 ## $5 - whether or not to unbind - true or false
 ## $6 - whether or not the app runs silently - true or false
+## $7 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList)
 
 logFile="/private/var/log/mobile.to.local.log"
 
 log() {
     /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> $logFile
-#    /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> /private/var/log/jamf.log
 }
 
 dsclBin="/usr/bin/dscl"
 
-## standard attributes for a local account - these will not be deleted from the mobile account
-attribsToKeep="_writers_AvatarRepresentation\|_writers_hint\|_writers_jpegphoto\|_writers_passwd\|_writers_picture\|_writers_unlockOptions\|_writers_UserCertificate\|accountPolicyData\|AvatarRepresentation\|HeimdalSRPKey\|KerberosKeys\|LinkedIdentity\|record_daemon_version\|ShadowHashData\|unlockOptions\|AltSecurityIdentities\|AppleMetaNodeLocation\|AuthenticationAuthority\|GeneratedUID\|JPEGPhoto\|NFSHomeDirectory\|Password\|Picture\|PrimaryGroupID\|RealName\|RecordName\|RecordType\|UniqueID\|UserShell"
+## to list attributes
+## dscl -raw . -read /Users/${currentUser} | grep dsAttrType | awk -F":" '{ print $2 }'
 
-attribsToRemove=(_writers_LinkedIdentity account_instance cached_auth_policy cached_groups original_realname original_shell original_smb_home preserved_attributes AppleMetaRecordName CopyTimestamp MCXFlags MCXSettings OriginalAuthenticationAuthority OriginalNodeName PasswordPolicyOptions PrimaryNTDomain SMBGroupRID SMBHome SMBHomeDrive SMBPasswordLastSet SMBPrimaryGroupSID SMBSID)
+## standard attributes for a local account - these will not be deleted from the mobile account
+attribsToKeep="_writers_AvatarRepresentation\|_writers_hint\|_writers_inputSources\|_writers_jpegphoto\|_writers_passwd\|_writers_picture\|_writers_unlockOptions\|_writers_UserCertificate\|accountPolicyData\|AvatarRepresentation\|inputSources\|record_daemon_version\|unlockOptions\|AltSecurityIdentities\|AppleMetaNodeLocation\|AuthenticationAuthority\|GeneratedUID\|JPEGPhoto\|NFSHomeDirectory\|Password\|Picture\|PrimaryGroupID\|RealName\|RecordName\|RecordType\|UniqueID\|UserShell"
+
+attribsToRemove=(_writers_LinkedIdentity account_instance cached_auth_policy cached_groups original_realname original_shell original_smb_home preserved_attributes AppleMetaRecordName CopyTimestamp EmailAddress FirstName JobTitle LastName MCXFlags MCXSettings OriginalAuthenticationAuthority OriginalNodeName PasswordPolicyOptions PhoneNumber PrimaryNTDomain SMBGroupRID SMBHome SMBHomeDrive SMBPasswordLastSet SMBPrimaryGroupSID SMBSID Street)
 
 ## in case the log file does not exist
 if [ ! -f $logFile ];then
@@ -147,7 +150,6 @@ echo "opendirectoryd restarted with pid $pid"
 #done
 #echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: new id: $newID" >> /var/log/jamf.log
 
-
 ## export updated AuthenticationAuthority for the account
 log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
 ## localAuthenticationAuthority=$($dsclBin . -read /Users/"${currentName}" AuthenticationAuthority)
@@ -155,30 +157,33 @@ log "AuthenticationAuthority for local account:"
 localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
 log "${localAuthenticationAuthority}"
 
-## remove attributes from mobile account - start
-#while read theAttribute;do
-#    log "deleting attribute: $theAttribute"
-#    $dsclBin . -delete "/Users/${currentName}" $theAttribute
-#    #    echo $?
-#done << EOL
-#$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v -w "${attribsToKeep}")
-#EOL
 log "------------- Start deleting attributes --------------"
+## remove attributes from mobile account - start
+if [[ $7 -eq "keeplist" ]];do
+while read theAttribute;do
+    log "deleting attribute: $theAttribute"
+    $dsclBin . -delete "/Users/${currentName}" $theAttribute
+#    #    echo $?
+done << EOL
+$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v -w "${attribsToKeep}")
+EOL
+elif [[ $7 -eq "removelist" ]];do
 for theAttribute in "${attribsToRemove[@]}";do
     log "deleting attribute: $theAttribute"
     $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
 done
+fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
 
-#### for testing to pause the script ####
+#### for testing, to pause the script ####
 #touch /Users/Shared/pause.txt
 #while [ -f /Users/Shared/pause.txt ];do
 #    sleep 10
 #done
 
 ## ensure proper group on home directory
-## skipping the change of group permissions on the user folder to avoide PPPC prompts for contacts and calendars??
+## skipping the change of owner permissions on the user folder to avoide PPPC prompts for contacts and calendars??
 ## handle later, fixing permissions on all files/folders
 homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
 log "Setting group and permissions for ${homeDir}"
@@ -190,6 +195,11 @@ else
     log "failed to updated group for home directory"
 fi
 
+## add user to staff group
+result=$(/usr/sbin/dseditgroup -o edit -n /Local/Default -a "${currentName}" -t user staff;echo "$?")
+if [ "$result" = "0" ];then
+    log "${currentName} was added to the staff group"
+fi
 
 ## add to the admins group, if appropriate
 if (([ "${isAdmin}" = "yes" ] && [ "$userType" != "standard" ]) || [ "$userType" = "admin" ]);then
