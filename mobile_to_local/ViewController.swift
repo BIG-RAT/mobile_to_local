@@ -27,6 +27,7 @@ class ViewController: NSViewController {
     var mode             = "interactive"
     var silent           = false
     var unbind           = true
+    var listType         = "removeList"
     var plistData        = [String:Any]()
     
     // OS version info
@@ -81,7 +82,7 @@ class ViewController: NSViewController {
     func completeMigration() {
 //        print("migration script - start")
 
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind) \(silent)")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind) \(silent) \(listType)")
 
 //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
@@ -269,6 +270,7 @@ class ViewController: NSViewController {
                 if mode == "silent" {
                     silent = true
                 }
+                listType         = plistData["listType"] as? String ?? "removeList"
                 print("allowNewUsername: \(allowNewUsername)")
                 print("        userType: \(userType)")
                 print("          unbind: \(unbind)")
@@ -301,9 +303,15 @@ class ViewController: NSViewController {
                         }
                     case "-userType":
                         userType = CommandLine.arguments[i+1]
+                        // default to standard if input is not something expected
+                        userType = (userType.lowercased() == "admin") ? "admin":"standard"
                     case "-unbind":
                         if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                             unbind = false
+                        }
+                    case "-listType":
+                        if ["removelist", "keeplist"].contains(CommandLine.arguments[i+1].lowercased()) {
+                            listType = CommandLine.arguments[i+1].lowercased()
                         }
                     default:
                         writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
@@ -315,21 +323,26 @@ class ViewController: NSViewController {
             if silent {
                 allowNewUsername = false
                 // hide the app UI
+                self.view.isHidden = true
                 NSApplication.shared.mainWindow?.setIsVisible(false)
+            } else {
+                self.view.isHidden = false
+                NSApplication.shared.mainWindow?.setIsVisible(true)
             }
             if allowNewUsername {
 //                DispatchQueue.main.async {
                     self.newUser_TextField.isEditable   = true
-                    self.updateHomeDir_button.isEnabled = true
-                    self.updateHomeDir_button.isHidden  = false
 //                }
-                // Privacy restrictions are preventing changing NSHomeDirectory in 10.15 and above
-//                        if os.majorVersion == 10 && os.minorVersion < 14 {
-//                            DispatchQueue.main.async {
-//                                self.updateHomeDir_button.isEnabled = true
-//                                self.updateHomeDir_button.isHidden  = false
-//                            }
+                // Privacy restrictions are preventing changing NSHomeDirectory in 10.14 and above
+                    if os.majorVersion == 10 && os.minorVersion < 14 {
+//                        DispatchQueue.main.async {
+                            self.updateHomeDir_button.isEnabled = true
+                            self.updateHomeDir_button.isHidden  = false
+                        updateHomeDir_button.toolTip = "New home folder name"
 //                        }
+                    } else {
+                        updateHomeDir_button.toolTip = "Not available for macOS 10.14 and later"
+                    }
             }
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
             newUser = shellResult[0]
@@ -387,7 +400,7 @@ class ViewController: NSViewController {
 
             if silent {
                 self.showLockWindow()
-                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent)")
+                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
 
                 logMigrationResult(exitValue: exitResult)
 

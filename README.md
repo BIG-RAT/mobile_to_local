@@ -25,36 +25,37 @@ There is also a check to ensure the account is not already a local one.
 If the user is allowed to change their login name an alert will be given if the name is already taken.
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/exists.png "exists")
 
-Attributes not needed for the local account are removed, currently these are the following:
-
-* _writers_LinkedIdentity
-* account_instance
-* cached_auth_policy
-* cached_groups
-* original_realname
-* original_shell
-* original_smb_home
-* preserved_attributes
-* AppleMetaRecordName
-* CopyTimestamp
-* EMailAddress
-* FirstName
-* JobTitle
-* LastName
-* MCXFlags
-* MCXSettings
-* OriginalAuthenticationAuthority
-* OriginalNodeName
-* PasswordPolicyOptions
-* PhoneNumber
-* PrimaryNTDomain
-* SMBGroupRID
-* SMBHome
-* SMBHomeDrive
-* SMBPasswordLastSet
-* SMBPrimaryGroupSID
-* SMBSID
-* Street
+Attributes not needed for the local account are removed.  The removal process is accomplished by either using a list of attributes to remove or a list of attributes to keep.  Currently these are the lists:
+| removeList | keepList                      |
+|  :---: | :---: |
+| _writers_LinkedIdentity| _writers_AvatarRepresentation |
+| account_instance | _writers_hint |
+| cached_auth_policy | _writers_inputSources |
+| cached_groups | _writers_jpegphoto |
+| original_realname | _writers_passwd |
+| original_shell | _writers_picture |
+| original_smb_home | _writers_unlockOptions |
+| preserved_attributes | _writers_UserCertificate |
+| AppleMetaRecordName | accountPolicyData |
+| CopyTimestamp | AvatarRepresentation |
+| EMailAddress | inputSources |
+| FirstName | record_daemon_version |
+| JobTitle | unlockOptions |
+| LastName | AltSecurityIdentities |
+| MCXFlags | AppleMetaNodeLocation |
+| MCXSettings | AuthenticationAuthority |
+| OriginalAuthenticationAuthority | GeneratedUID |
+| OriginalNodeName | JPEGPhoto |
+| PasswordPolicyOptions | NFSHomeDirectory |
+| PhoneNumber | Password |
+| PrimaryNTDomain | Picture |
+| SMBGroupRID | PrimaryGroupID |
+| SMBHome | RealName |
+| SMBHomeDrive | RecordName|
+| SMBPasswordLastSet | RecordType |
+| SMBPrimaryGroupSID | UniqueID |
+| SMBSID | UserShell |
+| Street |
 
 * AuthenticationAuthority has LocalCachedUser and Kerberosv5 settings removed
 
@@ -63,8 +64,7 @@ Mobile account shortname is added as an alias to the local account RecordName, i
 
 The process is relatively quick, under 30 seconds, and logs to /var/log/mobile.to.local.log.  The resulting local account is FileVault 2 enabled (if enabled to begin with) and retains local group membership.
 
-The local account retains the uniqueID of the mobile account, this removes the need to reset permissions.  Group permissions are not updated on the users folder, this is to avoid PPPC issues.  Lastly, the shortname can only contain the following:<pre>
-     numbers
+The local account retains the uniqueID of the mobile account, this removes the need to reset permissions.  Group permissions on the user folder as set to staff.  Lastly, the shortname can only contain the following:<pre>numbers
      letters
      - (dash)
      _ (underscore)
@@ -76,6 +76,7 @@ Available switches that can be passed:
         -userType: type of account to migrate to.  Either standard or admin.
           -unbind: whether or not to unbind after migrating.  Either true or false.
             -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
+        -listType: Defines how attributes will be removed.  Use either removeList (default) or keepList.
 </pre>
 
 #### Examples:
