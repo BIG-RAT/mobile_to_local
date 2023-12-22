@@ -159,18 +159,23 @@ log "${localAuthenticationAuthority}"
 
 log "------------- Start deleting attributes --------------"
 ## remove attributes from mobile account - start
-if [[ $7 -eq "keeplist" ]];do
+if [[ $7 == "keeplist" ]];then
 while read theAttribute;do
     log "deleting attribute: $theAttribute"
-    $dsclBin . -delete "/Users/${currentName}" $theAttribute
+    $dsclBin -raw . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
 #    #    echo $?
 done << EOL
-$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $2}' | grep -v -w "${attribsToKeep}")
+$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $1 ":" $2}' | grep -v -w "${attribsToKeep}")
 EOL
-elif [[ $7 -eq "removelist" ]];do
+elif [[ $7 == "removelist" ]];then
 for theAttribute in "${attribsToRemove[@]}";do
     log "deleting attribute: $theAttribute"
-    $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
+    if [[ $theAttribute == "AppleMetaRecordName" || $theAttribute == "PrimaryNTDomain" ]];then
+        $dsclBin -raw . -delete "/Users/${currentName}" "dsAttrTypeStandard:"$theAttribute 2>/dev/null
+    else
+        $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
+    fi
+    ##
 done
 fi
 ## remove attributes from mobile account - end
