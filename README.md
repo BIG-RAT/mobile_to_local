@@ -26,37 +26,38 @@ There is also a check to ensure the account is not already a local one.
 If the user is allowed to change their login name an alert will be given if the name is already taken.
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/exists.png "exists")
 
-Attributes not needed for the local account are removed.  The removal process is accomplished by either using a list of attributes to remove or a list of attributes to keep.  Currently these are the lists:
-| removeList | keepList                      |
-|  :---: | :---: |
-| _writers_LinkedIdentity| _writers_AvatarRepresentation |
-| account_instance | _writers_hint |
-| cached_auth_policy | _writers_inputSources |
-| cached_groups | _writers_jpegphoto |
-| original_realname | _writers_passwd |
-| original_shell | _writers_picture |
-| original_smb_home | _writers_unlockOptions |
-| preserved_attributes | _writers_UserCertificate |
-| AppleMetaRecordName | accountPolicyData |
-| CopyTimestamp | AvatarRepresentation |
-| EMailAddress | inputSources |
-| FirstName | record_daemon_version |
-| JobTitle | unlockOptions |
-| LastName | AltSecurityIdentities |
-| MCXFlags | AppleMetaNodeLocation |
-| MCXSettings | AuthenticationAuthority |
-| OriginalAuthenticationAuthority | GeneratedUID |
-| OriginalNodeName | JPEGPhoto |
-| PasswordPolicyOptions | NFSHomeDirectory |
-| PhoneNumber | Password |
-| PrimaryNTDomain | Picture |
-| SMBGroupRID | PrimaryGroupID |
-| SMBHome | RealName |
-| SMBHomeDrive | RecordName|
-| SMBPasswordLastSet | RecordType |
-| SMBPrimaryGroupSID | UniqueID |
-| SMBSID | UserShell |
+Attributes not needed for the local account are removed.  The removal process is accomplished by either using a list of attributes to remove (removeList) or a list of attributes to keep (keepList).  If no list type is provided keepList will be used.  Currently these are the lists:
+| removeList |  | |  | |  | keepList |
+|  :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| _writers_LinkedIdentity |  | |  | |  | _writers_AvatarRepresentation |
+| account_instance |  | |  | |   | _writers_hint |
+| cached_auth_policy |  | |  | |   | _writers_inputSources |
+| cached_groups |  | |  | |   | _writers_jpegphoto |
+| original_realname |  | |  | |   | _writers_passwd |
+| original_shell |  | |  | |   | _writers_picture |
+| original_smb_home |  | |  | |   | _writers_unlockOptions |
+| preserved_attributes |  | |  | |   | _writers_UserCertificate |
+| AppleMetaRecordName |  | |  | |   | accountPolicyData |
+| CopyTimestamp |  | |  | |   | AvatarRepresentation |
+| EMailAddress |  | |  | |   | inputSources |
+| FirstName |  | |  | |   | record_daemon_version |
+| JobTitle |  | |  | |   | unlockOptions |
+| LastName |  | |  | |   | AltSecurityIdentities |
+| MCXFlags |  | |  | |   | AppleMetaNodeLocation |
+| MCXSettings |  | |  | |   | AuthenticationAuthority |
+| OriginalAuthenticationAuthority |  | |  | |   | GeneratedUID |
+| OriginalNodeName |  | |  | |   | JPEGPhoto |
+| PasswordPolicyOptions |  | |  | |   | NFSHomeDirectory |
+| PhoneNumber |  | |  | |   | Password |
+| PrimaryNTDomain |  | |  | |   | Picture |
+| SMBGroupRID |  | |  | |   | PrimaryGroupID |
+| SMBHome |  | |  | |   | RealName |
+| SMBHomeDrive |  | |  | |   | RecordName|
+| SMBPasswordLastSet |  | |  | |   | RecordType |
+| SMBPrimaryGroupSID |  | |  | |   | UniqueID |
+| SMBSID |  | |  | |   | UserShell |
 | Street |
+
 
 * AuthenticationAuthority has LocalCachedUser and Kerberosv5 settings removed
 
@@ -110,6 +111,7 @@ Create an ongoing policy with no triggers.  Make the policy available in Self Se
  <hr>
  
 Thanks for aiding in the project:
+* @dstranathan
 * @matthewsphillips
 * @ryanslater_uk
 

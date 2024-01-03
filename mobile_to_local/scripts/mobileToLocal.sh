@@ -9,7 +9,7 @@
 ## $4 - type of user to create; standard or admin
 ## $5 - whether or not to unbind - true or false
 ## $6 - whether or not the app runs silently - true or false
-## $7 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList)
+## $7 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList) which is the default
 
 logFile="/private/var/log/mobile.to.local.log"
 
@@ -158,8 +158,19 @@ localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" A
 log "${localAuthenticationAuthority}"
 
 log "------------- Start deleting attributes --------------"
+log "    delete using $7"
 ## remove attributes from mobile account - start
-if [[ $7 == "keeplist" ]];then
+if [[ $7 == "removelist" ]];then
+    for theAttribute in "${attribsToRemove[@]}";do
+        log "deleting attribute: $theAttribute"
+        if [[ $theAttribute == "AppleMetaRecordName" || $theAttribute == "PrimaryNTDomain" ]];then
+            $dsclBin -raw . -delete "/Users/${currentName}" "dsAttrTypeStandard:"$theAttribute 2>/dev/null
+        else
+            $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
+        fi
+        ##
+    done
+else
 while read theAttribute;do
     log "deleting attribute: $theAttribute"
     $dsclBin -raw . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
@@ -167,16 +178,6 @@ while read theAttribute;do
 done << EOL
 $($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $1 ":" $2}' | grep -v -w "${attribsToKeep}")
 EOL
-elif [[ $7 == "removelist" ]];then
-for theAttribute in "${attribsToRemove[@]}";do
-    log "deleting attribute: $theAttribute"
-    if [[ $theAttribute == "AppleMetaRecordName" || $theAttribute == "PrimaryNTDomain" ]];then
-        $dsclBin -raw . -delete "/Users/${currentName}" "dsAttrTypeStandard:"$theAttribute 2>/dev/null
-    else
-        $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
-    fi
-    ##
-done
 fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
