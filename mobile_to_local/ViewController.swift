@@ -27,7 +27,7 @@ class ViewController: NSViewController {
     var mode             = "interactive"
     var silent           = false
     var unbind           = true
-    var listType         = "removeList"
+    var listType         = "keeplist"
     var plistData        = [String:Any]()
     
     // OS version info
@@ -270,7 +270,7 @@ class ViewController: NSViewController {
                 if mode == "silent" {
                     silent = true
                 }
-                listType         = plistData["listType"] as? String ?? "removeList"
+                listType         = plistData["listType"] as? String ?? "keeplist"
                 print("allowNewUsername: \(allowNewUsername)")
                 print("        userType: \(userType)")
                 print("          unbind: \(unbind)")
@@ -312,6 +312,8 @@ class ViewController: NSViewController {
                     case "-listType":
                         if ["removelist", "keeplist"].contains(CommandLine.arguments[i+1].lowercased()) {
                             listType = CommandLine.arguments[i+1].lowercased()
+                        } else {
+                            listType = "keeplist"
                         }
                     default:
                         writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
