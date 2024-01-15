@@ -1,4 +1,8 @@
 # Mobile to Local
+
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/BIG-RAT/mobile_to_local?display_name=tag) ![GitHub all releases](https://img.shields.io/github/downloads/BIG-RAT/mobile_to_local/total)
+ ![GitHub issues](https://img.shields.io/github/issues-raw/BIG-RAT/mobile_to_local) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/BIG-RAT/mobile_to_local) ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/BIG-RAT/mobile_to_local) ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/BIG-RAT/mobile_to_local)
+
 Migrate mobile Active Directory account to a local account.<br>
 Requires 10.13 or later.<br>
 Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/download/current/Mobile.to.Local.zip)
