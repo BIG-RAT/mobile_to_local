@@ -82,7 +82,7 @@ class ViewController: NSViewController {
     func completeMigration() {
 //        print("migration script - start")
 
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind) \(silent) \(listType)")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
 
 //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
