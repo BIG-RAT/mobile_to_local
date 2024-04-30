@@ -264,7 +264,7 @@ class ViewController: NSViewController {
             } else {
     //            print("settings: \(plistData)")
                 allowNewUsername = plistData["allowNewUsername"] as? Bool ?? false
-                userType         = plistData["userType"] as? String ?? "standard"
+                userType         = plistData["userType"] as? String ?? "current"
                 unbind           = plistData["unbind"] as? Bool ?? true
                 mode             = plistData["mode"] as? String ?? "interactive"
                 if mode == "silent" {
