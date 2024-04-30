@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="21701" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -286,10 +285,6 @@ Click migrate to convert your mobile account to a local one.</string>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MKp-LH-sXa">
                                 <rect key="frame" x="411" y="9" width="89" height="33"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="75" id="P1X-08-AZX"/>
-                                    <constraint firstAttribute="height" constant="21" id="ZsU-Q3-7xz"/>
-                                </constraints>
                                 <buttonCell key="cell" type="push" title="Migrate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6XM-7M-6j4">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -297,6 +292,10 @@ Click migrate to convert your mobile account to a local one.</string>
 DQ
 </string>
                                 </buttonCell>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="75" id="P1X-08-AZX"/>
+                                    <constraint firstAttribute="height" constant="21" id="ZsU-Q3-7xz"/>
+                                </constraints>
                                 <connections>
                                     <action selector="migrate:" target="XfG-lQ-9wD" id="zrV-GD-EYZ"/>
                                 </connections>
