@@ -271,10 +271,10 @@ class ViewController: NSViewController {
                     silent = true
                 }
                 listType         = plistData["listType"] as? String ?? "keeplist"
-                print("allowNewUsername: \(allowNewUsername)")
-                print("        userType: \(userType)")
-                print("          unbind: \(unbind)")
-                print("          silent: \(silent)")
+//                print("allowNewUsername: \(allowNewUsername)")
+//                print("        userType: \(userType)")
+//                print("          unbind: \(unbind)")
+//                print("          silent: \(silent)")
             }
             
             // read commandline args
@@ -302,9 +302,10 @@ class ViewController: NSViewController {
                             silent = true
                         }
                     case "-userType":
-                        userType = CommandLine.arguments[i+1]
-                        // default to standard if input is not something expected
-                        userType = (userType.lowercased() == "admin") ? "admin":"standard"
+                        if userType.lowercased() != "current" {
+                            userType = CommandLine.arguments[i+1]
+                            userType = (userType.lowercased() == "admin") ? "admin":"standard"
+                        }
                     case "-unbind":
                         if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                             unbind = false
@@ -317,7 +318,7 @@ class ViewController: NSViewController {
                         }
                     default:
                         writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
-                        print("unknown switch passed: \(CommandLine.arguments[i])")
+//                        print("unknown switch passed: \(CommandLine.arguments[i])")
                     }
                 }
             }
