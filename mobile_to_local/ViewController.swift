@@ -21,8 +21,8 @@ class ViewController: NSViewController {
     var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 //    var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
-    var newUser                = ""
-    var userType               = ""
+    var newUser          = ""
+    var userType         = "current"
     var allowNewUsername = false
     var mode             = "interactive"
     var silent           = false
@@ -398,6 +398,7 @@ class ViewController: NSViewController {
                 alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
                 NSApplication.shared.terminate(self)
             }
+            
             // Do any additional setup after loading the view.
 
             if silent {
