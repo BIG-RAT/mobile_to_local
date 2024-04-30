@@ -33,6 +33,14 @@ if [ ! -f $logFile ];then
     /bin/chmod 644 $logFile
 fi
 
+log """mobile to local parameters:
+                        new username: $1
+                        password for user: $2
+                        type of user to create: $4
+                        unbind: $5
+                        silent: $6
+                        attribute mode: $7"""
+
 ## grab the computer name to use in the log
 computerName=$(scutil --get ComputerName)
 
@@ -46,6 +54,8 @@ newName="$1"
 ## check admin status
 isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
 log "result of isAdmin check: ${isAdmin}"
+
+exit 0
 
 ## check the OriginalNodeName to determine if it is a local or mobile account
 mobileUserCheck=$($dsclBin . -read "/Users/$currentName" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard)
@@ -80,6 +90,8 @@ fi
 userType="$4"
 if [ "${userType}" = "standard" ];then
     log "User will be migrated as a $userType user"
+elif [ "${userType}" = "current" ];then
+    log "User type will not be changed"
 else
     log "User will be migrated as an $userType user"
 fi
