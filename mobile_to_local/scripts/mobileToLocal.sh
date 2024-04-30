@@ -33,12 +33,6 @@ if [ ! -f $logFile ];then
     /bin/chmod 644 $logFile
 fi
 
-log """mobile to local parameters:
-                        new username: $1
-                        type of user to create: $4
-                        unbind: $5
-                        silent: $6
-                        attribute mode: $7"""
 
 ## grab the computer name to use in the log
 computerName=$(scutil --get ComputerName)
@@ -49,6 +43,13 @@ currentName=$( stat -f%Su /dev/console )
 
 ## new username
 newName="$1"
+
+log """mobile to local parameters:
+                        new username: $1
+                        type of user to create: $4
+                        unbind: $5
+                        silent: $6
+                        attribute mode: $7"""
 
 ## check admin status
 isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
