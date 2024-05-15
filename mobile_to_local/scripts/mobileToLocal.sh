@@ -20,7 +20,7 @@ log() {
 dsclBin="/usr/bin/dscl"
 
 ## to list attributes
-## dscl -raw . -read /Users/${currentUser} | grep dsAttrType | awk -F":" '{ print $2 }'
+## $dsclBin -raw . -read /Users/${currentUser} | grep dsAttrType | awk -F":" '{ print $2 }'
 
 ## standard attributes for a local account - these will not be deleted from the mobile account
 attribsToKeep="_writers_AvatarRepresentation\|_writers_hint\|_writers_inputSources\|_writers_jpegphoto\|_writers_passwd\|_writers_picture\|_writers_unlockOptions\|_writers_UserCertificate\|accountPolicyData\|AvatarRepresentation\|inputSources\|record_daemon_version\|unlockOptions\|AltSecurityIdentities\|AppleMetaNodeLocation\|AuthenticationAuthority\|GeneratedUID\|JPEGPhoto\|NFSHomeDirectory\|Password\|Picture\|PrimaryGroupID\|RealName\|RecordName\|RecordType\|UniqueID\|UserShell"
@@ -39,7 +39,7 @@ computerName=$(scutil --get ComputerName)
 
 ## get logged in username and UniqueID (id can no longer be reset)
 currentName=$( stat -f%Su /dev/console )
-#oldID=$( dscl . -read /Users/"$currentName" UniqueID | awk '/UniqueID: / {print $2}' )
+#oldID=$( $dsclBin . -read /Users/"$currentName" UniqueID | awk '/UniqueID: / {print $2}' )
 
 ## new username
 newName="$1"
@@ -66,7 +66,7 @@ log "current user: ${currentName} is a mobile user."
 
 if [ $6 != "true" ];then
     ## verify we're either keeping the same username or new name doesn't exist
-    nameCheck=$(dscl . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
+    nameCheck=$($dsclBin . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
     if [ "$nameCheck" = "0" ] && [ ! "${newName}" = "${currentName}" ];then
         ## account already exists and belongs to a different user
         log "${newName} belongs to another user."
@@ -75,6 +75,19 @@ if [ $6 != "true" ];then
     password="$2"
 fi
 
+## get primary group id
+groupId=$($dsclBin . read /Users/"${currentName}" PrimaryGroupID | awk '{print $2}')
+staffAlias=$($dsclBin . list /Groups PrimaryGroupID | grep $groupId | awk '{print $1}')
+if [ $staffAlias -eq "" ];then
+    log "creating new group (staffAlias) to replace DomainUsers"
+    staffAlias="staffAlias"
+    $dsclBin . create /Groups/$staffAlias
+    $dsclBin . create /Groups/DomainUsers gid $groupId
+else
+    log "found existing local group ($staffAlias) to use for DomainUsers"
+fi
+log "adding built-in group staff to $staffAlias"
+dseditgroup -o edit -a staff -t group $staffAlias
 
 ## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
 renameHomeDir="$3"
@@ -114,7 +127,7 @@ else
 fi
 
 #    ## capture account photo to migrate to the new account
-#    JpegPhoto=$(dscl . -read "/Users/$currentName" JPEGPhoto > "/tmp/$currentName.hex"
+#    JpegPhoto=$($dsclBin . -read "/Users/$currentName" JPEGPhoto > "/tmp/$currentName.hex"
 #    xxd -plain -revert "/tmp/$currentName.hex" > "/tmp/$currentName.png")
 
 if [ "$unbind" == "true" ];then
@@ -152,7 +165,7 @@ echo "opendirectoryd restarted with pid $pid"
 ## find first available id
 ## can no longer reset id
 #newID="501"
-#allUsers=$(dscl . -list /Users UniqueID | awk '{ print $2 }')
+#allUsers=$($dsclBin . -list /Users UniqueID | awk '{ print $2 }')
 #isUnique=$(echo "$allUsers" | grep "^$newID$")
 #while [ "$isUnique" != "" ];do
 #    ((newID++))
@@ -201,21 +214,21 @@ log "------------ Finished deleting attributes ------------"
 ## ensure proper group on home directory
 ## skipping the change of owner permissions on the user folder to avoide PPPC prompts for contacts and calendars??
 ## handle later, fixing permissions on all files/folders
-homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
-log "Setting group and permissions for ${homeDir}"
-    log "chown -R :staff ${homeDir}"
-result=$(chown -R ":staff" "${homeDir}" &> /dev/null;echo "$?")
-if [ "$result" = "0" ];then
-    log "updated group for home directory"
-else
-    log "failed to updated group for home directory"
-fi
-
-## add user to staff group
-result=$(/usr/sbin/dseditgroup -o edit -n /Local/Default -a "${currentName}" -t user staff;echo "$?")
-if [ "$result" = "0" ];then
-    log "${currentName} was added to the staff group"
-fi
+#homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
+#log "Setting group and permissions for ${homeDir}"
+#    log "chown -Rf :staff ${homeDir}"
+#    result=$(chown -Rf ":staff" "${homeDir}" &> /dev/null;echo "$?")
+#if [ "$result" = "0" ];then
+#    log "updated group for home directory"
+#else
+#    log "failed to updated group for home directory"
+#fi
+#
+### add user to staff group
+#result=$(/usr/sbin/dseditgroup -o edit -n /Local/Default -a "${currentName}" -t user staff;echo "$?")
+#if [ "$result" = "0" ];then
+#    log "${currentName} was added to the staff group"
+#fi
 
 ## add to the admins group, if appropriate
 if (([ "${isAdmin}" = "yes" ] && [ "$userType" != "standard" ]) || [ "$userType" = "admin" ]);then

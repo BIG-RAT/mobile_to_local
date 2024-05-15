@@ -22,7 +22,7 @@ class ViewController: NSViewController {
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 //    var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
     var newUser          = ""
-    var userType         = "current"
+    var userType         = ""
     var allowNewUsername = false
     var mode             = "interactive"
     var silent           = false
@@ -302,10 +302,8 @@ class ViewController: NSViewController {
                             silent = true
                         }
                     case "-userType":
-                        if userType.lowercased() != "current" {
-                            userType = CommandLine.arguments[i+1]
-                            userType = (userType.lowercased() == "admin") ? "admin":"standard"
-                        }
+                        userType = CommandLine.arguments[i+1]
+                        userType = (userType.lowercased() == "admin") ? "admin":"standard"
                     case "-unbind":
                         if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                             unbind = false
