@@ -82,12 +82,13 @@ if [ "$staffAlias" = "" ];then
     log "creating new group (staffAlias) to replace <domain>\DomainUsers"
     staffAlias="staffAlias"
     $dsclBin . create /Groups/$staffAlias
-    $dsclBin . create /Groups/DomainUsers gid $groupId
+    $dsclBin . create /Groups/$staffAlias gid $groupId
+    $dsclBin . create /Groups/$staffAlias RealName $staffAlias
 else
     log "found existing local group ($staffAlias) to use for DomainUsers"
 fi
 log "adding built-in group staff to $staffAlias"
-dseditgroup -o edit -a staff -t group $staffAlias
+/usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
 
 ## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
 renameHomeDir="$3"
