@@ -78,8 +78,8 @@ fi
 ## get primary group id
 groupId=$($dsclBin . read /Users/"${currentName}" PrimaryGroupID | awk '{print $2}')
 staffAlias=$($dsclBin . list /Groups PrimaryGroupID | grep $groupId | awk '{print $1}')
-if [ $staffAlias -eq "" ];then
-    log "creating new group (staffAlias) to replace DomainUsers"
+if [ "$staffAlias" = "" ];then
+    log "creating new group (staffAlias) to replace <domain>\DomainUsers"
     staffAlias="staffAlias"
     $dsclBin . create /Groups/$staffAlias
     $dsclBin . create /Groups/DomainUsers gid $groupId
