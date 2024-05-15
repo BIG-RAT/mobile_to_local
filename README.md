@@ -11,8 +11,6 @@ Wanted to create an easy to use method to migrate mobile accounts to local accou
 
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/main.png "Mobile to Local")
 
-Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/download/current/Mobile.to.Local.zip)
-
 The app should be launched with elevated privileges:
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local```
