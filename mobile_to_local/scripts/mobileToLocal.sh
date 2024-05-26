@@ -50,6 +50,15 @@ log """mobile to local parameters:
                         unbind: $5
                         silent: $6
                         attribute mode: $7"""
+                        
+
+# check user has a secure token, if not make sure we have their password (can't run silently)
+hasToken=$($dsclBin . -read /Users/$currentName AuthenticationAuthority | grep -c ';SecureToken;')
+if [[ $hasToken -eq 0 && $6 = "true" ]];then
+    log "$currentName does not have a secure token, app cannot run silently - exiting"
+    exit 100
+fi
+
 
 ## check admin status
 isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
@@ -206,9 +215,7 @@ fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
 
-# check user has a secure token, if not need to set password
-hasToken=$($dsclBin . -read /Users/$currentName AuthenticationAuthority | grep -c ';SecureToken;')
-
+## set password if user has no secure token
 if [[ $hasToken -eq 0 ]]; then
     log "FileVault is enabled and $currentName does not have a secure token. Creating local password."
     $dsclBin . -passwd /Users/$currentName \'"${password}"\'
