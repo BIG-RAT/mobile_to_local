@@ -172,17 +172,6 @@ while [ "$pid" = "" ];do
 done
 echo "opendirectoryd restarted with pid $pid"
 
-## find first available id
-## can no longer reset id
-#newID="501"
-#allUsers=$($dsclBin . -list /Users UniqueID | awk '{ print $2 }')
-#isUnique=$(echo "$allUsers" | grep "^$newID$")
-#while [ "$isUnique" != "" ];do
-#    ((newID++))
-#    isUnique=$(echo "$allUsers" | grep "^$newID$")
-#done
-#echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: new id: $newID" >> /var/log/jamf.log
-
 ## export updated AuthenticationAuthority for the account
 log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
 ## localAuthenticationAuthority=$($dsclBin . -read /Users/"${currentName}" AuthenticationAuthority)
@@ -217,34 +206,10 @@ log "------------ Finished deleting attributes ------------"
 
 ## set password if user has no secure token
 if [[ $hasToken -eq 0 ]]; then
-    log "FileVault is enabled and $currentName does not have a secure token. Creating local password."
-    $dsclBin . -passwd /Users/$currentName \'"${password}"\'
+    log "$currentName does not have a secure token. Setting local password."
+    pwdResult=$($dsclBin . -passwd /Users/$currentName \'${password}\')
+    log "result of setting password: $pwdResult"
 fi
-
-#### for testing, to pause the script ####
-#touch /Users/Shared/pause.txt
-#while [ -f /Users/Shared/pause.txt ];do
-#    sleep 10
-#done
-
-## ensure proper group on home directory
-## skipping the change of owner permissions on the user folder to avoide PPPC prompts for contacts and calendars??
-## handle later, fixing permissions on all files/folders
-#homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
-#log "Setting group and permissions for ${homeDir}"
-#    log "chown -Rf :staff ${homeDir}"
-#    result=$(chown -Rf ":staff" "${homeDir}" &> /dev/null;echo "$?")
-#if [ "$result" = "0" ];then
-#    log "updated group for home directory"
-#else
-#    log "failed to updated group for home directory"
-#fi
-#
-### add user to staff group
-#result=$(/usr/sbin/dseditgroup -o edit -n /Local/Default -a "${currentName}" -t user staff;echo "$?")
-#if [ "$result" = "0" ];then
-#    log "${currentName} was added to the staff group"
-#fi
 
 ## add to the admins group, if appropriate
 if (([ "${isAdmin}" = "yes" ] && [ "$userType" != "standard" ]) || [ "$userType" = "admin" ]);then
@@ -279,11 +244,6 @@ if [ "${newName}" != "${currentName}" ];then
         $dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
     fi
 fi
-
-## update user id
-#log "Changing UniqueID from $oldID to $newID"
-#log "$dsclBin -u \"${newName}\" -P '*******' . -change \"/Users/${newName}\" UniqueID $oldID $newID"
-#$dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" UniqueID $oldID $newID
 
 ## fix permissions for all items owned by the previous name/id
 #log "Fix permissions for new UniqueID"
