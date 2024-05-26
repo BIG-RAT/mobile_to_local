@@ -38,7 +38,7 @@ fi
 computerName=$(scutil --get ComputerName)
 
 ## get logged in username and UniqueID (id can no longer be reset)
-currentName=$( stat -f%Su /dev/console )
+currentName=$(stat -f%Su /dev/console)
 #oldID=$( $dsclBin . -read /Users/"$currentName" UniqueID | awk '/UniqueID: / {print $2}' )
 
 ## new username
@@ -205,6 +205,15 @@ EOL
 fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
+
+# If FileVault is enabled - check user has a secure token, if not need to set password
+FVstatus=$(/usr/bin/fdesetup status | /usr/bin/grep -c 'On.')
+hasToken=$($dsclBin . -read /Users/$currentName AuthenticationAuthority | grep -c ';SecureToken;')
+
+if [[ $FVstatus -eq 1 && $hasToken -eq 0 ]]; then
+    log "FileVault is enabled and $currentName does not have a secure token. Creating local password."
+    $dsclBin . -passwd /Users/$currentName \'"${password}"\'
+fi
 
 #### for testing, to pause the script ####
 #touch /Users/Shared/pause.txt
