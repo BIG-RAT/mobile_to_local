@@ -206,11 +206,10 @@ fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
 
-# If FileVault is enabled - check user has a secure token, if not need to set password
-FVstatus=$(/usr/bin/fdesetup status | /usr/bin/grep -c 'On.')
+# check user has a secure token, if not need to set password
 hasToken=$($dsclBin . -read /Users/$currentName AuthenticationAuthority | grep -c ';SecureToken;')
 
-if [[ $FVstatus -eq 1 && $hasToken -eq 0 ]]; then
+if [[ $hasToken -eq 0 ]]; then
     log "FileVault is enabled and $currentName does not have a secure token. Creating local password."
     $dsclBin . -passwd /Users/$currentName \'"${password}"\'
 fi
