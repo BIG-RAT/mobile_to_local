@@ -86,10 +86,10 @@ class ViewController: NSViewController {
 
 //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
-        if exitResult == 1000 {
-            alert_dialog(header: "", message: "Account was not modified. User needs a secure token. Contact IT before trying again.")
-            NSApplication.shared.terminate(self)
-        }
+//        if exitResult == 100 {
+//            alert_dialog(header: "", message: "Account was not modified. User needs a secure token. Contact IT before trying again.")
+//            NSApplication.shared.terminate(self)
+//        }
     }
 
     @IBAction func cancel(_ sender: Any) {
