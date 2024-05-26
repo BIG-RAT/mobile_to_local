@@ -207,8 +207,7 @@ log "------------ Finished deleting attributes ------------"
 ## set password if user has no secure token
 if [[ $hasToken -eq 0 ]]; then
     log "$currentName does not have a secure token. Setting local password."
-    pwdResult=$($dsclBin . -passwd /Users/$currentName \'${password}\')
-    log "result of setting password: $pwdResult"
+    $dsclBin . -passwd /Users/$currentName \'$2\' 2>&1 | tee -a $logFile
 fi
 
 ## add to the admins group, if appropriate
