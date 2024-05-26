@@ -149,6 +149,8 @@ class ViewController: NSViewController {
         case 0:
             writeToLog(theMessage: "successfully migrated account.")
             NSApplication.shared.terminate(self)
+        case 100:
+            NSApplication.shared.terminate(self)
         case 244:
             writeToLog(theMessage: "Account \(newUser) already exists and belongs to another user.")
             if !silent {
