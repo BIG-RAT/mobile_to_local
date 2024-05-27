@@ -80,6 +80,7 @@ Available switches that can be passed:
         -userType: type of account to migrate to.  Either standard or admin.
           -unbind: whether or not to unbind after migrating.  Either true or false.
             -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
+                   Silent mode cannot be used if the user does not have a secure token.
         -listType: Defines how attributes will be removed.  Use either removeList (default) or keepList.
 </pre>
 
