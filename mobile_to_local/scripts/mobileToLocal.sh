@@ -12,12 +12,12 @@
 ## $7 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList) which is the default
 
 logFile="/private/var/log/mobile.to.local.log"
+dsclBin="/usr/bin/dscl"
 
 log() {
     /bin/echo "$(date "+%a %b %d %H:%M:%S") $computerName ${currentName}[migrate]: $1" >> $logFile
 }
 
-dsclBin="/usr/bin/dscl"
 
 ## to list attributes
 ## $dsclBin -raw . -read /Users/${currentUser} | grep dsAttrType | awk -F":" '{ print $2 }'
@@ -27,19 +27,17 @@ attribsToKeep="_writers_AvatarRepresentation\|_writers_hint\|_writers_inputSourc
 
 attribsToRemove=(_writers_LinkedIdentity account_instance cached_auth_policy cached_groups original_realname original_shell original_smb_home preserved_attributes AppleMetaRecordName CopyTimestamp EmailAddress FirstName JobTitle LastName MCXFlags MCXSettings OriginalAuthenticationAuthority OriginalNodeName PasswordPolicyOptions PhoneNumber PrimaryNTDomain SMBGroupRID SMBHome SMBHomeDrive SMBPasswordLastSet SMBPrimaryGroupSID SMBSID Street)
 
-## in case the log file does not exist
+## create log file if it does not exist
 if [ ! -f $logFile ];then
     /usr/bin/touch $logFile
     /bin/chmod 644 $logFile
 fi
-
 
 ## grab the computer name to use in the log
 computerName=$(scutil --get ComputerName)
 
 ## get logged in username and UniqueID (id can no longer be reset)
 currentName=$(stat -f%Su /dev/console)
-#oldID=$( $dsclBin . -read /Users/"$currentName" UniqueID | awk '/UniqueID: / {print $2}' )
 
 ## new username
 newName="$1"
@@ -52,7 +50,7 @@ log """mobile to local parameters:
                         attribute mode: $7"""
                         
 
-# check user has a secure token, if not make sure we have their password (can't run silently)
+# check if user has a secure token, if not make sure we have their password (can't run silently)
 hasToken=$($dsclBin . -read /Users/$currentName AuthenticationAuthority | grep -c ';SecureToken;')
 if [[ $hasToken -eq 0 && $6 = "true" ]];then
     log "$currentName does not have a secure token, app cannot run silently - exiting"
@@ -126,7 +124,7 @@ else
 fi
 
 ## define icon location
-theIcon="${BASH_SOURCE%/*}/../MigrateAsst.png"
+#theIcon="${BASH_SOURCE%/*}/../MigrateAsst.png"
 
 ## see if account is FileVault enabled
 FileVaultUserCheck=$(fdesetup list | grep -w "${currentName}")
@@ -207,7 +205,7 @@ log "------------ Finished deleting attributes ------------"
 ## set password if user has no secure token
 if [[ $hasToken -eq 0 ]]; then
     log "$currentName does not have a secure token. Setting local password."
-    $dsclBin . -passwd /Users/$currentName \'$2\' 2>&1 | tee -a $logFile
+    $dsclBin . -passwd /Users/$currentName """${2}""" | tee -a $logFile
 fi
 
 ## add to the admins group, if appropriate
