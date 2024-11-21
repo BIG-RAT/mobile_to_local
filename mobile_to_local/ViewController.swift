@@ -20,7 +20,7 @@ class ViewController: NSViewController {
     
     var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
-//    var LogFileW: FileHandle?  = FileHandle(forUpdatingAtPath: "/private/var/log/jamf.log")
+
     var newUser          = ""
     var userType         = ""
     var allowNewUsername = false
@@ -81,17 +81,65 @@ class ViewController: NSViewController {
 
     func completeMigration() {
 //        print("migration script - start")
+        
+        let tmpPassword = UUID()
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '\(tmpPassword)' 0 "+userType+" \(unbind)"+" \(silent) \(listType)")
 
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
 
 //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
+        
+        // reset local user's password
+        do {
+             try resetUserPassword(username: newUser, tmpPassword: "\(tmpPassword)", originalPassword: password.stringValue)
+             print("Password reset successfully.")
+         } catch {
+             print("Failed to reset password: \(error.localizedDescription)")
+         }
+        
 //        if exitResult == 100 {
 //            alert_dialog(header: "", message: "Account was not modified. User needs a secure token. Contact IT before trying again.")
 //            NSApplication.shared.terminate(self)
 //        }
     }
 
+    func resetUserPassword(username: String, tmpPassword: String, originalPassword: String) throws {
+        guard let session = ODSession.default() else {
+            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+        }
+
+        guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
+            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+        }
+
+        // Find the user record
+        let query = try ODQuery(
+            node: node,
+            forRecordTypes: kODRecordTypeUsers,
+            attribute: kODAttributeTypeRecordName,
+            matchType: ODMatchType(kODMatchEqualTo),
+            queryValues: username,
+            returnAttributes: kODAttributeTypeNativeOnly,
+            maximumResults: 1
+        )
+
+        guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+            print("User not found: \(username).")
+            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+        }
+
+        // Reset the password
+        do {
+            try userRecord.changePassword(tmpPassword, toPassword: originalPassword)
+            print("Password successfully changed for user \(username).")
+        } catch {
+            print("Failed password change for user \(username).")
+            print("Error: \(error.localizedDescription).")
+            throw NSError(domain: "OpenDirectory", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to change password: \(error.localizedDescription)"])
+        }
+    }
+    
     @IBAction func cancel(_ sender: Any) {
         NSApplication.shared.terminate(self)
     }
@@ -337,18 +385,18 @@ class ViewController: NSViewController {
             }
             if allowNewUsername {
 //                DispatchQueue.main.async {
-                    self.newUser_TextField.isEditable   = true
+                self.newUser_TextField.isEditable   = true
 //                }
                 // Privacy restrictions are preventing changing NSHomeDirectory in 10.14 and above
-                    if os.majorVersion == 10 && os.minorVersion < 14 {
-//                        DispatchQueue.main.async {
-                            self.updateHomeDir_button.isEnabled = true
-                            self.updateHomeDir_button.isHidden  = false
-                        updateHomeDir_button.toolTip = "New home folder name"
-//                        }
-                    } else {
-                        updateHomeDir_button.toolTip = "Not available for macOS 10.14 and later"
-                    }
+//                    if os.majorVersion == 10 && os.minorVersion < 14 {
+////                        DispatchQueue.main.async {
+//                            self.updateHomeDir_button.isEnabled = true
+//                            self.updateHomeDir_button.isHidden  = false
+//                        updateHomeDir_button.toolTip = "New home folder name"
+////                        }
+//                    } else {
+//                        updateHomeDir_button.toolTip = "Not available for macOS 10.14 and later"
+//                    }
             }
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
             newUser = shellResult[0]
@@ -407,7 +455,16 @@ class ViewController: NSViewController {
 
             if silent {
                 self.showLockWindow()
-                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
+                let tmpPassword = UUID()
+                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '\(tmpPassword)' 0 "+userType+" \(unbind)"+" \(silent) \(listType)")
+                
+                // reset local user's password
+                do {
+                     try resetUserPassword(username: newUser, tmpPassword: "\(tmpPassword)", originalPassword: password.stringValue)
+                     print("Password reset successfully.")
+                 } catch {
+                     print("Failed to reset password: \(error.localizedDescription)")
+                 }
 
                 logMigrationResult(exitValue: exitResult)
 
