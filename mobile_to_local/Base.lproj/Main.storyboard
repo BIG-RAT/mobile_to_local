@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22689"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -200,8 +201,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="513" height="278"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DWd-Be-SFk">
-                                <rect key="frame" x="162" y="112" width="109" height="17"/>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DWd-Be-SFk">
+                                <rect key="frame" x="162" y="105" width="109" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="New logon name:" id="UA3-cY-kQd">
                                     <font key="font" metaFont="system"/>
@@ -209,8 +210,8 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L2H-tX-wvN">
-                                <rect key="frame" x="274" y="109" width="216" height="22"/>
+                            <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L2H-tX-wvN">
+                                <rect key="frame" x="274" y="102" width="216" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="Ipr-Wc-tzr">
                                     <font key="font" metaFont="system"/>
@@ -218,8 +219,8 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U4S-Jf-6Dx">
-                                <rect key="frame" x="205" y="57" width="70" height="17"/>
+                            <textField focusRingType="none" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U4S-Jf-6Dx">
+                                <rect key="frame" x="205" y="72" width="70" height="17"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Password: " id="epx-6X-CTw">
                                     <font key="font" metaFont="system"/>
@@ -227,8 +228,8 @@
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <secureTextField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MSE-JM-FnQ">
-                                <rect key="frame" x="274" y="54" width="216" height="22"/>
+                            <secureTextField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MSE-JM-FnQ">
+                                <rect key="frame" x="274" y="69" width="216" height="22"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <secureTextFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" usesSingleLineMode="YES" id="YuC-hy-PsM">
                                     <font key="font" metaFont="system"/>
@@ -253,7 +254,7 @@ Gw
                                     <action selector="cancel:" target="XfG-lQ-9wD" id="66u-tF-uJu"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JoB-f9-LF3">
+                            <textField focusRingType="none" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JoB-f9-LF3">
                                 <rect key="frame" x="117" y="134" width="376" height="76"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <textFieldCell key="cell" sendsActionOnEndEditing="YES" state="on" id="vVB-3A-r7r">
@@ -275,14 +276,6 @@ Click migrate to convert your mobile account to a local one.</string>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="MigrateAsst" id="NVV-gM-GcC"/>
                             </imageView>
-                            <button toolTip="10.13 and earlier only" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="C4l-JJ-TLA">
-                                <rect key="frame" x="253" y="86" width="199" height="18"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="check" title="Update home directory name" bezelStyle="regularSquare" imagePosition="left" enabled="NO" inset="2" id="c0n-T5-6ip">
-                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
-                                </buttonCell>
-                            </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MKp-LH-sXa">
                                 <rect key="frame" x="411" y="9" width="89" height="33"/>
                                 <buttonCell key="cell" type="push" title="Migrate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6XM-7M-6j4">
@@ -309,7 +302,6 @@ DQ
                     <connections>
                         <outlet property="newUser_TextField" destination="L2H-tX-wvN" id="jm9-5i-3gj"/>
                         <outlet property="password" destination="MSE-JM-FnQ" id="8Qf-7y-Ctb"/>
-                        <outlet property="updateHomeDir_button" destination="C4l-JJ-TLA" id="Adz-vB-kXg"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
@@ -359,7 +351,7 @@ DQ
                                 </constraints>
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="MigrateAsst" id="lId-Nw-JNj"/>
                             </imageView>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lXP-vj-NAf">
+                            <textField focusRingType="none" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="lXP-vj-NAf">
                                 <rect key="frame" x="25" y="25" width="573" height="38"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="38" id="qvY-zU-nZe"/>

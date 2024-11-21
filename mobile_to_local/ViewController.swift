@@ -89,6 +89,7 @@ class ViewController: NSViewController {
         logMigrationResult(exitValue: exitResult)
         
         // reset local user's password if needed
+        writeToLog(theMessage: "Checking for SecureToken.")
         if !hasSecureToken(username: newUser) {
             do {
                 try resetUserPassword(username: newUser, originalPassword: password.stringValue)
@@ -98,7 +99,11 @@ class ViewController: NSViewController {
             }
         }
         
+        writeToLog(theMessage: "Logging the user out.")
         (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: "/bin/launchctl", "reboot", "user")
+        print("exitResult: \(exitResult)")
+        print("logout error: \(errorResult)")
+        print("logout text: \(shellResult)")
         
     }
     
@@ -135,12 +140,17 @@ class ViewController: NSViewController {
     func hasSecureToken(username: String) -> Bool {
         if let userRecord = OdUserRecord(username: username) {
             guard let aa = try? userRecord.recordDetails(forAttributes: ["dsAttrTypeStandard:AuthenticationAuthority"])["dsAttrTypeStandard:AuthenticationAuthority"] as? [String] else {
+                writeToLog(theMessage: "Unable to query user for a secure token.")
                 return false
             }
             for attrib in aa {
-                if attrib.contains("SecureToken") { return true }
+                if attrib.contains("SecureToken") {
+                    writeToLog(theMessage: "User has a secure token.")
+                    return true
+                }
             }
         }
+        writeToLog(theMessage: "User does not have a secure token.")
         return false
     }
 
