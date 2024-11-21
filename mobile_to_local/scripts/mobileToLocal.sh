@@ -211,10 +211,10 @@ fi
 #log "Fix permissions for new UniqueID"
 #find / -uid $oldID -exec chown -h $newID {} \; 2>/dev/null
 
-if [ $4 != "true" ];then
-    loggedInUser=$(stat -f%Su /dev/console)
-    ps -Ajc | grep loginwindow | grep "$loggedInUser" | grep -v grep | awk '{print $2}' | sudo xargs kill &
-    log "loginwindow restarted." &
-fi
+#if [ $4 != "true" ];then
+#    loggedInUser=$(stat -f%Su /dev/console)
+#    ps -Ajc | grep loginwindow | grep "$loggedInUser" | grep -v grep | awk '{print $2}' | sudo xargs kill &
+#    log "loginwindow restarted." &
+#fi
 
 #rm -fr $0
