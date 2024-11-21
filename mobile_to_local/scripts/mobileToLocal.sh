@@ -68,7 +68,6 @@ if [ $4 != "true" ];then
         log "${newName} belongs to another user."
         exit 500
     fi
-    password="$2"
 fi
 
 ## get primary group id
@@ -122,7 +121,7 @@ fi
 if [ "$unbind" == "true" ];then
 ## unbind
     log "performing machine unbind"
-    /usr/sbin/dsconfigad -remove -force -username "$currentName" -password "${password}"
+    /usr/sbin/dsconfigad -remove -force -username "$currentName" -password "123456"
     log "result of unbind operation: $?"
     /bin/rm "/Library/Preferences/OpenDirectory/Configurations/Active Directory/*.plist"
 fi

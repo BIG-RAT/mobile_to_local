@@ -22,7 +22,7 @@ class ViewController: NSViewController {
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
     var newUser          = ""
-    var userType         = ""
+    var userType         = "-"
     var allowNewUsername = false
     var mode             = "interactive"
     var silent           = false
