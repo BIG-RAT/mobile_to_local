@@ -81,40 +81,35 @@ class ViewController: NSViewController {
 
     func completeMigration() {
 //        print("migration script - start")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)")
+            
+        //        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
         
-        let tmpPassword = UUID()
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '\(tmpPassword)' 0 "+userType+" \(unbind)"+" \(silent) \(listType)")
-
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
-
-//        print("migration script - end")
+        //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
         
-        // reset local user's password
+        // reset local user's password if needed
         do {
-             try resetUserPassword(username: newUser, tmpPassword: "\(tmpPassword)", originalPassword: password.stringValue)
-             print("Password reset successfully.")
-         } catch {
-             print("Failed to reset password: \(error.localizedDescription)")
-         }
-        
-//        if exitResult == 100 {
-//            alert_dialog(header: "", message: "Account was not modified. User needs a secure token. Contact IT before trying again.")
-//            NSApplication.shared.terminate(self)
-//        }
+            try resetUserPassword(username: newUser, originalPassword: password.stringValue)
+            print("Password reset successfully.")
+        } catch {
+            print("Failed to reset password: \(error.localizedDescription)")
+        }
     }
-
-    func resetUserPassword(username: String, tmpPassword: String, originalPassword: String) throws {
+    
+    func OdUserRecord(username: String) -> ODRecord? {
         guard let session = ODSession.default() else {
-            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+//            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+            return nil
         }
 
         guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
-            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+//            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+            return nil
         }
 
         // Find the user record
-        let query = try ODQuery(
+        let query = try? ODQuery(
             node: node,
             forRecordTypes: kODRecordTypeUsers,
             attribute: kODAttributeTypeRecordName,
@@ -124,19 +119,36 @@ class ViewController: NSViewController {
             maximumResults: 1
         )
 
-        guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+        guard let results = try? query?.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
             print("User not found: \(username).")
-            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+//            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+            return nil
         }
+        return userRecord
+    }
+    
+    func hasSecureToken(username: String) -> Bool {
+        if let userRecord = OdUserRecord(username: username) {
+            guard let aa = try? userRecord.recordDetails(forAttributes: ["dsAttrTypeStandard:AuthenticationAuthority"])["dsAttrTypeStandard:AuthenticationAuthority"] as? [String] else {
+                return false
+            }
+            for attrib in aa {
+                if attrib.contains("SecureToken") { return true }
+            }
+        }
+        return false
+    }
 
-        // Reset the password
-        do {
-            try userRecord.changePassword(tmpPassword, toPassword: originalPassword)
-            print("Password successfully changed for user \(username).")
-        } catch {
-            print("Failed password change for user \(username).")
-            print("Error: \(error.localizedDescription).")
-            throw NSError(domain: "OpenDirectory", code: 4, userInfo: [NSLocalizedDescriptionKey: "Failed to change password: \(error.localizedDescription)"])
+    func resetUserPassword(username: String, originalPassword: String) throws {
+        if let userRecord = OdUserRecord(username: username), !hasSecureToken(username: newUser) {
+            // Reset the password
+            do {
+                try userRecord.changePassword(nil, toPassword: originalPassword)
+                writeToLog(theMessage: "Password successfully set for user \(username).")
+            } catch {
+                writeToLog(theMessage: "Failed password set for user \(username).")
+                writeToLog(theMessage: "Error: \(error.localizedDescription).")
+            }
         }
     }
     
@@ -454,19 +466,15 @@ class ViewController: NSViewController {
             // Do any additional setup after loading the view.
 
             if silent {
-                self.showLockWindow()
-                let tmpPassword = UUID()
-                (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '\(tmpPassword)' 0 "+userType+" \(unbind)"+" \(silent) \(listType)")
-                
-                // reset local user's password
-                do {
-                     try resetUserPassword(username: newUser, tmpPassword: "\(tmpPassword)", originalPassword: password.stringValue)
-                     print("Password reset successfully.")
-                 } catch {
-                     print("Failed to reset password: \(error.localizedDescription)")
-                 }
-
-                logMigrationResult(exitValue: exitResult)
+                if hasSecureToken(username: newUser) {
+                    self.showLockWindow()
+                    
+                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)")
+                    
+                    logMigrationResult(exitValue: exitResult)
+                } else {
+                    writeToLog(theMessage: "\(newUser) does not have a secure token, cannot run silently.")
+                }
 
                 NSApplication.shared.terminate(self)
             } else {

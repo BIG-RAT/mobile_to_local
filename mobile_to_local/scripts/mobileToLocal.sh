@@ -4,12 +4,10 @@
 
 ## passed variables
 ## $1 - new username
-## $2 - temporary password for user
-## $3 - indicate if we're changing the home directory name; 0 - no change, 1 - change
-## $4 - type of user to create; standard or admin
-## $5 - whether or not to unbind - true or false
-## $6 - whether or not the app runs silently - true or false
-## $7 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList) which is the default
+## $2 - type of user to create; standard or admin
+## $3 - whether or not to unbind - true or false
+## $4 - whether or not the app runs silently - true or false
+## $5 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList) which is the default
 
 logFile="/private/var/log/mobile.to.local.log"
 dsclBin="/usr/bin/dscl"
@@ -44,20 +42,11 @@ newName="$1"
 
 log """mobile to local parameters:
                         new username: $1
-                        type of user to create: $4
-                        unbind: $5
-                        silent: $6
-                        attribute mode: $7"""
+                        type of user to create: $2
+                        unbind: $3
+                        silent: $4
+                        attribute mode: $5"""
                         
-
-# check if user has a secure token, if not make sure we have their password (can't run silently)
-hasToken=$($dsclBin . -read /Users/$currentName AuthenticationAuthority | grep -c ';SecureToken;')
-if [[ $hasToken -eq 0 && $6 = "true" ]];then
-    log "$currentName does not have a secure token, app cannot run silently - exiting"
-    exit 100
-fi
-
-
 ## check admin status
 isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
 log "result of isAdmin check: ${isAdmin}"
@@ -71,7 +60,7 @@ if [ "${mobileUserCheck}" = "" ];then
 fi
 log "current user: ${currentName} is a mobile user."
 
-if [ $6 != "true" ];then
+if [ $4 != "true" ];then
     ## verify we're either keeping the same username or new name doesn't exist
     nameCheck=$($dsclBin . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
     if [ "$nameCheck" = "0" ] && [ ! "${newName}" = "${currentName}" ];then
@@ -97,16 +86,8 @@ fi
 log "adding built-in group staff to $staffAlias"
 /usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
 
-## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
-#renameHomeDir="$3"
-#if [ "${renameHomeDir}" = "1" ];then
-#    log "Home directory will be renamed"
-#else
-#    log "Home directory will not be renamed"
-#fi
-
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
-userType="$4"
+userType="$2"
 if [ "${userType}" = "standard" ];then
     log "User will be migrated as a $userType user"
 elif [ "${userType}" = "current" ];then
@@ -116,7 +97,7 @@ else
 fi
 
 ## set the unbind var; 'true' or 'false'
-unbind="$5"
+unbind="$3"
 if [ "${unbind}" = "true" ];then
     log "machine will be unbound from Active Directory"
 else
@@ -172,15 +153,14 @@ echo "opendirectoryd restarted with pid $pid"
 
 ## export updated AuthenticationAuthority for the account
 log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
-## localAuthenticationAuthority=$($dsclBin . -read /Users/"${currentName}" AuthenticationAuthority)
 log "AuthenticationAuthority for local account:"
 localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
 log "${localAuthenticationAuthority}"
 
 log "------------- Start deleting attributes --------------"
-log "    delete using $7"
+log "    delete using $5"
 ## remove attributes from mobile account - start
-if [[ $7 == "removelist" ]];then
+if [[ $5 == "removelist" ]];then
     for theAttribute in "${attribsToRemove[@]}";do
         log "deleting attribute: $theAttribute"
         if [[ $theAttribute == "AppleMetaRecordName" || $theAttribute == "PrimaryNTDomain" ]];then
@@ -188,25 +168,18 @@ if [[ $7 == "removelist" ]];then
         else
             $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
         fi
-        ##
     done
 else
 while read theAttribute;do
     log "deleting attribute: $theAttribute"
     $dsclBin -raw . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
-#    #    echo $?
+#    echo $?
 done << EOL
 $($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $1 ":" $2}' | grep -v -w "${attribsToKeep}")
 EOL
 fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
-
-## set password if user has no secure token - needs password
-if [[ $hasToken -eq 0 ]]; then
-    log "$currentName does not have a secure token. Setting local password."
-    $dsclBin . -passwd /Users/$currentName """${2}""" | tee -a $logFile
-fi
 
 ## add to the admins group, if appropriate
 if (([ "${isAdmin}" = "yes" ] && [ "$userType" != "standard" ]) || [ "$userType" = "admin" ]);then
@@ -232,21 +205,13 @@ if [ "${newName}" != "${currentName}" ];then
     $dsclBin . -change "/Users/${currentName}" RecordName "${currentName}" "${newName}"
     log "adding alias for old username: ${currentName}"
     $dsclBin . -append "/Users/${newName}" RecordName "${currentName}"
-#    if [ "${renameHomeDir}" = "1" ];then
-#        log "Moving (renaming) current home directory ${homeDir} to /Users/${newName}"
-#        /bin/mv "${homeDir}" "/Users/${newName}"
-#        
-#        log "setting home directory (NFSHomeDirectory) to /Users/${newName}"
-#        log "$dsclBin -u ${newName} -P '********' . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"/Users/${newName}\""
-#        $dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
-#    fi
 fi
 
 ## fix permissions for all items owned by the previous name/id
 #log "Fix permissions for new UniqueID"
 #find / -uid $oldID -exec chown -h $newID {} \; 2>/dev/null
 
-if [ $6 != "true" ];then
+if [ $4 != "true" ];then
     loggedInUser=$(stat -f%Su /dev/console)
     ps -Ajc | grep loginwindow | grep "$loggedInUser" | grep -v grep | awk '{print $2}' | sudo xargs kill &
     log "loginwindow restarted." &
