@@ -89,12 +89,17 @@ class ViewController: NSViewController {
         logMigrationResult(exitValue: exitResult)
         
         // reset local user's password if needed
-        do {
-            try resetUserPassword(username: newUser, originalPassword: password.stringValue)
-            print("Password reset successfully.")
-        } catch {
-            print("Failed to reset password: \(error.localizedDescription)")
+        if !hasSecureToken(username: newUser) {
+            do {
+                try resetUserPassword(username: newUser, originalPassword: password.stringValue)
+                writeToLog(theMessage: "Password reset successfully.")
+            } catch {
+                writeToLog(theMessage: "Failed to reset password: \(error.localizedDescription)")
+            }
         }
+        
+        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: "/bin/launchctl", "reboot", "user")
+        
     }
     
     func OdUserRecord(username: String) -> ODRecord? {
@@ -140,7 +145,7 @@ class ViewController: NSViewController {
     }
 
     func resetUserPassword(username: String, originalPassword: String) throws {
-        if let userRecord = OdUserRecord(username: username), !hasSecureToken(username: newUser) {
+        if let userRecord = OdUserRecord(username: username) {
             // Reset the password
             do {
                 try userRecord.changePassword(nil, toPassword: originalPassword)
