@@ -4,7 +4,7 @@
 
 ## passed variables
 ## $1 - new username
-## $2 - password for user
+## $2 - temporary password for user
 ## $3 - indicate if we're changing the home directory name; 0 - no change, 1 - change
 ## $4 - type of user to create; standard or admin
 ## $5 - whether or not to unbind - true or false
@@ -98,12 +98,12 @@ log "adding built-in group staff to $staffAlias"
 /usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
 
 ## renameHomeDir is 0 if we're not renaming the user home directory to the new name (if different the the existing) and 1 if we are
-renameHomeDir="$3"
-if [ "${renameHomeDir}" = "1" ];then
-    log "Home directory will be renamed"
-else
-    log "Home directory will not be renamed"
-fi
+#renameHomeDir="$3"
+#if [ "${renameHomeDir}" = "1" ];then
+#    log "Home directory will be renamed"
+#else
+#    log "Home directory will not be renamed"
+#fi
 
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
 userType="$4"
@@ -202,7 +202,7 @@ fi
 ## remove attributes from mobile account - end
 log "------------ Finished deleting attributes ------------"
 
-## set password if user has no secure token
+## set password if user has no secure token - needs password
 if [[ $hasToken -eq 0 ]]; then
     log "$currentName does not have a secure token. Setting local password."
     $dsclBin . -passwd /Users/$currentName """${2}""" | tee -a $logFile
@@ -232,14 +232,14 @@ if [ "${newName}" != "${currentName}" ];then
     $dsclBin . -change "/Users/${currentName}" RecordName "${currentName}" "${newName}"
     log "adding alias for old username: ${currentName}"
     $dsclBin . -append "/Users/${newName}" RecordName "${currentName}"
-    if [ "${renameHomeDir}" = "1" ];then
-        log "Moving (renaming) current home directory ${homeDir} to /Users/${newName}"
-        /bin/mv "${homeDir}" "/Users/${newName}"
-        
-        log "setting home directory (NFSHomeDirectory) to /Users/${newName}"
-        log "$dsclBin -u ${newName} -P '********' . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"/Users/${newName}\""
-        $dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
-    fi
+#    if [ "${renameHomeDir}" = "1" ];then
+#        log "Moving (renaming) current home directory ${homeDir} to /Users/${newName}"
+#        /bin/mv "${homeDir}" "/Users/${newName}"
+#        
+#        log "setting home directory (NFSHomeDirectory) to /Users/${newName}"
+#        log "$dsclBin -u ${newName} -P '********' . -change \"/Users/${newName}\" NFSHomeDirectory \"${homeDir}\" \"/Users/${newName}\""
+#        $dsclBin -u "${newName}" -P \'"${password}"\' . -change "/Users/${newName}" NFSHomeDirectory "${homeDir}" "/Users/${newName}"
+#    fi
 fi
 
 ## fix permissions for all items owned by the previous name/id
