@@ -541,7 +541,7 @@ class ViewController: NSViewController {
     override func viewDidAppear() {
 
 //      Make sure the window is not restorable, to get the cursor in the username field
-        NSApplication.shared.mainWindow?.makeFirstResponder(newUser_TextField)
+        NSApplication.shared.mainWindow?.makeFirstResponder(password_TextField)
         
     }
 
