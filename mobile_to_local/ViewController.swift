@@ -68,7 +68,7 @@ class ViewController: NSViewController {
                 self.completeMigration()
             }
 
-            showLockWindow()
+//            showLockWindow()
 
         } else {
             writeToLog(theMessage: "Unable to verify password.")
@@ -100,22 +100,12 @@ class ViewController: NSViewController {
         }
         
         writeToLog(theMessage: "Clean up AuthenticationAuthority")
-        do {
-            try Function.shared.aaCleanup(username: NSUserName())
-        } catch {
-            print("Error: \(error.localizedDescription)")
-        }
-
+        let cleanupResult = Function.shared.aaCleanup(username: NSUserName())
+        writeToLog(theMessage: "Clean up result: \(cleanupResult)")
         
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
-            
-        //        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
-        
-        //        print("migration script - end")
-        logMigrationResult(exitValue: exitResult)
-        
-        // reset local user's password if needed - must occure after demobilization
         writeToLog(theMessage: "Checking for SecureToken.")
+        
+        // reset local user's password if needed
         if !hasSecureToken(username: newUser) {
             do {
                 try resetUserPassword(username: newUser, originalPassword: password.stringValue)
@@ -124,13 +114,20 @@ class ViewController: NSViewController {
                 writeToLog(theMessage: "Failed to reset password: \(error.localizedDescription)")
             }
         }
+
+        
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+                    
+          //print("migration script - end")
+//        logMigrationResult(exitValue: exitResult)
+        
         
         writeToLog(theMessage: "Logging the user out.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
-        logMigrationResult(exitValue: exitResult)
-        writeToLog(theMessage: "exitResult: \(exitResult)")
-        writeToLog(theMessage: "logout error: \(errorResult)")
-        writeToLog(theMessage: "logout text: \(shellResult)")
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
+//        logMigrationResult(exitValue: exitResult)
+//        writeToLog(theMessage: "exitResult: \(exitResult)")
+//        writeToLog(theMessage: "logout error: \(errorResult)")
+//        writeToLog(theMessage: "logout text: \(shellResult)")
         
     }
     

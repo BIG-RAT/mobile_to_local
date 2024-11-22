@@ -13,34 +13,59 @@ class Function: NSObject {
     
     static let shared = Function()
     
-    func aaCleanup(username: String) throws {
+    func aaCleanup(username: String) -> [String] {
+        var currentAuthorities = [String]()
+        var message = [String]()
+        do {
+            // Connect to the local node
+            guard let session = ODSession.default() else {
+                print("Unable to create ODSession")
+//                throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to create ODSession"])
+                return ["Unable to create ODSession"]
+            }
+            print("Created ODSession")
+            
+            let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
+            print("Connected to /Local/Default")
+            
+            // Find the user record
+            let query = try ODQuery(
+                node: node,
+                forRecordTypes: kODRecordTypeUsers,
+                attribute: kODAttributeTypeRecordName,
+                matchType: ODMatchType(kODMatchEqualTo),
+                queryValues: username,
+                returnAttributes: kODAttributeTypeNativeOnly,
+                maximumResults: 1
+            )
 
-        // Connect to the local node
-        guard let session = ODSession.default() else {
-            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to create ODSession"])
-        }
-        
-        let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
+            guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+                print("User not found: \(username).")
+//                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+                return ["User not found: \(username)"]
+            }
             
-        // Get the user record
-        let userRecord = try node.record(
-            withRecordType: kODRecordTypeUsers,
-            name: username,
-            attributes: nil
-        )
-        
-        // Fetch the current AuthenticationAuthority attribute
-        guard let authAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
-            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "AuthenticationAuthority attribute not found"])
-        }
-        print("Current AuthenticationAuthority attribute: \(authAuthorities)")
+            // Fetch the current AuthenticationAuthority attribute
+            guard let authAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
+                print("AuthenticationAuthority attribute not found")
+                return ["AuthenticationAuthority attribute not found"]
+//                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "AuthenticationAuthority attribute not found"])
+            }
+            currentAuthorities = authAuthorities
+            print("Current AuthenticationAuthority attribute: \(authAuthorities)")
             
-        // Filter out the LocalCachedUser entry
-        let updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") || !$0.contains("Kerberos5") }
-        
-        // Update the AuthenticationAuthority attribute
-        try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
-        print("Updated AuthenticationAuthority attribute successfully: \(authAuthorities)")
+            // Filter out the LocalCachedUser entry
+            let updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") || !$0.contains("Kerberos5") }
+            
+            // Update the AuthenticationAuthority attribute
+            message = ["updating AuthenticationAuthority"]
+            try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
+            print("Updated AuthenticationAuthority attribute successfully: \(authAuthorities)")
+            message = updatedAuthAuthorities
+        } catch {
+            return message
+        }
+        return message
     }
     
     func isAdmin(username: String) -> Bool {
