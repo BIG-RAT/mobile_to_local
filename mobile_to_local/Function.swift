@@ -14,7 +14,6 @@ class Function: NSObject {
     static let shared = Function()
     
     func aaCleanup(username: String) -> [String] {
-        var currentAuthorities = [String]()
         var message = [String]()
         
         print("username: \(username)")
@@ -54,18 +53,30 @@ class Function: NSObject {
                 return ["AuthenticationAuthority attribute not found"]
 //                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "AuthenticationAuthority attribute not found"])
             }
-            currentAuthorities = authAuthorities
             print("Current AuthenticationAuthority attribute: \(authAuthorities)")
             
             // Filter out the LocalCachedUser entry
-            var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
-            updatedAuthAuthorities = updatedAuthAuthorities.filter { !$0.contains("Kerberosv5") }
+//            var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
+//            updatedAuthAuthorities = updatedAuthAuthorities.filter { !$0.contains("Kerberosv5") }
             
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
-            try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
-            print("Updated AuthenticationAuthority attribute successfully: \(updatedAuthAuthorities)")
-            message = updatedAuthAuthorities
+            for attrib in authAuthorities {
+                if attrib.contains("LocalCachedUser") || attrib.contains("Kerberosv5") {
+                    print("Try to removed attribute: \(attrib)")
+                    try userRecord.removeValue(attrib, fromAttribute: kODAttributeTypeAuthenticationAuthority)
+                    print("Removed attribute: \(attrib)")
+                }
+            }
+            guard let newAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
+                print("AuthenticationAuthority attribute not found")
+                return ["AuthenticationAuthority attribute not found"]
+//                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "AuthenticationAuthority attribute not found"])
+            }
+            
+//            try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
+            print("Updated AuthenticationAuthority attribute successfully: \(newAuthorities)")
+            message = newAuthorities
         } catch {
             return message
         }
