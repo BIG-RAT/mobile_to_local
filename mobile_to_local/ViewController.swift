@@ -80,8 +80,26 @@ class ViewController: NSViewController {
 
     func completeMigration() {
 //        print("migration script - start")
+        // see is user is an admin
+        let isAdmin = Function.shared.isAdmin(username: newUser)
+        writeToLog(theMessage: "isAdmin: \(isAdmin)")
+        if userType == "current" {
+            userType = isAdmin ? "admin":"standard"
+        }
+        if !["admin", "standard"].contains(userType) {
+            writeToLog(theMessage: "Unknown user type (\(userType)) requested, user type will remain unchanged.")
+            userType = isAdmin ? "admin":"standard"
+        }
+        writeToLog(theMessage: "Type of local user to convert to: \(userType).")
         
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)")
+        let isMobile = Function.shared.isMobile(username: newUser)
+        if !isMobile {
+            writeToLog(theMessage: "You are not logged in with a mobile account: \(newUser)")
+            alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(newUser)")
+            NSApplication.shared.terminate(self)
+        }
+        
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
             
         //        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
         
@@ -100,11 +118,11 @@ class ViewController: NSViewController {
         }
         
         writeToLog(theMessage: "Logging the user out.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: "/bin/launchctl", "reboot", "user")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
         logMigrationResult(exitValue: exitResult)
-        print("exitResult: \(exitResult)")
-        print("logout error: \(errorResult)")
-        print("logout text: \(shellResult)")
+        writeToLog(theMessage: "exitResult: \(exitResult)")
+        writeToLog(theMessage: "logout error: \(errorResult)")
+        writeToLog(theMessage: "logout text: \(shellResult)")
         
     }
     
@@ -254,7 +272,7 @@ class ViewController: NSViewController {
         }
     }
     
-    func shell(cmd: String, args: String...) -> (exitCode: Int32, errorStatus: [String], localResult: [String]) {
+    func shell(cmd: String, args: [String]) -> (exitCode: Int32, errorStatus: [String], localResult: [String]) {
         var localResult  = [String]()
         var errorStatus  = [String]()
         
@@ -426,7 +444,7 @@ class ViewController: NSViewController {
 //                        updateHomeDir_button.toolTip = "Not available for macOS 10.14 and later"
 //                    }
             }
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c","stat -f%Su /dev/console")
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
             newUser = shellResult[0]
             newUser_TextField.stringValue = newUser
 
@@ -439,7 +457,7 @@ class ViewController: NSViewController {
             }
 
             // Verify we're the only account logged in - start
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "w | awk '/console/ {print $1}' | sort | uniq")
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "w | awk '/console/ {print $1}' | sort | uniq"])
             // remove blank entry in array
             var loggedInUserArray = shellResult.dropLast()
             if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
@@ -460,7 +478,7 @@ class ViewController: NSViewController {
 
 
             // Verify we're not logged in with a local account
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard")
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard"])
 
             let accountTypeArray = shellResult
 
@@ -485,7 +503,7 @@ class ViewController: NSViewController {
                 if hasSecureToken(username: newUser) {
                     self.showLockWindow()
                     
-                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)")
+                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
                     
                     logMigrationResult(exitValue: exitResult)
                 } else {
