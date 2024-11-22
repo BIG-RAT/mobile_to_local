@@ -15,7 +15,7 @@ import SystemConfiguration
 class ViewController: NSViewController {
     
     @IBOutlet weak var newUser_TextField: NSTextField!
-    @IBOutlet weak var password: NSSecureTextField!
+    @IBOutlet weak var password_TextField: NSSecureTextField!
     
     var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
@@ -60,7 +60,7 @@ class ViewController: NSViewController {
             return
         }
 
-        if authCheck(password: "\(password.stringValue)") {
+        if authCheck(password: "\(password_TextField.stringValue)") {
 
             writeToLog(theMessage: "Password verified.")
 
@@ -105,22 +105,26 @@ class ViewController: NSViewController {
         
         writeToLog(theMessage: "Checking for SecureToken.")
         
-        // reset local user's password if needed
-        if !hasSecureToken(username: newUser) {
-            do {
-                try resetUserPassword(username: newUser, originalPassword: password.stringValue)
-                writeToLog(theMessage: "Password reset successfully.")
-            } catch {
-                writeToLog(theMessage: "Failed to reset password: \(error.localizedDescription)")
-            }
-        }
 
-//        writeToLog(theMessage: "Call demobilization script.")
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
-//        logMigrationResult(exitValue: exitResult)
+        writeToLog(theMessage: "Call demobilization script.")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+        logMigrationResult(exitValue: exitResult)
                     
           //print("migration script - end")
-        
+        // reset local user's password if needed
+        if !hasSecureToken(username: newUser) {
+            writeToLog(theMessage: "Reset password")
+//            do {
+//                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
+//                writeToLog(theMessage: "Password reset successfully.")
+                (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
+            print(" password reset exitResult: \(exitResult)")
+            print("password reset errorResult: \(errorResult)")
+            print("password reset shellResult: \(shellResult)")
+//            } catch {
+//                writeToLog(theMessage: "Failed to reset password: \(error.localizedDescription)")
+//            }
+        }
         
 //        writeToLog(theMessage: "Logging the user out.")
 //        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
