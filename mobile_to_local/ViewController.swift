@@ -15,14 +15,13 @@ import SystemConfiguration
 class ViewController: NSViewController {
     
     @IBOutlet weak var newUser_TextField: NSTextField!
-    @IBOutlet weak var updateHomeDir_button: NSButton!
     @IBOutlet weak var password: NSSecureTextField!
     
     var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
     var newUser          = ""
-    var userType         = "-"
+    var userType         = "current"
     var allowNewUsername = false
     var mode             = "interactive"
     var silent           = false
@@ -81,6 +80,7 @@ class ViewController: NSViewController {
 
     func completeMigration() {
 //        print("migration script - start")
+        
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)")
             
         //        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
@@ -88,7 +88,7 @@ class ViewController: NSViewController {
         //        print("migration script - end")
         logMigrationResult(exitValue: exitResult)
         
-        // reset local user's password if needed
+        // reset local user's password if needed - must occure after demobilization
         writeToLog(theMessage: "Checking for SecureToken.")
         if !hasSecureToken(username: newUser) {
             do {
@@ -101,6 +101,7 @@ class ViewController: NSViewController {
         
         writeToLog(theMessage: "Logging the user out.")
         (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: "/bin/launchctl", "reboot", "user")
+        logMigrationResult(exitValue: exitResult)
         print("exitResult: \(exitResult)")
         print("logout error: \(errorResult)")
         print("logout text: \(shellResult)")
@@ -158,7 +159,7 @@ class ViewController: NSViewController {
         if let userRecord = OdUserRecord(username: username) {
             // Reset the password
             do {
-                try userRecord.changePassword(nil, toPassword: originalPassword)
+                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
                 writeToLog(theMessage: "Password successfully set for user \(username).")
             } catch {
                 writeToLog(theMessage: "Failed password set for user \(username).")
