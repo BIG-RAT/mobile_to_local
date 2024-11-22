@@ -59,7 +59,7 @@ class Function: NSObject {
             
             // Filter out the LocalCachedUser entry
             var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
-            updatedAuthAuthorities = authAuthorities.filter { !$0.contains("Kerberosv5") }
+            updatedAuthAuthorities = updatedAuthAuthorities.filter { !$0.contains("Kerberosv5") }
             
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
