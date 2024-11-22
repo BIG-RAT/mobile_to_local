@@ -13,6 +13,36 @@ class Function: NSObject {
     
     static let shared = Function()
     
+    func aaCleanup(username: String) throws {
+
+        // Connect to the local node
+        guard let session = ODSession.default() else {
+            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to create ODSession"])
+        }
+        
+        let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
+            
+        // Get the user record
+        let userRecord = try node.record(
+            withRecordType: kODRecordTypeUsers,
+            name: username,
+            attributes: nil
+        )
+        
+        // Fetch the current AuthenticationAuthority attribute
+        guard let authAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
+            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "AuthenticationAuthority attribute not found"])
+        }
+        print("Current AuthenticationAuthority attribute: \(authAuthorities)")
+            
+        // Filter out the LocalCachedUser entry
+        let updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") || !$0.contains("Kerberos5") }
+        
+        // Update the AuthenticationAuthority attribute
+        try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
+        print("Updated AuthenticationAuthority attribute successfully: \(authAuthorities)")
+    }
+    
     func isAdmin(username: String) -> Bool {
         do {
             // Open the local directory
@@ -75,7 +105,7 @@ class Function: NSObject {
         return false
     }
 
-    func adminGroup(username: String, operation: String) -> Bool {
+    func updateAdminGroup(username: String, operation: String) -> Bool {
         do {
             // Open the local directory node
             let session = ODSession.default()
