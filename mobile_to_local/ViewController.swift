@@ -116,18 +116,15 @@ class ViewController: NSViewController {
         }
 
         
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+        logMigrationResult(exitValue: exitResult)
                     
           //print("migration script - end")
-//        logMigrationResult(exitValue: exitResult)
         
         
         writeToLog(theMessage: "Logging the user out.")
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
-//        logMigrationResult(exitValue: exitResult)
-//        writeToLog(theMessage: "exitResult: \(exitResult)")
-//        writeToLog(theMessage: "logout error: \(errorResult)")
-//        writeToLog(theMessage: "logout text: \(shellResult)")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
+        logMigrationResult(exitValue: exitResult)
         
     }
     

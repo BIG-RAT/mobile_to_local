@@ -129,14 +129,14 @@ fi
 ## remove .account file if present
 /bin/rm -f "/Users/${currentName}/.account" || true
 
-aa=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
-log "original AuthenticationAuthority from mobile account:"
-log "${aa}"
-lcu=$(/bin/echo "${aa}" | xmllint --xpath 'string(//string[contains(text(),";LocalCachedUser;")])' -)
-krb5=$(/bin/echo "${aa}" | xmllint --xpath 'string(//string[contains(text(),";Kerberosv5;")])' -)
-
-$dsclBin -plist . -delete /Users/"${currentName}" AuthenticationAuthority "${lcu}"
-$dsclBin -plist . -delete /Users/"${currentName}" AuthenticationAuthority "${krb5}"
+#aa=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
+#log "original AuthenticationAuthority from mobile account:"
+#log "${aa}"
+#lcu=$(/bin/echo "${aa}" | xmllint --xpath 'string(//string[contains(text(),";LocalCachedUser;")])' -)
+#krb5=$(/bin/echo "${aa}" | xmllint --xpath 'string(//string[contains(text(),";Kerberosv5;")])' -)
+#
+#$dsclBin -plist . -delete /Users/"${currentName}" AuthenticationAuthority "${lcu}"
+#$dsclBin -plist . -delete /Users/"${currentName}" AuthenticationAuthority "${krb5}"
 
 pid=$(ps -ax | grep opendir | grep -v grep | awk '/ / {print $1}')
 echo "restarting opendirectoryd with pid $pid"
