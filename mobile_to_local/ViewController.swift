@@ -115,9 +115,9 @@ class ViewController: NSViewController {
             }
         }
 
-        writeToLog(theMessage: "Call demobilization script.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
-        logMigrationResult(exitValue: exitResult)
+//        writeToLog(theMessage: "Call demobilization script.")
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+//        logMigrationResult(exitValue: exitResult)
                     
           //print("migration script - end")
         

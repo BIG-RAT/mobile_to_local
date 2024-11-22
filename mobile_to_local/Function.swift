@@ -58,12 +58,13 @@ class Function: NSObject {
             print("Current AuthenticationAuthority attribute: \(authAuthorities)")
             
             // Filter out the LocalCachedUser entry
-            let updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") && !$0.contains("Kerberosv5") }
+            var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
+            updatedAuthAuthorities = authAuthorities.filter { !$0.contains("Kerberosv5") }
             
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
             try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
-            print("Updated AuthenticationAuthority attribute successfully: \(authAuthorities)")
+            print("Updated AuthenticationAuthority attribute successfully: \(updatedAuthAuthorities)")
             message = updatedAuthAuthorities
         } catch {
             return message
