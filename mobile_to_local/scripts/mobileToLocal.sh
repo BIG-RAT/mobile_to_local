@@ -48,8 +48,8 @@ log """mobile to local parameters:
                         attribute mode: $5"""
                         
 ## check admin status
-isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
-log "result of isAdmin check: ${isAdmin}"
+#isAdmin=$(/usr/sbin/dseditgroup -o checkmember -m "${currentName}" admin | cut -d" " -f1)
+#log "result of isAdmin check: ${isAdmin}"
 
 ## check the OriginalNodeName to determine if it is a local or mobile account
 mobileUserCheck=$($dsclBin . -read "/Users/$currentName" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard)
@@ -181,7 +181,7 @@ fi
 log "------------ Finished deleting attributes ------------"
 
 ## add to the admins group, if appropriate
-if (([ "${isAdmin}" = "yes" ] && [ "$userType" != "standard" ]) || [ "$userType" = "admin" ]);then
+if [ "$userType" = "admin" ];then
     result=$(/usr/sbin/dseditgroup -o edit -n /Local/Default -a "${currentName}" -t user admin;echo "$?")
     if [ "$result" = "0" ];then
         log "${currentName} was added to the admin group"
