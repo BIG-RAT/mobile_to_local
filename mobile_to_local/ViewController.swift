@@ -99,6 +99,14 @@ class ViewController: NSViewController {
             NSApplication.shared.terminate(self)
         }
         
+        writeToLog(theMessage: "Clean up AuthenticationAuthority")
+        do {
+            try Function.shared.aaCleanup(username: NSUserName())
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
+
+        
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
             
         //        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: "-c", "'"+migrationScript+"' '"+newUser+"' '"+password.stringValue+"' \(convertFromNSControlStateValue(updateHomeDir_button.state)) "+userType+" \(unbind)"+" \(silent) \(listType)")
@@ -332,6 +340,9 @@ class ViewController: NSViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let admin = Function.shared.isAdmin(username: NSUserName())
+        writeToLog(theMessage: "\(NSUserName()) is an admin: \(admin)")
         
         DispatchQueue.main.async { [self] in
             if !FileManager.default.fileExists(atPath: "/private/var/log/mobile.to.local.log") {
