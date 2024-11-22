@@ -16,6 +16,9 @@ class Function: NSObject {
     func aaCleanup(username: String) -> [String] {
         var currentAuthorities = [String]()
         var message = [String]()
+        
+        print("username: \(username)")
+        
         do {
             // Connect to the local node
             guard let session = ODSession.default() else {
