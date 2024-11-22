@@ -122,9 +122,9 @@ class ViewController: NSViewController {
           //print("migration script - end")
         
         
-        writeToLog(theMessage: "Logging the user out.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
-        logMigrationResult(exitValue: exitResult)
+//        writeToLog(theMessage: "Logging the user out.")
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
+//        logMigrationResult(exitValue: exitResult)
         
     }
     
