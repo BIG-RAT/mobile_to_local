@@ -301,7 +301,7 @@ DQ
                     </view>
                     <connections>
                         <outlet property="newUser_TextField" destination="L2H-tX-wvN" id="jm9-5i-3gj"/>
-                        <outlet property="password" destination="MSE-JM-FnQ" id="8Qf-7y-Ctb"/>
+                        <outlet property="password_TextField" destination="MSE-JM-FnQ" id="8Qf-7y-Ctb"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
