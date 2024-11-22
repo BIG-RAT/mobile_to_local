@@ -100,7 +100,7 @@ class ViewController: NSViewController {
         }
         
         writeToLog(theMessage: "Clean up AuthenticationAuthority")
-        let cleanupResult = Function.shared.aaCleanup(username: NSUserName())
+        let cleanupResult = Function.shared.aaCleanup(username: newUser)
         writeToLog(theMessage: "Clean up result: \(cleanupResult)")
         
         writeToLog(theMessage: "Checking for SecureToken.")
