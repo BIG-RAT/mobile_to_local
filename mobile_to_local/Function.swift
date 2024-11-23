@@ -124,7 +124,7 @@ class Function: NSObject {
             print("User not found: \(username).")
             throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
         }
-        return nil
+        return userRecord
     }
 
     func isAdmin(username: String) -> Bool {

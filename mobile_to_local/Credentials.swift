@@ -28,7 +28,7 @@ class Credentials {
             
             if let password = credential.data(using: String.Encoding.utf8) {
                 keychainQ.async { [self] in
-                    var keychainQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+                    let keychainQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
                                                         kSecAttrService as String: theService,
                                                         kSecAttrAccessGroup as String: accessGroup,
                                                         kSecUseDataProtectionKeychain as String: true,
@@ -108,14 +108,13 @@ class Credentials {
     func retrieve(service: String, account: String, whichServer: String = "") -> [String:String] {
         
         var keychainResult = [String:String]()
-        var theService = service
         
 //        print("[credentials] JamfProServer.sourceApiClient: \(JamfProServer.sourceUseApiClient)")
         
         userPassDict.removeAll()
         
         // look for common keychain item
-        keychainResult = itemLookup(service: theService)
+        keychainResult = itemLookup(service: service)
         
         return keychainResult
     }
