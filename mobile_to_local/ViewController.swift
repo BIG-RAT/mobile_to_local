@@ -61,7 +61,7 @@ class ViewController: NSViewController {
 
         let loggedInUser = Function.shared.currentUser()
         let password     = password_TextField.stringValue
-        if !Function.shared.passwordIsCorrect(username: loggedInUser, password: password) {
+        if Function.shared.passwordIsCorrect(username: loggedInUser, password: password) {
 
             WriteToLog.shared.message(stringOfText: "Password verified for \(loggedInUser).")
 
