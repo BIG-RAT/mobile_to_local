@@ -113,23 +113,23 @@ class ViewController: NSViewController {
 
         WriteToLog.shared.message(stringOfText: "Call demobilization script.")
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])
-        logMigrationResult(exitValue: exitResult)
+        logMigrationResult(exitValue: exitResult, newUser: newUser)
                     
           //print("migration script - end")
         // reset local user's password if needed
-        if !hasSecureToken(username: newUser) {
-            WriteToLog.shared.message(stringOfText: "Reset password")
-//            do {
-//                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
-//                WriteToLog.shared.message(stringOfText: "Password reset successfully.")
-                (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
-            print(" password reset exitResult: \(exitResult)")
-            print("password reset errorResult: \(errorResult)")
-            print("password reset shellResult: \(shellResult)")
-//            } catch {
-//                WriteToLog.shared.message(stringOfText: "Failed to reset password: \(error.localizedDescription)")
-//            }
-        }
+//        if !hasSecureToken(username: newUser) {
+//            WriteToLog.shared.message(stringOfText: "Reset password")
+////            do {
+////                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
+////                WriteToLog.shared.message(stringOfText: "Password reset successfully.")
+//                (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
+//            print(" password reset exitResult: \(exitResult)")
+//            print("password reset errorResult: \(errorResult)")
+//            print("password reset shellResult: \(shellResult)")
+////            } catch {
+////                WriteToLog.shared.message(stringOfText: "Failed to reset password: \(error.localizedDescription)")
+////            }
+//        }
         
 //        WriteToLog.shared.message(stringOfText: "Logging the user out.")
 //        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
@@ -249,7 +249,7 @@ class ViewController: NSViewController {
         return stringDate
     }
 
-    func logMigrationResult(exitValue: Int32) {
+    func logMigrationResult(exitValue: Int32, newUser: String = "") {
         switch exitValue {
         case 0:
             WriteToLog.shared.message(stringOfText: "successfully migrated account.")
@@ -445,8 +445,9 @@ class ViewController: NSViewController {
             if allowNewUsername {
                 self.newUser_TextField.isEditable   = true
             }
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
-            newUser = shellResult[0]
+            let newUser = Function.shared.currentUser()
+//            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
+//            newUser = shellResult[0]
             newUser_TextField.stringValue = newUser
 
             // Verify we're running with elevated privileges.
@@ -506,7 +507,7 @@ class ViewController: NSViewController {
                     
                     (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
                     
-                    logMigrationResult(exitValue: exitResult)
+                    logMigrationResult(exitValue: exitResult, newUser: newUser)
                 } else {
                     WriteToLog.shared.message(stringOfText: "\(newUser) does not have a secure token, cannot run silently.")
                 }
