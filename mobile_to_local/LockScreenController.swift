@@ -2,8 +2,7 @@
 //  LockScreenController.swift
 //  Mobile to Local
 //
-//  Created by Leslie Helou on 2/7/21.
-//  Copyright © 2021 jamf. All rights reserved.
+//  Copyright © 2024 jamf. All rights reserved.
 //
 
 import Cocoa

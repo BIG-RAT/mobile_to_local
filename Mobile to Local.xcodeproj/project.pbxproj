@@ -16,6 +16,9 @@
 		B5CA1ADF209120EA00C81085 /* MigrateAsst.png in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1ADE209120EA00C81085 /* MigrateAsst.png */; };
 		B5CA1AE12091215700C81085 /* logo.png in Resources */ = {isa = PBXBuildFile; fileRef = B5CA1AE02091215700C81085 /* logo.png */; };
 		CE724F3E2CF0551300828330 /* Function.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F3D2CF054FC00828330 /* Function.swift */; };
+		CE724F402CF15A1600828330 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F3F2CF15A1600828330 /* Credentials.swift */; };
+		CE724F422CF15AC900828330 /* WriteToLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F412CF15AC900828330 /* WriteToLog.swift */; };
+		CE724F442CF15C3A00828330 /* TimeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F432CF15C3A00828330 /* TimeDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +34,9 @@
 		B5CA1ADE209120EA00C81085 /* MigrateAsst.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = MigrateAsst.png; sourceTree = "<group>"; };
 		B5CA1AE02091215700C81085 /* logo.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = logo.png; sourceTree = "<group>"; };
 		CE724F3D2CF054FC00828330 /* Function.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Function.swift; sourceTree = "<group>"; };
+		CE724F3F2CF15A1600828330 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
+		CE724F412CF15AC900828330 /* WriteToLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteToLog.swift; sourceTree = "<group>"; };
+		CE724F432CF15C3A00828330 /* TimeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,10 +71,13 @@
 		B5CA1ACA2090CE0F00C81085 /* mobile_to_local */ = {
 			isa = PBXGroup;
 			children = (
+				CE724F3F2CF15A1600828330 /* Credentials.swift */,
 				CE724F3D2CF054FC00828330 /* Function.swift */,
 				B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */,
 				B579196B25D0F8F900387324 /* LockScreenController.swift */,
+				CE724F432CF15C3A00828330 /* TimeDelegate.swift */,
 				B5CA1ACD2090CE0F00C81085 /* ViewController.swift */,
+				CE724F412CF15AC900828330 /* WriteToLog.swift */,
 				B5CA1ACF2090CE0F00C81085 /* Assets.xcassets */,
 				B5CA1AD12090CE0F00C81085 /* Main.storyboard */,
 				B5CA1AD42090CE0F00C81085 /* Info.plist */,
@@ -168,8 +177,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE724F442CF15C3A00828330 /* TimeDelegate.swift in Sources */,
 				B5CA1ACE2090CE0F00C81085 /* ViewController.swift in Sources */,
+				CE724F422CF15AC900828330 /* WriteToLog.swift in Sources */,
 				B579196C25D0F8F900387324 /* LockScreenController.swift in Sources */,
+				CE724F402CF15A1600828330 /* Credentials.swift in Sources */,
 				B5CA1ACC2090CE0F00C81085 /* AppDelegate.swift in Sources */,
 				CE724F3E2CF0551300828330 /* Function.swift in Sources */,
 			);
