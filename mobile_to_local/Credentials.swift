@@ -27,12 +27,12 @@ class Credentials {
             
             if let password = credential.data(using: String.Encoding.utf8) {
                 // Access Control: Allow item to be accessed without user authentication
-                    let accessControl = SecAccessControlCreateWithFlags(
-                        nil,
-                        kSecAttrAccessibleWhenUnlocked,
-                        [],
-                        nil
-                    )
+                let accessControl = SecAccessControlCreateWithFlags(
+                    nil,
+                    kSecAttrAccessibleWhenUnlocked,
+                    [],
+                    nil
+                )
                 keychainQ.async { [self] in
                     let keychainQuery: [String: Any] = [
                         kSecClass as String: kSecClassGenericPassword,
@@ -54,21 +54,21 @@ class Credentials {
                                 WriteToLog.shared.message(stringOfText: "keychain item for service \(theService), account \(account), failed to update.")
                             }
                         } else {
-                            print("[Credentials.save] password for \(account) is up-to-date")
+                            WriteToLog.shared.message(stringOfText: "[Credentials.save] password for \(account) is up-to-date")
                         }
                     } else {
                         // try to add new credentials
                         let addStatus = SecItemAdd(keychainQuery as CFDictionary, nil)
                         if (addStatus != errSecSuccess) {
                             if let addErr = SecCopyErrorMessageString(addStatus, nil) {
-                                print("[addStatus] Write failed for new credentials: \(addErr)")
+                                WriteToLog.shared.message(stringOfText: "[addStatus] Write failed for new credentials: \(addErr)")
                                 let deleteStatus = SecItemDelete(keychainQuery as CFDictionary)
-                                print("[Credentials.save] the deleteStatus: \(deleteStatus)")
+                                WriteToLog.shared.message(stringOfText: "[Credentials.save] the deleteStatus: \(deleteStatus)")
                                 sleep(1)
                                 let addStatus = SecItemAdd(keychainQuery as CFDictionary, nil)
                                 if (addStatus != errSecSuccess) {
                                     if let addErr = SecCopyErrorMessageString(addStatus, nil) {
-                                        print("[addStatus] Write failed for new credentials after deleting: \(addErr)")
+                                        WriteToLog.shared.message(stringOfText: "[addStatus] Write failed for new credentials after deleting: \(addErr)")
                                     }
                                 }
                             }
