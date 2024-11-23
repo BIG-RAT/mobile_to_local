@@ -14,7 +14,7 @@ let kSecClassGenericPasswordString = NSString(format: kSecClassGenericPassword)
 let keychainQ                      = DispatchQueue(label: "com.jamf.creds", qos: DispatchQoS.background)
 
 let sharedPrefix                   = "MobileToLocal"
-let accessGroup                    = "PS2F6S478M.jamfie.SharedJPMA"
+let accessGroup                    = "PS2F6S478M.pse.jamf.mobile-to-local"
 
 class Credentials {
     
