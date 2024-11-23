@@ -36,7 +36,7 @@ fi
 computerName=$(scutil --get ComputerName)
 
 ## get logged in username and UniqueID (id can no longer be reset)
-currentName=$(stat -f%Su /dev/console)
+currentName="$(stat -f%Su /dev/console)"
 
 ## new username
 newName="$1"
@@ -196,7 +196,7 @@ fi
 
 if [ -n $6 ];then
     log "$currentName does not have a secure token. Setting local password."
-    password="$(security find-generic-password -s \"MobileToLocal-$6\" -w)"
+    password="$(security find-generic-password -a \"$currentName\" -s \"MobileToLocal-$6\" -w)"
     
     log "password: $password"
     
