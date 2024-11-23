@@ -200,6 +200,8 @@ class Function: NSObject {
         do {
             if let userRecord = try getUserRecord(username: username) {
                 
+                WriteToLog.shared.message(stringOfText: "username: \(username)")
+                WriteToLog.shared.message(stringOfText: "password: \(password)")
                 // Attempt to verify the credentials
                 try userRecord.verifyPassword(password)
                 
