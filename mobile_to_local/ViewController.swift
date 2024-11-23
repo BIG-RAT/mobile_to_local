@@ -107,9 +107,6 @@ class ViewController: NSViewController {
         WriteToLog.shared.message(stringOfText: "Clean up AuthenticationAuthority")
         let cleanupResult = Function.shared.aaCleanup(username: newUser)
         WriteToLog.shared.message(stringOfText: "Clean up result: \(cleanupResult)")
-        
-        WriteToLog.shared.message(stringOfText: "Checking for SecureToken.")
-        
 
         WriteToLog.shared.message(stringOfText: "Call demobilization script.")
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])

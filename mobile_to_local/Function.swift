@@ -19,33 +19,6 @@ class Function: NSObject {
         print("username: \(username)")
         
         do {
-            // Connect to the local node
-//            guard let session = ODSession.default() else {
-//                print("Unable to create ODSession")
-////                throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to create ODSession"])
-//                return ["Unable to create ODSession"]
-//            }
-//            print("Created ODSession")
-//            
-//            let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
-//            print("Connected to /Local/Default")
-//            
-//            // Find the user record
-//            let query = try ODQuery(
-//                node: node,
-//                forRecordTypes: kODRecordTypeUsers,
-//                attribute: kODAttributeTypeRecordName,
-//                matchType: ODMatchType(kODMatchEqualTo),
-//                queryValues: username,
-//                returnAttributes: kODAttributeTypeNativeOnly,
-//                maximumResults: 1
-//            )
-//
-//            guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
-//                print("User not found: \(username).")
-////                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
-//                return ["User not found: \(username)"]
-//            }
             guard let userRecord = try getUserRecord(username: username) else {
                 return ["User not found: \(username)"]
             }
@@ -65,10 +38,11 @@ class Function: NSObject {
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
             for attrib in authAuthorities {
-                if attrib.contains("LocalCachedUser") || attrib.contains("Kerberosv5") {
-                    print("Try to removed attribute: \(attrib)")
+//                if attrib.contains("LocalCachedUser") || attrib.contains("Kerberosv5") {
+                if attrib.contains("LocalCachedUser") {
+                    WriteToLog.shared.message(stringOfText: "Try to removed attribute: \(attrib)")
                     try userRecord.removeValue(attrib, fromAttribute: kODAttributeTypeAuthenticationAuthority)
-                    print("Removed attribute: \(attrib)")
+                    WriteToLog.shared.message(stringOfText: "Removed attribute: \(attrib)")
                 }
             }
             guard let newAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
