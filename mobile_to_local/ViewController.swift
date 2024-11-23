@@ -137,38 +137,38 @@ class ViewController: NSViewController {
         
     }
     
-    func OdUserRecord(username: String) -> ODRecord? {
-        guard let session = ODSession.default() else {
-//            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
-            return nil
-        }
-
-        guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
-//            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
-            return nil
-        }
-
-        // Find the user record
-        let query = try? ODQuery(
-            node: node,
-            forRecordTypes: kODRecordTypeUsers,
-            attribute: kODAttributeTypeRecordName,
-            matchType: ODMatchType(kODMatchEqualTo),
-            queryValues: username,
-            returnAttributes: kODAttributeTypeNativeOnly,
-            maximumResults: 1
-        )
-
-        guard let results = try? query?.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
-            print("User not found: \(username).")
-//            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
-            return nil
-        }
-        return userRecord
-    }
+//    func OdUserRecord(username: String) -> ODRecord? {
+//        guard let session = ODSession.default() else {
+////            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+//            return nil
+//        }
+//
+//        guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
+////            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+//            return nil
+//        }
+//
+//        // Find the user record
+//        let query = try? ODQuery(
+//            node: node,
+//            forRecordTypes: kODRecordTypeUsers,
+//            attribute: kODAttributeTypeRecordName,
+//            matchType: ODMatchType(kODMatchEqualTo),
+//            queryValues: username,
+//            returnAttributes: kODAttributeTypeNativeOnly,
+//            maximumResults: 1
+//        )
+//
+//        guard let results = try? query?.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+//            print("User not found: \(username).")
+////            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+//            return nil
+//        }
+//        return userRecord
+//    }
     
     func hasSecureToken(username: String) -> Bool {
-        if let userRecord = OdUserRecord(username: username) {
+        if let userRecord = try? Function.shared.getUserRecord(username: username) /*OdUserRecord(username: username)*/ {
             guard let aa = try? userRecord.recordDetails(forAttributes: ["dsAttrTypeStandard:AuthenticationAuthority"])["dsAttrTypeStandard:AuthenticationAuthority"] as? [String] else {
                 WriteToLog.shared.message(stringOfText: "Unable to query user for a secure token.")
                 return false
@@ -184,18 +184,18 @@ class ViewController: NSViewController {
         return false
     }
 
-    func resetUserPassword(username: String, originalPassword: String) throws {
-        if let userRecord = OdUserRecord(username: username) {
-            // Reset the password
-            do {
-                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
-                WriteToLog.shared.message(stringOfText: "Password successfully set for user \(username).")
-            } catch {
-                WriteToLog.shared.message(stringOfText: "Failed password set for user \(username).")
-                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription).")
-            }
-        }
-    }
+//    func resetUserPassword(username: String, originalPassword: String) throws {
+//        if let userRecord = OdUserRecord(username: username) {
+//            // Reset the password
+//            do {
+//                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
+//                WriteToLog.shared.message(stringOfText: "Password successfully set for user \(username).")
+//            } catch {
+//                WriteToLog.shared.message(stringOfText: "Failed password set for user \(username).")
+//                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription).")
+//            }
+//        }
+//    }
     
     @IBAction func cancel(_ sender: Any) {
         NSApplication.shared.terminate(self)
@@ -211,30 +211,30 @@ class ViewController: NSViewController {
         //return true
     }   // func alert_dialog - end
 
-    func authCheck(password: String) -> Bool {
-        do {
-            var uid: uid_t = 0
-            var gid: gid_t = 0
-            var username = ""
-
-            if let theResult = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid) {
-                username     = "\(theResult)"
-            } else {
-                WriteToLog.shared.message(stringOfText: "Unable to identify logged in user.")
-                view.wantsLayer = true
-                return false
-            }
-
-            WriteToLog.shared.message(stringOfText: "Verifying authentication for: \(username)")
-            let session = ODSession()
-            let node = try ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes))
-            let record = try node.record(withRecordType: kODRecordTypeUsers, name: username, attributes: nil)
-            try record.verifyPassword(password)
-            return true
-        } catch {
-            return false
-        }
-    }
+//    func authCheck(password: String) -> Bool {
+//        do {
+//            var uid: uid_t = 0
+//            var gid: gid_t = 0
+//            var username = ""
+//
+//            if let theResult = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid) {
+//                username     = "\(theResult)"
+//            } else {
+//                WriteToLog.shared.message(stringOfText: "Unable to identify logged in user.")
+//                view.wantsLayer = true
+//                return false
+//            }
+//
+//            WriteToLog.shared.message(stringOfText: "Verifying authentication for: \(username)")
+//            let session = ODSession()
+//            let node = try ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes))
+//            let record = try node.record(withRecordType: kODRecordTypeUsers, name: username, attributes: nil)
+//            try record.verifyPassword(password)
+//            return true
+//        } catch {
+//            return false
+//        }
+//    }
     
     func getDateTime(x: Int8) -> String {
         let date = Date()
