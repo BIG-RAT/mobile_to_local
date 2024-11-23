@@ -1,9 +1,8 @@
 //
 //  ViewController.swift
-//  mobile_to_local
+//  Mobile to Local
 //
-//  Created by Leslie Helou on 4/25/18.
-//  Copyright © 2018 jamf. All rights reserved.
+//  Copyright © 2024 jamf. All rights reserved.
 //
 
 import AppKit
@@ -20,7 +19,7 @@ class ViewController: NSViewController {
     var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
-    var newUser          = ""
+//    var newUser          = ""
     var userType         = "current"
     var allowNewUsername = false
     var mode             = "interactive"
@@ -53,80 +52,86 @@ class ViewController: NSViewController {
     @IBAction func migrate(_ sender: Any) {
         var allowedCharacters = CharacterSet.alphanumerics
         allowedCharacters.insert(charactersIn: "-_.")
-        newUser = newUser_TextField.stringValue
+        let newUser = newUser_TextField.stringValue
         if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
-            writeToLog(theMessage: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
+            WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
             alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
             return
         }
 
-        if authCheck(password: "\(password_TextField.stringValue)") {
+        let loggedInUser = Function.shared.currentUser()
+        let password     = password_TextField.stringValue
+        if !Function.shared.passwordIsCorrect(username: loggedInUser, password: password) {
 
-            writeToLog(theMessage: "Password verified.")
+            WriteToLog.shared.message(stringOfText: "Password verified for \(loggedInUser).")
 
             DispatchQueue.main.async {
-                self.completeMigration()
+                self.completeMigration(loggedInUser: loggedInUser, newUser: newUser, password: password)
             }
 
 //            showLockWindow()
 
         } else {
-            writeToLog(theMessage: "Unable to verify password.")
-            alert_dialog(header: "Alert", message: "Unable to verify password.  Please re-enter your credentials.")
+            WriteToLog.shared.message(stringOfText: "Unable to verify password.")
+            alert_dialog(header: "Alert", message: "Unable to verify password for \(loggedInUser).  Please re-enter the password.")
             view.window?.makeKeyAndOrderFront(self)
             return
         }
     }
 
-    func completeMigration() {
+    func completeMigration(loggedInUser: String, newUser: String, password: String) {
 //        print("migration script - start")
+        // verify password
+        
+        let service = "\(UUID())"
+        Credentials.shared.save(service: service, account: newUser, credential: password)
         // see is user is an admin
-        let isAdmin = Function.shared.isAdmin(username: newUser)
-        writeToLog(theMessage: "isAdmin: \(isAdmin)")
+        let isAdmin = Function.shared.isAdmin(username: loggedInUser)
+        WriteToLog.shared.message(stringOfText: "isAdmin: \(isAdmin)")
         if userType == "current" {
             userType = isAdmin ? "admin":"standard"
         }
         if !["admin", "standard"].contains(userType) {
-            writeToLog(theMessage: "Unknown user type (\(userType)) requested, user type will remain unchanged.")
+            WriteToLog.shared.message(stringOfText: "Unknown user type (\(userType)) requested, user type will remain unchanged.")
             userType = isAdmin ? "admin":"standard"
         }
-        writeToLog(theMessage: "Type of local user to convert to: \(userType).")
+        WriteToLog.shared.message(stringOfText: "Type of local user to convert to: \(userType).")
         
         let isMobile = Function.shared.isMobile(username: newUser)
         if !isMobile {
-            writeToLog(theMessage: "You are not logged in with a mobile account: \(newUser)")
+            WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(newUser)")
             alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(newUser)")
             NSApplication.shared.terminate(self)
         }
         
-        writeToLog(theMessage: "Clean up AuthenticationAuthority")
+        WriteToLog.shared.message(stringOfText: "Clean up AuthenticationAuthority")
         let cleanupResult = Function.shared.aaCleanup(username: newUser)
-        writeToLog(theMessage: "Clean up result: \(cleanupResult)")
+        WriteToLog.shared.message(stringOfText: "Clean up result: \(cleanupResult)")
         
-        writeToLog(theMessage: "Checking for SecureToken.")
+        WriteToLog.shared.message(stringOfText: "Checking for SecureToken.")
         
 
-        writeToLog(theMessage: "Call demobilization script.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+        WriteToLog.shared.message(stringOfText: "Call demobilization script.")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])
         logMigrationResult(exitValue: exitResult)
                     
           //print("migration script - end")
         // reset local user's password if needed
         if !hasSecureToken(username: newUser) {
-            writeToLog(theMessage: "Reset password")
+            WriteToLog.shared.message(stringOfText: "Reset password")
 //            do {
 //                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
-//                writeToLog(theMessage: "Password reset successfully.")
+//                WriteToLog.shared.message(stringOfText: "Password reset successfully.")
                 (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
             print(" password reset exitResult: \(exitResult)")
             print("password reset errorResult: \(errorResult)")
             print("password reset shellResult: \(shellResult)")
 //            } catch {
-//                writeToLog(theMessage: "Failed to reset password: \(error.localizedDescription)")
+//                WriteToLog.shared.message(stringOfText: "Failed to reset password: \(error.localizedDescription)")
 //            }
         }
         
-//        writeToLog(theMessage: "Logging the user out.")
+//        WriteToLog.shared.message(stringOfText: "Logging the user out.")
 //        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
 //        logMigrationResult(exitValue: exitResult)
         
@@ -165,17 +170,17 @@ class ViewController: NSViewController {
     func hasSecureToken(username: String) -> Bool {
         if let userRecord = OdUserRecord(username: username) {
             guard let aa = try? userRecord.recordDetails(forAttributes: ["dsAttrTypeStandard:AuthenticationAuthority"])["dsAttrTypeStandard:AuthenticationAuthority"] as? [String] else {
-                writeToLog(theMessage: "Unable to query user for a secure token.")
+                WriteToLog.shared.message(stringOfText: "Unable to query user for a secure token.")
                 return false
             }
             for attrib in aa {
                 if attrib.contains("SecureToken") {
-                    writeToLog(theMessage: "User has a secure token.")
+                    WriteToLog.shared.message(stringOfText: "User has a secure token.")
                     return true
                 }
             }
         }
-        writeToLog(theMessage: "User does not have a secure token.")
+        WriteToLog.shared.message(stringOfText: "User does not have a secure token.")
         return false
     }
 
@@ -184,10 +189,10 @@ class ViewController: NSViewController {
             // Reset the password
             do {
                 try userRecord.changePassword(originalPassword, toPassword: originalPassword)
-                writeToLog(theMessage: "Password successfully set for user \(username).")
+                WriteToLog.shared.message(stringOfText: "Password successfully set for user \(username).")
             } catch {
-                writeToLog(theMessage: "Failed password set for user \(username).")
-                writeToLog(theMessage: "Error: \(error.localizedDescription).")
+                WriteToLog.shared.message(stringOfText: "Failed password set for user \(username).")
+                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription).")
             }
         }
     }
@@ -215,12 +220,12 @@ class ViewController: NSViewController {
             if let theResult = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid) {
                 username     = "\(theResult)"
             } else {
-                writeToLog(theMessage: "Unable to identify logged in user.")
+                WriteToLog.shared.message(stringOfText: "Unable to identify logged in user.")
                 view.wantsLayer = true
                 return false
             }
 
-            writeToLog(theMessage: "Verifying authentication for: \(username)")
+            WriteToLog.shared.message(stringOfText: "Verifying authentication for: \(username)")
             let session = ODSession()
             let node = try ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes))
             let record = try node.record(withRecordType: kODRecordTypeUsers, name: username, attributes: nil)
@@ -247,12 +252,12 @@ class ViewController: NSViewController {
     func logMigrationResult(exitValue: Int32) {
         switch exitValue {
         case 0:
-            writeToLog(theMessage: "successfully migrated account.")
+            WriteToLog.shared.message(stringOfText: "successfully migrated account.")
             NSApplication.shared.terminate(self)
         case 100:
             NSApplication.shared.terminate(self)
         case 244:
-            writeToLog(theMessage: "Account \(newUser) already exists and belongs to another user.")
+            WriteToLog.shared.message(stringOfText: "Account \(newUser) already exists and belongs to another user.")
             if !silent {
                 alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
             } else {
@@ -260,7 +265,7 @@ class ViewController: NSViewController {
             }
             return
         case 232:
-            writeToLog(theMessage: "You are not logged in with a mobile account: \(newUser)")
+            WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(newUser)")
             if !silent {
                 alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(newUser)")
             } else {
@@ -268,7 +273,7 @@ class ViewController: NSViewController {
             }
             NSApplication.shared.terminate(self)
         default:
-            writeToLog(theMessage: "An unknown error has occured: \(exitResult).")
+            WriteToLog.shared.message(stringOfText: "An unknown error has occured: \(exitResult).")
             if !silent {
                 alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
             } else {
@@ -340,7 +345,7 @@ class ViewController: NSViewController {
         super.viewDidLoad()
         
         let admin = Function.shared.isAdmin(username: NSUserName())
-        writeToLog(theMessage: "\(NSUserName()) is an admin: \(admin)")
+        WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
         
         DispatchQueue.main.async { [self] in
             if !FileManager.default.fileExists(atPath: "/private/var/log/mobile.to.local.log") {
@@ -359,7 +364,7 @@ class ViewController: NSViewController {
                 } else {
                     print("log is not writeable")
                 }
-                writeToLog(theMessage: "New log file created.")
+                WriteToLog.shared.message(stringOfText: "New log file created.")
             }
             
             // read environment settings - start
@@ -367,8 +372,7 @@ class ViewController: NSViewController {
                 plistData = (NSDictionary(contentsOf: URL(fileURLWithPath: "/Library/Managed Preferences/pse.jamf.mobile-to-local.plist")) as? [String : Any])!
             }
             if plistData.count == 0 {
-    //            if LogLevel.debug { WriteToLog().message(stringOfText: "Error reading plist\n") }
-                print("plist not found")
+                WriteToLog.shared.message(stringOfText: "No configuration file found.")
             } else {
     //            print("settings: \(plistData)")
                 allowNewUsername = plistData["allowNewUsername"] as? Bool ?? false
@@ -393,7 +397,7 @@ class ViewController: NSViewController {
             numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
             if numberOfArgs > 0 {
                 if (numberOfArgs % 2) != 0 {
-                    writeToLog(theMessage: "Argument error occured - Contact IT for help.")
+                    WriteToLog.shared.message(stringOfText: "Argument error occured - Contact IT for help.")
                     alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
                     NSApplication.shared.terminate(self)
                 }
@@ -423,7 +427,7 @@ class ViewController: NSViewController {
                             listType = "keeplist"
                         }
                     default:
-                        writeToLog(theMessage: "unknown switch passed: \(CommandLine.arguments[i])")
+                        WriteToLog.shared.message(stringOfText: "unknown switch passed: \(CommandLine.arguments[i])")
 //                        print("unknown switch passed: \(CommandLine.arguments[i])")
                     }
                 }
@@ -439,19 +443,7 @@ class ViewController: NSViewController {
                 NSApplication.shared.mainWindow?.setIsVisible(true)
             }
             if allowNewUsername {
-//                DispatchQueue.main.async {
                 self.newUser_TextField.isEditable   = true
-//                }
-                // Privacy restrictions are preventing changing NSHomeDirectory in 10.14 and above
-//                    if os.majorVersion == 10 && os.minorVersion < 14 {
-////                        DispatchQueue.main.async {
-//                            self.updateHomeDir_button.isEnabled = true
-//                            self.updateHomeDir_button.isHidden  = false
-//                        updateHomeDir_button.toolTip = "New home folder name"
-////                        }
-//                    } else {
-//                        updateHomeDir_button.toolTip = "Not available for macOS 10.14 and later"
-//                    }
             }
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
             newUser = shellResult[0]
@@ -460,7 +452,7 @@ class ViewController: NSViewController {
             // Verify we're running with elevated privileges.
             if NSUserName() != "root" {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
-                writeToLog(theMessage: "Assistant must be run with elevated privileges.")
+                WriteToLog.shared.message(stringOfText: "Assistant must be run with elevated privileges.")
                 alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
                 NSApplication.shared.terminate(self)
             }
@@ -477,13 +469,13 @@ class ViewController: NSViewController {
 
             if loggedInUserCount > 1 {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
-                writeToLog(theMessage: "Other users are currently logged into this machine (fast user switching).")
-                writeToLog(theMessage: "Logged in users: \(shellResult)")
+                WriteToLog.shared.message(stringOfText: "Other users are currently logged into this machine (fast user switching).")
+                WriteToLog.shared.message(stringOfText: "Logged in users: \(shellResult)")
                 alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
                 NSApplication.shared.terminate(self)
             }
             // Verify we're the only account logged in - end
-            writeToLog(theMessage: "No other logins detected.")
+            WriteToLog.shared.message(stringOfText: "No other logins detected.")
 
 
             // Verify we're not logged in with a local account
@@ -494,14 +486,14 @@ class ViewController: NSViewController {
             if accountTypeArray.count != 0 {
                     if accountTypeArray[0] == "" {
                         NSApplication.shared.mainWindow?.setIsVisible(false)
-                        writeToLog(theMessage: "You are currently logged in with a local account, migration is not necessary.")
+                        WriteToLog.shared.message(stringOfText: "You are currently logged in with a local account, migration is not necessary.")
                         alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
                         NSApplication.shared.terminate(self)
                     }
             } else {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
-                writeToLog(theMessage: "\(errorResult[0])")
-                writeToLog(theMessage: "Unable to locate account information.  You may be logged in with a network managed account.")
+                WriteToLog.shared.message(stringOfText: "\(errorResult[0])")
+                WriteToLog.shared.message(stringOfText: "Unable to locate account information.  You may be logged in with a network managed account.")
                 alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
                 NSApplication.shared.terminate(self)
             }
@@ -516,7 +508,7 @@ class ViewController: NSViewController {
                     
                     logMigrationResult(exitValue: exitResult)
                 } else {
-                    writeToLog(theMessage: "\(newUser) does not have a secure token, cannot run silently.")
+                    WriteToLog.shared.message(stringOfText: "\(newUser) does not have a secure token, cannot run silently.")
                 }
 
                 NSApplication.shared.terminate(self)

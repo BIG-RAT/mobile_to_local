@@ -1,9 +1,8 @@
 //
 //  AppDelegate.swift
-//  mobile_to_local
+//  Mobile to Local
 //
-//  Created by Leslie Helou on 4/25/18.
-//  Copyright © 2018 jamf. All rights reserved.
+//  Copyright © 2024 jamf. All rights reserved.
 //
 
 import Cocoa

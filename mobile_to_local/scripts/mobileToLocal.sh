@@ -8,6 +8,7 @@
 ## $3 - whether or not to unbind - true or false
 ## $4 - whether or not the app runs silently - true or false
 ## $5 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList) which is the default
+## $6 - string used to locate password in keychain
 
 logFile="/private/var/log/mobile.to.local.log"
 dsclBin="/usr/bin/dscl"
@@ -191,6 +192,16 @@ elif [ "$userType" = "standard" ];then
     if [ "$result" = "0" ];then
         log "${currentName} was removed from the admin group"
     fi
+fi
+
+if [ -n $6 ];then
+    log "$currentName does not have a secure token. Setting local password."
+    password="$(security find-generic-password -s \"MobileToLocal-$6\" -w)"
+    
+    log "password: $password"
+    
+    $dsclBin . -passwd /Users/$currentName """${password}""" | tee -a $logFile
+    security delete-generic-password -s \"MobileToLocal-$6\"
 fi
 
 ## if we changed shortnames update the RecordName attribute and add the old name as an alias

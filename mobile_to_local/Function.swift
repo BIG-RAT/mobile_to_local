@@ -2,12 +2,12 @@
 //  Function.swift
 //  Mobile to Local
 //
-//  Created by leslie on 11/22/24.
 //  Copyright © 2024 jamf. All rights reserved.
 //
 
 import Foundation
 import OpenDirectory
+import SystemConfiguration
 
 class Function: NSObject {
     
@@ -20,30 +20,33 @@ class Function: NSObject {
         
         do {
             // Connect to the local node
-            guard let session = ODSession.default() else {
-                print("Unable to create ODSession")
-//                throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to create ODSession"])
-                return ["Unable to create ODSession"]
-            }
-            print("Created ODSession")
-            
-            let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
-            print("Connected to /Local/Default")
-            
-            // Find the user record
-            let query = try ODQuery(
-                node: node,
-                forRecordTypes: kODRecordTypeUsers,
-                attribute: kODAttributeTypeRecordName,
-                matchType: ODMatchType(kODMatchEqualTo),
-                queryValues: username,
-                returnAttributes: kODAttributeTypeNativeOnly,
-                maximumResults: 1
-            )
-
-            guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
-                print("User not found: \(username).")
-//                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+//            guard let session = ODSession.default() else {
+//                print("Unable to create ODSession")
+////                throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Unable to create ODSession"])
+//                return ["Unable to create ODSession"]
+//            }
+//            print("Created ODSession")
+//            
+//            let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
+//            print("Connected to /Local/Default")
+//            
+//            // Find the user record
+//            let query = try ODQuery(
+//                node: node,
+//                forRecordTypes: kODRecordTypeUsers,
+//                attribute: kODAttributeTypeRecordName,
+//                matchType: ODMatchType(kODMatchEqualTo),
+//                queryValues: username,
+//                returnAttributes: kODAttributeTypeNativeOnly,
+//                maximumResults: 1
+//            )
+//
+//            guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+//                print("User not found: \(username).")
+////                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+//                return ["User not found: \(username)"]
+//            }
+            guard let userRecord = try getUserRecord(username: username) else {
                 return ["User not found: \(username)"]
             }
             
@@ -83,6 +86,47 @@ class Function: NSObject {
         return message
     }
     
+    func currentUser() -> String {
+        var uid: uid_t = 0
+        var gid: gid_t = 0
+        var username = ""
+
+        if let theResult = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid) {
+            username     = "\(theResult)"
+            return username
+        } else {
+            WriteToLog.shared.message(stringOfText: "Unable to identify logged in user.")
+            return ""
+        }
+    }
+    
+    func getUserRecord(username: String) throws -> ODRecord? {
+        guard let session = ODSession.default() else {
+            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+        }
+            
+        guard let node = try? ODNode(session: session, name: "/Search") else {
+            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+        }
+        
+        // Find the user record
+        let query = try ODQuery(
+            node: node,
+            forRecordTypes: kODRecordTypeUsers,
+            attribute: kODAttributeTypeRecordName,
+            matchType: ODMatchType(kODMatchEqualTo),
+            queryValues: username,
+            returnAttributes: kODAttributeTypeNativeOnly,
+            maximumResults: 1
+        )
+        
+        guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+            print("User not found: \(username).")
+            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+        }
+        return nil
+    }
+
     func isAdmin(username: String) -> Bool {
         do {
             // Open the local directory
@@ -94,12 +138,16 @@ class Function: NSObject {
             
             // Get the group members (this resolves nested memberships)
             if let members = try query.values(forAttribute: kODAttributeTypeGroupMembership) as? [String] {
+                print("members: \(members)")
                 return members.contains(username)
             }
             
             // Check nested groups (GroupMembers attribute resolves nested entries)
             if let nestedGroups = try query.values(forAttribute: kODAttributeTypeGroupMembers) as? [String] {
-                let userRecord = try node.record(withRecordType: kODRecordTypeUsers, name: username, attributes: nil)
+                print("nestedGroups: \(nestedGroups)")
+                guard let userRecord = try getUserRecord(username: username) else {
+                    return false
+                }
                 let userUUID = try userRecord.values(forAttribute: kODAttributeTypeGUID) as? [String]
                 return userUUID?.contains(where: nestedGroups.contains) ?? false
             }
@@ -143,6 +191,30 @@ class Function: NSObject {
         }
         
         return false
+    }
+    
+    func passwordIsCorrect(username: String, password: String) -> Bool {
+        do {
+            // Open the local directory node
+            let session = ODSession.default()
+            let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
+            
+            // Get the user record
+            let userRecord = try node.record(
+                withRecordType: kODRecordTypeUsers,
+                name: username,
+                attributes: nil
+            )
+            
+            // Attempt to verify the credentials
+            try userRecord.verifyPassword(password)
+            
+            // If no exception is thrown, the credentials are correct
+            return true
+        } catch {
+            WriteToLog.shared.message(stringOfText: "Authentication failed: \(error)")
+            return false
+        }
     }
 
     func updateAdminGroup(username: String, operation: String) -> Bool {
