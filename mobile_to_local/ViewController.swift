@@ -335,7 +335,7 @@ class ViewController: NSViewController {
     func writeToLog(theMessage: String) {
         writeToLogQ.sync {
             LogFileW?.seekToEndOfFile()
-            let fullMessage = getDateTime(x: 2) + " \(newUser) [Migration]: " + theMessage + "\n"
+            let fullMessage = getDateTime(x: 2) + " [Migration]: " + theMessage + "\n"
             let LogText = (fullMessage as NSString).data(using: String.Encoding.utf8.rawValue)
             LogFileW?.write(LogText!)
         }

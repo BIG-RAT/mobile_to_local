@@ -123,7 +123,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 0830;
-				LastUpgradeCheck = 1510;
+				LastUpgradeCheck = 1610;
 				ORGANIZATIONNAME = jamf;
 				TargetAttributes = {
 					B5CA1AC72090CE0F00C81085 = {
@@ -334,7 +334,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -358,7 +358,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 2.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
