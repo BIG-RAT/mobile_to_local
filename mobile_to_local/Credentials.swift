@@ -14,7 +14,6 @@ let kSecClassGenericPasswordString = NSString(format: kSecClassGenericPassword)
 let keychainQ                      = DispatchQueue(label: "com.jamf.creds", qos: DispatchQoS.background)
 
 let sharedPrefix                   = "MobileToLocal"
-let accessGroup                    = "PS2F6S478M.pse.jamf.mobile-to-local"
 
 class Credentials {
     
@@ -23,17 +22,24 @@ class Credentials {
     var userPassDict = [String:String]()
     
     func save(service: String, account: String, credential: String, whichServer: String = "") {
-        if service != "" && account != "" && service.first != "/" {
+        if service != "" && account != "" {
             let theService = sharedPrefix + "-" + service
             
             if let password = credential.data(using: String.Encoding.utf8) {
+                // Access Control: Allow item to be accessed without user authentication
+                    let accessControl = SecAccessControlCreateWithFlags(
+                        nil,
+                        kSecAttrAccessibleWhenUnlocked,
+                        [],
+                        nil
+                    )
                 keychainQ.async { [self] in
-                    let keychainQuery: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
-                                                        kSecAttrService as String: theService,
-                                                        kSecAttrAccessGroup as String: accessGroup,
-                                                        kSecUseDataProtectionKeychain as String: true,
-                                                        kSecAttrAccount as String: account,
-                                                        kSecValueData as String: password]
+                    let keychainQuery: [String: Any] = [
+                        kSecClass as String: kSecClassGenericPassword,
+                        kSecAttrService as String: theService,
+                        kSecAttrAccount as String: account,
+                        kSecValueData as String: password,
+                        kSecAttrAccessControl as String: accessControl as Any]
                     
                     // see if credentials already exist for server
                     let accountCheck = checkExisting(service: theService, account: account)
@@ -79,7 +85,6 @@ class Credentials {
         
         userPassDict.removeAll()
         let keychainQuery: [String: Any] = [kSecClass as String: kSecClassGenericPasswordString,
-                                            kSecAttrAccessGroup as String: accessGroup,
                                             kSecAttrService as String: service,
                                             kSecAttrAccount as String: account,
                                             kSecMatchLimit as String: kSecMatchLimitOne,
@@ -126,7 +131,6 @@ class Credentials {
         userPassDict.removeAll()
         let keychainQuery: [String: Any] = [kSecClass as String: kSecClassGenericPasswordString,
                                             kSecAttrService as String: service,
-                                            kSecAttrAccessGroup as String: accessGroup,
                                             kSecUseDataProtectionKeychain as String: true,
                                             kSecMatchLimit as String: kSecMatchLimitAll,
                                             kSecReturnAttributes as String: true,
