@@ -102,15 +102,17 @@ class Function: NSObject {
     
     func getUserRecord(username: String) throws -> ODRecord? {
         guard let session = ODSession.default() else {
-            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+//            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+            return nil
         }
-            
-        guard let node = try? ODNode(session: session, name: "/Search") else {
-            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+
+        guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
+//            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+            return nil
         }
-        
+
         // Find the user record
-        let query = try ODQuery(
+        let query = try? ODQuery(
             node: node,
             forRecordTypes: kODRecordTypeUsers,
             attribute: kODAttributeTypeRecordName,
@@ -119,10 +121,11 @@ class Function: NSObject {
             returnAttributes: kODAttributeTypeNativeOnly,
             maximumResults: 1
         )
-        
-        guard let results = try query.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
+
+        guard let results = try? query?.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
             print("User not found: \(username).")
-            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+//            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+            return nil
         }
         return userRecord
     }
@@ -195,22 +198,17 @@ class Function: NSObject {
     
     func passwordIsCorrect(username: String, password: String) -> Bool {
         do {
-            // Open the local directory node
-            let session = ODSession.default()
-            let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
-            
-            // Get the user record
-            let userRecord = try node.record(
-                withRecordType: kODRecordTypeUsers,
-                name: username,
-                attributes: nil
-            )
-            
-            // Attempt to verify the credentials
-            try userRecord.verifyPassword(password)
-            
-            // If no exception is thrown, the credentials are correct
-            return true
+            if let userRecord = try getUserRecord(username: username) {
+                
+                // Attempt to verify the credentials
+                try userRecord.verifyPassword(password)
+                
+                // If no exception is thrown, the credentials are correct
+                return true
+            } else {
+                WriteToLog.shared.message(stringOfText: "Authentication failed for \(username)")
+                return false
+            }
         } catch {
             WriteToLog.shared.message(stringOfText: "Authentication failed: \(error)")
             return false
