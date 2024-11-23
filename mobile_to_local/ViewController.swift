@@ -72,7 +72,7 @@ class ViewController: NSViewController {
 //            showLockWindow()
 
         } else {
-            WriteToLog.shared.message(stringOfText: "Unable to verify password.")
+            WriteToLog.shared.message(stringOfText: "Unable to verify password for \(loggedInUser).")
             alert_dialog(header: "Alert", message: "Unable to verify password for \(loggedInUser).  Please re-enter the password.")
             view.window?.makeKeyAndOrderFront(self)
             return
