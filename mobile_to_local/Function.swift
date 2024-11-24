@@ -84,21 +84,22 @@ class Function: NSObject {
         for (key, value) in attributes {
             let (keyType, keyName) = "\(key)".decipherKey
             print("Attribute: \(key)")
-            if let values = value as? [String] {
-                for val in values {
-                    print("  Value: \(val)")
-                }
-            } else {
-                if !Attributes.keepList.contains(keyName) {
-                    print("Delete key: \(keyName)")
-                    do {
-                        try theRecord.removeValues(forAttribute: keyType + ":" + keyName)
-                        print("Successfully deleted key: \(keyName)")
-                    } catch {
-                        print("Failed to deleted key: \(keyName)")
-                    }
+            if !Attributes.keepList.contains(keyName) {
+                WriteToLog.shared.message(stringOfText: "Delete key: \(keyName)")
+                do {
+                    try theRecord.removeValues(forAttribute: keyType + ":" + keyName)
+                    WriteToLog.shared.message(stringOfText: "Successfully deleted key: \(keyName)")
+                } catch {
+                    WriteToLog.shared.message(stringOfText: "Failed to deleted key: \(keyName)")
                 }
             }
+//            if let values = value as? [String] {
+//                for val in values {
+//                    print("  Value: \(val)")
+//                }
+//            } else {
+//                print("  Value: \(value)")
+//            }
         }
     }
     
