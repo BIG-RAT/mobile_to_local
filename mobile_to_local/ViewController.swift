@@ -19,7 +19,6 @@ class ViewController: NSViewController {
     var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
-//    var newUser          = ""
     var userType         = "current"
     var allowNewUsername = false
     var mode             = "interactive"
@@ -80,18 +79,14 @@ class ViewController: NSViewController {
     }
 
     func completeMigration(loggedInUser: String, newUser: String, password: String) {
-//        print("migration script - start")
-        // verify password
         
-//        let service = "\(UUID())"
-//        Credentials.shared.save(service: service, account: newUser, credential: password)
         // see is user is an admin
         let isAdmin = Function.shared.isAdmin(username: loggedInUser)
         WriteToLog.shared.message(stringOfText: "isAdmin: \(isAdmin)")
         if userType == "current" {
             userType = isAdmin ? "admin":"standard"
         }
-        if !["admin", "standard"].contains(userType) {
+        if !["admin", "standard"].contains(userType.lowercased()) {
             WriteToLog.shared.message(stringOfText: "Unknown user type (\(userType)) requested, user type will remain unchanged.")
             userType = isAdmin ? "admin":"standard"
         }
@@ -112,20 +107,15 @@ class ViewController: NSViewController {
         Function.shared.deleteAttributes(username: loggedInUser)
         
 
-//          print("migration script - end")
 //         reset local user's password if needed
         if !hasSecureToken(username: newUser) {
             WriteToLog.shared.message(stringOfText: "Reset password")
                 resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
                 WriteToLog.shared.message(stringOfText: "Password reset successfully.")
-//                (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
-//            print(" password reset exitResult: \(exitResult)")
-//            print("password reset errorResult: \(errorResult)")
-//            print("password reset shellResult: \(shellResult)")
         }
         
         WriteToLog.shared.message(stringOfText: "Call demobilization script.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent)"])
         
         WriteToLog.shared.message(stringOfText: "Logging the user out.")
         (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
@@ -350,7 +340,7 @@ class ViewController: NSViewController {
                 if mode == "silent" {
                     silent = true
                 }
-                listType         = plistData["listType"] as? String ?? "keeplist"
+//                listType         = plistData["listType"] as? String ?? "keeplist"
 //                print("allowNewUsername: \(allowNewUsername)")
 //                print("        userType: \(userType)")
 //                print("          unbind: \(unbind)")
@@ -388,12 +378,12 @@ class ViewController: NSViewController {
                         if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                             unbind = false
                         }
-                    case "-listType":
-                        if ["removelist", "keeplist"].contains(CommandLine.arguments[i+1].lowercased()) {
-                            listType = CommandLine.arguments[i+1].lowercased()
-                        } else {
-                            listType = "keeplist"
-                        }
+//                    case "-listType":
+//                        if ["removelist", "keeplist"].contains(CommandLine.arguments[i+1].lowercased()) {
+//                            listType = CommandLine.arguments[i+1].lowercased()
+//                        } else {
+//                            listType = "keeplist"
+//                        }
                     default:
                         WriteToLog.shared.message(stringOfText: "unknown switch passed: \(CommandLine.arguments[i])")
 //                        print("unknown switch passed: \(CommandLine.arguments[i])")
@@ -473,7 +463,7 @@ class ViewController: NSViewController {
                 if hasSecureToken(username: newUser) {
                     self.showLockWindow()
                     
-                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
+                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent)"])
                     
                     logMigrationResult(exitValue: exitResult, newUser: newUser)
                 } else {
