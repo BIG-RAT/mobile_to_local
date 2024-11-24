@@ -168,31 +168,6 @@ class ViewController: NSViewController {
         dialog.runModal()
         //return true
     }   // func alert_dialog - end
-
-//    func authCheck(password: String) -> Bool {
-//        do {
-//            var uid: uid_t = 0
-//            var gid: gid_t = 0
-//            var username = ""
-//
-//            if let theResult = SCDynamicStoreCopyConsoleUser(nil, &uid, &gid) {
-//                username     = "\(theResult)"
-//            } else {
-//                WriteToLog.shared.message(stringOfText: "Unable to identify logged in user.")
-//                view.wantsLayer = true
-//                return false
-//            }
-//
-//            WriteToLog.shared.message(stringOfText: "Verifying authentication for: \(username)")
-//            let session = ODSession()
-//            let node = try ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes))
-//            let record = try node.record(withRecordType: kODRecordTypeUsers, name: username, attributes: nil)
-//            try record.verifyPassword(password)
-//            return true
-//        } catch {
-//            return false
-//        }
-//    }
     
     func getDateTime(x: Int8) -> String {
         let date = Date()
