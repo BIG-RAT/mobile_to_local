@@ -4,7 +4,7 @@
  ![GitHub issues](https://img.shields.io/github/issues-raw/BIG-RAT/mobile_to_local) ![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/BIG-RAT/mobile_to_local) ![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/BIG-RAT/mobile_to_local) ![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/BIG-RAT/mobile_to_local)
 
 Migrate mobile Active Directory account to a local account.<br>
-Requires 10.13 or later.<br>
+Requires 10.15 or later.<br>
 Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/latest/download/Mobile.to.Local.zip)
 
 Wanted to create an easy to use method to migrate mobile accounts to local accounts.  One item in particular I wanted to address was ensuring a FileVault 2 enabled mobile account was migrated to a FileVault 2 enabled local account and have arrived at the following.
@@ -28,7 +28,9 @@ There is also a check to ensure the account is not already a local one.
 If the user is allowed to change their login name an alert will be given if the name is already taken.
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/exists.png "exists")
 
-Attributes not needed for the local account are removed.  The removal process is accomplished by either using a list of attributes to remove (removeList) or a list of attributes to keep (keepList).  If no list type is provided keepList will be used.  Currently these are the lists:
+Attributes not needed for the local account are removed.  The removal process is accomplished by either using a list of attributes to remove (removeList) or a list of attributes to keep (keepList).  If no list type is provided keepList will be used.</br>
+**Important**: Starting with v3.0.0 only the keepList is used.</br>
+Currently these are the lists:
 | removeList |  | |  | |  | keepList |
 |  :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | _writers_LinkedIdentity |  | |  | |  | _writers_AvatarRepresentation |
@@ -61,7 +63,7 @@ Attributes not needed for the local account are removed.  The removal process is
 | Street |
 
 
-* AuthenticationAuthority has LocalCachedUser and Kerberosv5 settings removed
+* AuthenticationAuthority has LocalCachedUser and Kerberosv5 (for the domain) settings removed
 
 Mobile account shortname is added as an alias to the local account RecordName, if they differ.
 
@@ -81,7 +83,7 @@ Available switches that can be passed:
           -unbind: whether or not to unbind after migrating.  Either true or false.
             -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
                    Silent mode cannot be used if the user does not have a secure token.
-        -listType: Defines how attributes will be removed.  Use either removeList (default) or keepList.
+        -listType: Defines how attributes will be removed.  Use either removeList (only available pre v3.0.0) or keepList.
 </pre>
 
 #### Examples:
@@ -91,7 +93,7 @@ To allow the user to change their login name launch the app with the -allowNewUs
 
 ![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/nameChange.png "nameChange")
 
-Note, for macOS 10.14 and above the user home directory will not be renamed when changing the shortname of the user due to privacy preference restrictions.
+Note, the user home directory will not be renamed when changing the shortname of the user due to privacy preference restrictions.
 
 To specify the type of local account to create and unbind the machine from Active Directory use the -userType and -unbind switches:
 
