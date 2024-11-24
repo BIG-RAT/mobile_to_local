@@ -34,7 +34,7 @@ class Function: NSObject {
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
             var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
-            updatedAuthAuthorities = updatedAuthAuthorities.filter { !$0.contains(";Kerberosv5;") }
+            updatedAuthAuthorities = updatedAuthAuthorities.filter { !$0.contains("Kerberosv5") }
             try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
 
             usleep(10000)
