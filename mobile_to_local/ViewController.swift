@@ -97,20 +97,23 @@ class ViewController: NSViewController {
         }
         WriteToLog.shared.message(stringOfText: "Type of local user to convert to: \(userType).")
         
-        let isMobile = Function.shared.isMobile(username: newUser)
+        let isMobile = Function.shared.isMobile(username: loggedInUser)
         if !isMobile {
-            WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(newUser)")
-            alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(newUser)")
+            WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(loggedInUser)")
+            alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(loggedInUser)")
             NSApplication.shared.terminate(self)
         }
         
         WriteToLog.shared.message(stringOfText: "Clean up AuthenticationAuthority")
-        let cleanupResult = Function.shared.aaCleanup(username: newUser)
+        let cleanupResult = Function.shared.aaCleanup(username: loggedInUser)
         WriteToLog.shared.message(stringOfText: "Clean up result: \(cleanupResult)")
 
-        WriteToLog.shared.message(stringOfText: "Call demobilization script.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])
-        logMigrationResult(exitValue: exitResult, newUser: newUser)
+        WriteToLog.shared.message(stringOfText: "Delete Attributes - start")
+        Function.shared.deleteAttributes(username: loggedInUser)
+        
+//        WriteToLog.shared.message(stringOfText: "Call demobilization script.")
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])
+//        logMigrationResult(exitValue: exitResult, newUser: newUser)
                     
           //print("migration script - end")
         // reset local user's password if needed
