@@ -19,6 +19,7 @@
 		CE724F402CF15A1600828330 /* Credentials.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F3F2CF15A1600828330 /* Credentials.swift */; };
 		CE724F422CF15AC900828330 /* WriteToLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F412CF15AC900828330 /* WriteToLog.swift */; };
 		CE724F442CF15C3A00828330 /* TimeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F432CF15C3A00828330 /* TimeDelegate.swift */; };
+		CE724F462CF2705400828330 /* Attributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F452CF2704E00828330 /* Attributes.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -37,6 +38,7 @@
 		CE724F3F2CF15A1600828330 /* Credentials.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Credentials.swift; sourceTree = "<group>"; };
 		CE724F412CF15AC900828330 /* WriteToLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteToLog.swift; sourceTree = "<group>"; };
 		CE724F432CF15C3A00828330 /* TimeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDelegate.swift; sourceTree = "<group>"; };
+		CE724F452CF2704E00828330 /* Attributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attributes.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,6 +73,7 @@
 		B5CA1ACA2090CE0F00C81085 /* mobile_to_local */ = {
 			isa = PBXGroup;
 			children = (
+				CE724F452CF2704E00828330 /* Attributes.swift */,
 				CE724F3F2CF15A1600828330 /* Credentials.swift */,
 				CE724F3D2CF054FC00828330 /* Function.swift */,
 				B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */,
@@ -179,6 +182,7 @@
 			files = (
 				CE724F442CF15C3A00828330 /* TimeDelegate.swift in Sources */,
 				B5CA1ACE2090CE0F00C81085 /* ViewController.swift in Sources */,
+				CE724F462CF2705400828330 /* Attributes.swift in Sources */,
 				CE724F422CF15AC900828330 /* WriteToLog.swift in Sources */,
 				B579196C25D0F8F900387324 /* LockScreenController.swift in Sources */,
 				CE724F402CF15A1600828330 /* Credentials.swift in Sources */,

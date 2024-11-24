@@ -74,6 +74,72 @@ class Function: NSObject {
         }
     }
     
+    func deleteAttributes(username: String) {
+        let attributes = getAttributes(username: username)
+        guard let theRecord = try? getUserRecord(username: username) else {
+            WriteToLog.shared.message(stringOfText: "Unable to get user record.")
+            return
+        }
+        
+        for (key, value) in attributes {
+            let (keyType, keyName) = "\(key)".decipherKey
+            print("Attribute: \(key)")
+            if let values = value as? [String] {
+                for val in values {
+                    print("  Value: \(val)")
+                }
+            } else {
+                if !Attributes.keepList.contains(keyName) {
+                    print("Delete key: \(keyName)")
+                    do {
+                        try theRecord.removeValues(forAttribute: keyType + ":" + keyName)
+                        print("Successfully deleted key: \(keyName)")
+                    } catch {
+                        print("Failed to deleted key: \(keyName)")
+                    }
+                }
+            }
+        }
+    }
+    
+    func getAttributes(username: String) -> [AnyHashable: Any] {
+        do {
+            // Access the local directory node
+            let session = ODSession.default()
+            let node = try ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes))
+            
+            let query = try ODQuery(node: node, forRecordTypes: kODRecordTypeUsers, attribute: kODAttributeTypeRecordName, matchType: ODMatchType(kODMatchEqualTo), queryValues: username, returnAttributes: kODAttributeTypeAllAttributes, maximumResults: 1)
+            
+            // Execute the query
+            if let results = try query.resultsAllowingPartial(false) as? [ODRecord] {
+                print("results count: \(results.count)")
+                for record in results {
+                    // Get all attributes for the user
+                    let attributes = try record.recordDetails(forAttributes: nil)
+                    return attributes
+//                    for (key, value) in attributes {
+//                        print("Attribute: \(key)")
+//                        if let values = value as? [String] {
+//                            for val in values {
+//                                print("  Value: \(val)")
+//                            }
+//                        } else {
+//                            print("  Value: \(value)")
+//                        }
+//                    }
+                }
+            } else {
+                print("No user found.")
+                return [:]
+            }
+            
+        } catch {
+            print("Error: \(error)")
+            return [:]
+        }
+        return [:]
+    }
+    
     func getUserRecord(username: String) throws -> ODRecord? {
         guard let session = ODSession.default() else {
 //            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
@@ -219,4 +285,15 @@ class Function: NSObject {
         }
     }
     
+}
+extension String {
+    var decipherKey: (String, String) {
+        get {
+            var keyArray = self.split(separator: ":")
+            if keyArray.count == 2 {
+                return (String(keyArray[0]), String(keyArray[1]))
+            }
+            return ("","")
+        }
+    }
 }
