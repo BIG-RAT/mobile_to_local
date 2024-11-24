@@ -115,57 +115,27 @@ class ViewController: NSViewController {
 //        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])
 //        logMigrationResult(exitValue: exitResult, newUser: newUser)
                     
-          //print("migration script - end")
-        // reset local user's password if needed
-//        if !hasSecureToken(username: newUser) {
-//            WriteToLog.shared.message(stringOfText: "Reset password")
-////            do {
-////                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
-////                WriteToLog.shared.message(stringOfText: "Password reset successfully.")
+//          print("migration script - end")
+//         reset local user's password if needed
+        if !hasSecureToken(username: newUser) {
+            WriteToLog.shared.message(stringOfText: "Reset password")
+            do {
+                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
+                WriteToLog.shared.message(stringOfText: "Password reset successfully.")
 //                (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
 //            print(" password reset exitResult: \(exitResult)")
 //            print("password reset errorResult: \(errorResult)")
 //            print("password reset shellResult: \(shellResult)")
-////            } catch {
-////                WriteToLog.shared.message(stringOfText: "Failed to reset password: \(error.localizedDescription)")
-////            }
-//        }
+            } catch {
+                WriteToLog.shared.message(stringOfText: "Failed to reset password: \(error.localizedDescription)")
+            }
+        }
         
-//        WriteToLog.shared.message(stringOfText: "Logging the user out.")
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
-//        logMigrationResult(exitValue: exitResult)
+        WriteToLog.shared.message(stringOfText: "Logging the user out.")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
+        logMigrationResult(exitValue: exitResult)
         
     }
-    
-//    func OdUserRecord(username: String) -> ODRecord? {
-//        guard let session = ODSession.default() else {
-////            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
-//            return nil
-//        }
-//
-//        guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
-////            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
-//            return nil
-//        }
-//
-//        // Find the user record
-//        let query = try? ODQuery(
-//            node: node,
-//            forRecordTypes: kODRecordTypeUsers,
-//            attribute: kODAttributeTypeRecordName,
-//            matchType: ODMatchType(kODMatchEqualTo),
-//            queryValues: username,
-//            returnAttributes: kODAttributeTypeNativeOnly,
-//            maximumResults: 1
-//        )
-//
-//        guard let results = try? query?.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
-//            print("User not found: \(username).")
-////            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
-//            return nil
-//        }
-//        return userRecord
-//    }
     
     func hasSecureToken(username: String) -> Bool {
         if let userRecord = try? Function.shared.getUserRecord(username: username) /*OdUserRecord(username: username)*/ {
@@ -184,18 +154,18 @@ class ViewController: NSViewController {
         return false
     }
 
-//    func resetUserPassword(username: String, originalPassword: String) throws {
-//        if let userRecord = OdUserRecord(username: username) {
-//            // Reset the password
-//            do {
-//                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
-//                WriteToLog.shared.message(stringOfText: "Password successfully set for user \(username).")
-//            } catch {
-//                WriteToLog.shared.message(stringOfText: "Failed password set for user \(username).")
-//                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription).")
-//            }
-//        }
-//    }
+    func resetUserPassword(username: String, originalPassword: String) throws {
+        if let userRecord = try? Function.shared.getUserRecord(username: username) {
+            // Reset the password
+            do {
+                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
+                WriteToLog.shared.message(stringOfText: "Password successfully set for user \(username).")
+            } catch {
+                WriteToLog.shared.message(stringOfText: "Failed password set for user \(username).")
+                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription).")
+            }
+        }
+    }
     
     @IBAction func cancel(_ sender: Any) {
         NSApplication.shared.terminate(self)
