@@ -119,16 +119,12 @@ class ViewController: NSViewController {
 //         reset local user's password if needed
         if !hasSecureToken(username: newUser) {
             WriteToLog.shared.message(stringOfText: "Reset password")
-            do {
-                try resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
+                resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
                 WriteToLog.shared.message(stringOfText: "Password reset successfully.")
 //                (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/dscl", args: ["-passwd", "/Users/'\(newUser)' '\(password_TextField.stringValue)'"])
 //            print(" password reset exitResult: \(exitResult)")
 //            print("password reset errorResult: \(errorResult)")
 //            print("password reset shellResult: \(shellResult)")
-            } catch {
-                WriteToLog.shared.message(stringOfText: "Failed to reset password: \(error.localizedDescription)")
-            }
         }
         
         WriteToLog.shared.message(stringOfText: "Logging the user out.")
@@ -154,15 +150,16 @@ class ViewController: NSViewController {
         return false
     }
 
-    func resetUserPassword(username: String, originalPassword: String) throws {
+    func resetUserPassword(username: String, originalPassword: String) {
         if let userRecord = try? Function.shared.getUserRecord(username: username) {
             // Reset the password
             do {
-                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
+                try userRecord.changePassword(nil, toPassword: originalPassword)
+//                try userRecord.changePassword(originalPassword, toPassword: originalPassword)
                 WriteToLog.shared.message(stringOfText: "Password successfully set for user \(username).")
             } catch {
                 WriteToLog.shared.message(stringOfText: "Failed password set for user \(username).")
-                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription).")
+                WriteToLog.shared.message(stringOfText: "Error: \(error.localizedDescription)")
             }
         }
     }
