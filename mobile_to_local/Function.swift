@@ -33,13 +33,18 @@ class Function: NSObject {
             
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
-            for attrib in authAuthorities {
-                if attrib.contains("LocalCachedUser") || attrib.contains(";Kerberosv5;") {
-                    WriteToLog.shared.message(stringOfText: "Try to removed attribute: \(attrib)")
-                    try userRecord.removeValue(attrib, fromAttribute: kODAttributeTypeAuthenticationAuthority)
-                    WriteToLog.shared.message(stringOfText: "Removed attribute: \(attrib)")
-                }
-            }
+            var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
+            updatedAuthAuthorities = authAuthorities.filter { !$0.contains(";Kerberosv5;") }
+            try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
+
+            usleep(10000)
+//            for attrib in authAuthorities {
+//                if attrib.contains("LocalCachedUser") || attrib.contains(";Kerberosv5;") {
+//                    WriteToLog.shared.message(stringOfText: "Try to removed attribute: \(attrib)")
+//                    try userRecord.removeValue(attrib, fromAttribute: kODAttributeTypeAuthenticationAuthority)
+//                    WriteToLog.shared.message(stringOfText: "Removed attribute: \(attrib)")
+//                }
+//            }
             guard let newAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
                 print("AuthenticationAuthority attribute not found")
                 return ["AuthenticationAuthority attribute not found"]
