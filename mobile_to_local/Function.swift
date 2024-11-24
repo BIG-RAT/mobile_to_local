@@ -181,7 +181,6 @@ class Function: NSObject {
             
             // Get the group members (this resolves nested memberships)
             if let members = try query.values(forAttribute: kODAttributeTypeGroupMembership) as? [String] {
-                print("members: \(members)")
                 return members.contains(username)
             }
             
