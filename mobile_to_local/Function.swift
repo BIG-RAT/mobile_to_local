@@ -25,21 +25,16 @@ class Function: NSObject {
             
             // Fetch the current AuthenticationAuthority attribute
             guard let authAuthorities = try userRecord.values(forAttribute: kODAttributeTypeAuthenticationAuthority) as? [String] else {
-                print("AuthenticationAuthority attribute not found")
+                WriteToLog.shared.message(stringOfText: "AuthenticationAuthority attribute not found")
                 return ["AuthenticationAuthority attribute not found"]
 //                throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "AuthenticationAuthority attribute not found"])
             }
             print("Current AuthenticationAuthority attribute: \(authAuthorities)")
             
-            // Filter out the LocalCachedUser entry
-//            var updatedAuthAuthorities = authAuthorities.filter { !$0.contains("LocalCachedUser") }
-//            updatedAuthAuthorities = updatedAuthAuthorities.filter { !$0.contains("Kerberosv5") }
-            
             // Update the AuthenticationAuthority attribute
             message = ["updating AuthenticationAuthority"]
             for attrib in authAuthorities {
-//                if attrib.contains("LocalCachedUser") || attrib.contains("Kerberosv5") {
-                if attrib.contains("LocalCachedUser") {
+                if attrib.contains("LocalCachedUser") || attrib.contains(";Kerberosv5;") {
                     WriteToLog.shared.message(stringOfText: "Try to removed attribute: \(attrib)")
                     try userRecord.removeValue(attrib, fromAttribute: kODAttributeTypeAuthenticationAuthority)
                     WriteToLog.shared.message(stringOfText: "Removed attribute: \(attrib)")
@@ -52,7 +47,6 @@ class Function: NSObject {
             }
             
 //            try userRecord.setValue(updatedAuthAuthorities, forAttribute: kODAttributeTypeAuthenticationAuthority)
-            print("Updated AuthenticationAuthority attribute successfully: \(newAuthorities)")
             message = newAuthorities
         } catch {
             return message
