@@ -65,6 +65,8 @@ fi
 log "adding built-in group staff to $staffAlias"
 /usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
 
+userType="$2"
+
 ## set the unbind var; 'true' or 'false'
 unbind="$3"
 if [ "${unbind}" = "true" ];then
