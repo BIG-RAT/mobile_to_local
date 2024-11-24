@@ -69,7 +69,7 @@ class ViewController: NSViewController {
                 self.completeMigration(loggedInUser: loggedInUser, newUser: newUser, password: password)
             }
 
-//            showLockWindow()
+            showLockWindow()
 
         } else {
             WriteToLog.shared.message(stringOfText: "Unable to verify password for \(loggedInUser).")
@@ -83,8 +83,8 @@ class ViewController: NSViewController {
 //        print("migration script - start")
         // verify password
         
-        let service = "\(UUID())"
-        Credentials.shared.save(service: service, account: newUser, credential: password)
+//        let service = "\(UUID())"
+//        Credentials.shared.save(service: service, account: newUser, credential: password)
         // see is user is an admin
         let isAdmin = Function.shared.isAdmin(username: loggedInUser)
         WriteToLog.shared.message(stringOfText: "isAdmin: \(isAdmin)")
@@ -111,10 +111,7 @@ class ViewController: NSViewController {
         WriteToLog.shared.message(stringOfText: "Delete Attributes - start")
         Function.shared.deleteAttributes(username: loggedInUser)
         
-//        WriteToLog.shared.message(stringOfText: "Call demobilization script.")
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType) \(service)"])
-//        logMigrationResult(exitValue: exitResult, newUser: newUser)
-                    
+
 //          print("migration script - end")
 //         reset local user's password if needed
         if !hasSecureToken(username: newUser) {
@@ -126,6 +123,9 @@ class ViewController: NSViewController {
 //            print("password reset errorResult: \(errorResult)")
 //            print("password reset shellResult: \(shellResult)")
         }
+        
+        WriteToLog.shared.message(stringOfText: "Call demobilization script.")
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) \(listType)"])
         
         WriteToLog.shared.message(stringOfText: "Logging the user out.")
         (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
@@ -151,6 +151,7 @@ class ViewController: NSViewController {
     }
 
     func resetUserPassword(username: String, originalPassword: String) {
+        sleep(1)
         if let userRecord = try? Function.shared.getUserRecord(username: username) {
             // Reset the password
             do {

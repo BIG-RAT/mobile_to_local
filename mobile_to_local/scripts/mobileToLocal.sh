@@ -8,7 +8,6 @@
 ## $3 - whether or not to unbind - true or false
 ## $4 - whether or not the app runs silently - true or false
 ## $5 - how attributes are trimmed, remove only those defined (removeList) or keep only those defined (keepList) which is the default
-## $6 - string used to locate password in keychain
 
 logFile="/private/var/log/mobile.to.local.log"
 dsclBin="/usr/bin/dscl"
@@ -55,13 +54,13 @@ log """mobile to local parameters:
 #log "result of isAdmin check: ${isAdmin}"
 
 ## check the OriginalNodeName to determine if it is a local or mobile account
-mobileUserCheck=$($dsclBin . -read "/Users/$currentName" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard)
-if [ "${mobileUserCheck}" = "" ];then
-    ## account is a local account
-    log "$currentName is a local account."
-    exit 1000
-fi
-log "current user: ${currentName} is a mobile user."
+#mobileUserCheck=$($dsclBin . -read "/Users/$currentName" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard)
+#if [ "${mobileUserCheck}" = "" ];then
+#    ## account is a local account
+#    log "$currentName is a local account."
+#    exit 1000
+#fi
+#log "current user: ${currentName} is a mobile user."
 
 if [ $4 != "true" ];then
     ## verify we're either keeping the same username or new name doesn't exist
@@ -89,14 +88,14 @@ log "adding built-in group staff to $staffAlias"
 /usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
 
 ## set user type to create, if passed, to be either standard or admin.  If nothing is passed local will match mobile account
-userType="$2"
-if [ "${userType}" = "standard" ];then
-    log "User will be migrated as a $userType user"
-elif [ "${userType}" = "current" ];then
-    log "User type will not be changed"
-else
-    log "User will be migrated as an $userType user"
-fi
+#userType="$2"
+#if [ "${userType}" = "standard" ];then
+#    log "User will be migrated as a $userType user"
+#elif [ "${userType}" = "current" ];then
+#    log "User type will not be changed"
+#else
+#    log "User will be migrated as an $userType user"
+#fi
 
 ## set the unbind var; 'true' or 'false'
 unbind="$3"
@@ -154,34 +153,34 @@ done
 echo "opendirectoryd restarted with pid $pid"
 
 ## export updated AuthenticationAuthority for the account
-log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
-log "AuthenticationAuthority for local account:"
-localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
-log "${localAuthenticationAuthority}"
-
-log "------------- Start deleting attributes --------------"
-log "    delete using $5"
-## remove attributes from mobile account - start
-if [[ $5 == "removelist" ]];then
-    for theAttribute in "${attribsToRemove[@]}";do
-        log "deleting attribute: $theAttribute"
-        if [[ $theAttribute == "AppleMetaRecordName" || $theAttribute == "PrimaryNTDomain" ]];then
-            $dsclBin -raw . -delete "/Users/${currentName}" "dsAttrTypeStandard:"$theAttribute 2>/dev/null
-        else
-            $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
-        fi
-    done
-else
-while read theAttribute;do
-    log "deleting attribute: $theAttribute"
-    $dsclBin -raw . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
-#    echo $?
-done << EOL
-$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $1 ":" $2}' | grep -v -w "${attribsToKeep}")
-EOL
-fi
-## remove attributes from mobile account - end
-log "------------ Finished deleting attributes ------------"
+#log "$dsclBin . -read /Users/${currentName} AuthenticationAuthority"
+#log "AuthenticationAuthority for local account:"
+#localAuthenticationAuthority=$($dsclBin -plist . -read /Users/"${currentName}" AuthenticationAuthority)
+#log "${localAuthenticationAuthority}"
+#
+#log "------------- Start deleting attributes --------------"
+#log "    delete using $5"
+### remove attributes from mobile account - start
+#if [[ $5 == "removelist" ]];then
+#    for theAttribute in "${attribsToRemove[@]}";do
+#        log "deleting attribute: $theAttribute"
+#        if [[ $theAttribute == "AppleMetaRecordName" || $theAttribute == "PrimaryNTDomain" ]];then
+#            $dsclBin -raw . -delete "/Users/${currentName}" "dsAttrTypeStandard:"$theAttribute 2>/dev/null
+#        else
+#            $dsclBin . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
+#        fi
+#    done
+#else
+#while read theAttribute;do
+#    log "deleting attribute: $theAttribute"
+#    $dsclBin -raw . -delete "/Users/${currentName}" $theAttribute 2>/dev/null
+##    echo $?
+#done << EOL
+#$($dsclBin -raw . -read "/Users/${currentName}" | grep dsAttrType | awk -F":" '{print $1 ":" $2}' | grep -v -w "${attribsToKeep}")
+#EOL
+#fi
+### remove attributes from mobile account - end
+#log "------------ Finished deleting attributes ------------"
 
 ## add to the admins group, if appropriate
 if [ "$userType" = "admin" ];then
@@ -196,15 +195,15 @@ elif [ "$userType" = "standard" ];then
     fi
 fi
 
-if [ -n $6 ];then
-    log "$currentName does not have a secure token. Setting local password."
-    password="$(security find-generic-password -a \"$currentName\" -s \"MobileToLocal-$6\" -w)"
-    
-    log "password: $password"
-    
-    $dsclBin . -passwd /Users/$currentName """${password}""" | tee -a $logFile
-    security delete-generic-password -s \"MobileToLocal-$6\"
-fi
+#if [ -n $6 ];then
+#    log "$currentName does not have a secure token. Setting local password."
+#    password="$(security find-generic-password -a \"$currentName\" -s \"MobileToLocal-$6\" -w)"
+#    
+#    log "password: $password"
+#    
+#    $dsclBin . -passwd /Users/$currentName """${password}""" | tee -a $logFile
+#    security delete-generic-password -s \"MobileToLocal-$6\"
+#fi
 
 ## if we changed shortnames update the RecordName attribute and add the old name as an alias
 if [ "${newName}" != "${currentName}" ];then
