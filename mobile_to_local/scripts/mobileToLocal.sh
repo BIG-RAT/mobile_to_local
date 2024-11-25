@@ -31,24 +31,14 @@ computerName=$(scutil --get ComputerName)
 ## get logged in username and UniqueID (id can no longer be reset)
 currentName="$(stat -f%Su /dev/console)"
 
-## new username
 newName="$1"
+userType="$2"
 
 log """mobile to local parameters:
                         new username: $1
                         type of user to create: $2
                         unbind: $3
                         silent: $4"""
-
-if [ $4 != "true" ];then
-    ## verify we're either keeping the same username or new name doesn't exist
-    nameCheck=$($dsclBin . -read "/Users/${newName}" RealName &> /dev/null;echo $?)
-    if [ "$nameCheck" = "0" ] && [ ! "${newName}" = "${currentName}" ];then
-        ## account already exists and belongs to a different user
-        log "${newName} belongs to another user."
-        exit 500
-    fi
-fi
 
 ## get primary group id
 groupId=$($dsclBin . read /Users/"${currentName}" PrimaryGroupID | awk '{print $2}')
@@ -64,8 +54,6 @@ else
 fi
 log "adding built-in group staff to $staffAlias"
 /usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
-
-userType="$2"
 
 ## set the unbind var; 'true' or 'false'
 unbind="$3"
