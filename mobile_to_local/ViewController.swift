@@ -59,6 +59,19 @@ class ViewController: NSViewController {
         }
 
         let loggedInUser = Function.shared.currentUser()
+        
+        // if changing username, make sure new name isn't already in use
+        if loggedInUser.lowercased() != newUser_TextField.stringValue.lowercased() {
+            do {
+                let newUserRecord =  try Function.shared.getUserRecord(username: newUser_TextField.stringValue.lowercased())
+                alert_dialog(header: "", message: "Sorry, \(newUser_TextField.stringValue.lowercased()) already exists.")
+                newUser_TextField.becomeFirstResponder()
+                return
+            } catch {
+                WriteToLog.shared.message(stringOfText: "\(loggedInUser) will be migrated to local account \(newUser_TextField.stringValue.lowercased())")
+            }
+        }
+        
         let password     = password_TextField.stringValue
         if Function.shared.passwordIsCorrect(username: loggedInUser, password: password) {
 
