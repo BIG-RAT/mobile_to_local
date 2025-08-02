@@ -22,6 +22,7 @@ class ViewController: NSViewController {
     var userType         = "current"
     var customMessage    = """
         Please provide a name to use for login/unlocking your machine, also enter your current password.
+        
         Save and close items you are working on.
         Click migrate to convert your mobile account to a local one.
         """
@@ -53,6 +54,8 @@ class ViewController: NSViewController {
         return mode == "Dark"
     }
 
+    @IBOutlet var introMessage_TextView: NSTextView!
+    
     @IBAction func migrate(_ sender: Any) {
         var allowedCharacters = CharacterSet.alphanumerics
         allowedCharacters.insert(charactersIn: "-_.")
@@ -392,6 +395,8 @@ class ViewController: NSViewController {
                 self.view.isHidden = true
                 NSApplication.shared.mainWindow?.setIsVisible(false)
             } else {
+                introMessage_TextView.font   = NSFont.systemFont(ofSize: 16)
+                introMessage_TextView.string = customMessage
                 self.view.isHidden = false
                 NSApplication.shared.mainWindow?.setIsVisible(true)
             }
@@ -452,8 +457,6 @@ class ViewController: NSViewController {
                 NSApplication.shared.terminate(self)
             }
             
-            // Do any additional setup after loading the view.
-
             if silent {
                 if hasSecureToken(username: newUser) {
                     self.showLockWindow()
@@ -475,7 +478,6 @@ class ViewController: NSViewController {
                 NSApplication.shared.activate(ignoringOtherApps: true)
             }
         }
-
     }
     
     override var representedObject: Any? {
