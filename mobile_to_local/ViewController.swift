@@ -20,6 +20,11 @@ class ViewController: NSViewController {
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
     var userType         = "current"
+    var customMessage    = """
+        Please provide a name to use for login/unlocking your machine, also enter your current password.
+        Save and close items you are working on.
+        Click migrate to convert your mobile account to a local one.
+        """
     var allowNewUsername = false
     var mode             = "interactive"
     var silent           = false
@@ -366,6 +371,8 @@ class ViewController: NSViewController {
                         if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                             unbind = false
                         }
+                    case "-message":
+                        customMessage = CommandLine.arguments[i+1]
 //                    case "-listType":
 //                        if ["removelist", "keeplist"].contains(CommandLine.arguments[i+1].lowercased()) {
 //                            listType = CommandLine.arguments[i+1].lowercased()

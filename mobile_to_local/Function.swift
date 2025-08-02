@@ -72,6 +72,51 @@ class Function: NSObject {
             return ""
         }
     }
+
+    func createStaffAliasGroup(username: String) {
+        do {
+            // Get a reference to the local node
+            let session = ODSession.default()
+            let node = try ODNode(session: session, name: "/Local/Default")
+            
+            // Get id for <domain>\DomainUsers group (user's primary group)
+            let userRecord = getAttributes(username: username)
+            let primaryGroupArray = userRecord["dsAttrTypeStandard:PrimaryGroupID"] as? [String]
+            let primaryGroupId = primaryGroupArray?.first ?? "-1"
+            
+            // Create the new group
+            let groupRecordName = "StaffAlias"
+            let groupRecord = try node.createRecord(withRecordType: kODRecordTypeGroups, name: groupRecordName, attributes: [
+                kODAttributeTypeFullName: "Staff Alias"
+            ])
+            print("Group '\(groupRecordName)' created successfully.")
+            try groupRecord.setValue(primaryGroupId, forAttribute: kODAttributeTypePrimaryGroupID)
+            
+            
+            
+            // Fetch the built-in group
+            let builtInGroupName = "staff"
+            guard let builtInGroupRecord = try? node.record(withRecordType: kODRecordTypeGroups, name: builtInGroupName, attributes: nil) else {
+                print("Built-in group '\(builtInGroupName)' not found.")
+                return
+            }
+            
+            // Add the built-in Staff to the new group
+            let builtInGroupGUID = try builtInGroupRecord.values(forAttribute: kODAttributeTypeGUID).first as? String
+            if let builtInGroupGUID = builtInGroupGUID {
+                try groupRecord.addValue(builtInGroupGUID, toAttribute: kODAttributeTypeGroupMembership)
+                print("Added built-in group '\(builtInGroupName)' to '\(groupRecordName)'.")
+            } else {
+                print("Could not retrieve GUID for built-in group '\(builtInGroupName)'.")
+            }
+            
+            // Save changes
+            try groupRecord.synchronize()
+            print("Changes saved successfully.")
+        } catch {
+            print("Error: \(error.localizedDescription)")
+        }
+    }
     
     func deleteAttributes(username: String) {
         let attributes = getAttributes(username: username)
