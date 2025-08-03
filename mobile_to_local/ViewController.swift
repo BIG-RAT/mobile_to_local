@@ -336,6 +336,12 @@ class ViewController: NSViewController {
                 userType         = plistData["userType"] as? String ?? "current"
                 unbind           = plistData["unbind"] as? Bool ?? true
                 mode             = plistData["mode"] as? String ?? "interactive"
+                customMessage    = plistData["customMessage"] as? String ?? """
+                    Please provide a name to use for login/unlocking your machine, also enter your current password.
+                    
+                    Save and close items you are working on.
+                    Click migrate to convert your mobile account to a local one.
+                    """
                 if mode == "silent" {
                     silent = true
                 }
@@ -410,6 +416,7 @@ class ViewController: NSViewController {
             let newUser = myFunc.currentUser()
 //            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
 //            newUser = shellResult[0]
+            // change for testing
             newUser_TextField.stringValue = newUser
 
             // Verify we're running with elevated privileges.
@@ -493,10 +500,7 @@ class ViewController: NSViewController {
     }
     
     override func viewDidAppear() {
-
-//      Make sure the window is not restorable, to get the cursor in the username field
         NSApplication.shared.mainWindow?.makeFirstResponder(password_TextField)
-        
     }
 
 }

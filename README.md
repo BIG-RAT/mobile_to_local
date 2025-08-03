@@ -9,7 +9,7 @@ Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/
 
 Wanted to create an easy to use method to migrate mobile accounts to local accounts.  One item in particular I wanted to address was ensuring a FileVault 2 enabled mobile account was migrated to a FileVault 2 enabled local account and have arrived at the following.
 
-![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/main.png "Mobile to Local")
+![alt text](./mtl_images/main.png "Mobile to Local")
 
 The app should be launched with elevated privileges:
 
@@ -17,16 +17,16 @@ The app should be launched with elevated privileges:
 
 
 A notice will be displayed if the app is not launched with elevated privileges.
-![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/privs.png "not elevated")
+![alt text](./mtl_images/privs.png "not elevated")
 
 The password is verified during the process, if entered incorrectly the user will be alerted.
-![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/password.png "password")
+![alt text](./mtl_images/password.png "password")
 
 There is also a check to ensure the account is not already a local one.
-![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/localAccount.png "local")
+![alt text](./mtl_images/localAccount.png "local")
 
 If the user is allowed to change their login name an alert will be given if the name is already taken.
-![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/exists.png "exists")
+![alt text](./mtl_images/exists.png "exists")
 
 Attributes not needed for the local account are removed.  The removal process is accomplished by either using a list of attributes to remove (removeList) or a list of attributes to keep (keepList).  If no list type is provided keepList will be used.</br>
 **Important**: Starting with v3.0.0 only the keepList is used.</br>
@@ -83,6 +83,7 @@ Available switches that can be passed:
           -unbind: whether or not to unbind after migrating.  Either true or false.
             -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
                    Silent mode cannot be used if the user does not have a secure token.
+        -message: override default text displayed on initial window.
         -listType: Defines how attributes will be removed.  Use either removeList (only available pre v3.0.0) or keepList.
 </pre>
 
@@ -91,13 +92,19 @@ To allow the user to change their login name launch the app with the -allowNewUs
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -allowNewUsername true```
 
-![alt text](https://github.com/BIG-RAT/mobile_to_local/blob/master/mtl_images/nameChange.png "nameChange")
+![alt text](./mtl_images/nameChange.png "nameChange")
 
 Note, the user home directory will not be renamed when changing the shortname of the user due to privacy preference restrictions.
 
 To specify the type of local account to create and unbind the machine from Active Directory use the -userType and -unbind switches:
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -userType admin -unbind true```
+
+Display custom text:
+
+```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -message "Migrating your mobile account\\nEnter your existing password\\n\\nBe sure to save your work and close any applications before migrating."```
+
+![alt text](./mtl_images/customText.png "customText")
 
 To migrate a mobile account to local and set them as a standard user without prompting for input:
 
