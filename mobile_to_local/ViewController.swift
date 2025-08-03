@@ -413,6 +413,7 @@ class ViewController: NSViewController {
 
             // Verify we're running with elevated privileges.
             if NSUserName() != "root" {
+                // disable for testing
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "Assistant must be run with elevated privileges.")
                 alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
@@ -446,12 +447,13 @@ class ViewController: NSViewController {
             let accountTypeArray = shellResult
 
             if accountTypeArray.count != 0 {
-                    if accountTypeArray[0] == "" {
-                        NSApplication.shared.mainWindow?.setIsVisible(false)
-                        WriteToLog.shared.message(stringOfText: "You are currently logged in with a local account, migration is not necessary.")
-                        alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
-                        NSApplication.shared.terminate(self)
-                    }
+                // disable for testing
+                if accountTypeArray[0] == "" {
+                    NSApplication.shared.mainWindow?.setIsVisible(false)
+                    WriteToLog.shared.message(stringOfText: "You are currently logged in with a local account, migration is not necessary.")
+                    alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
+                    NSApplication.shared.terminate(self)
+                }
             } else {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "\(errorResult[0])")
