@@ -13,6 +13,8 @@ import SystemConfiguration
 
 class ViewController: NSViewController {
     
+    let myFunc = Function.shared
+    
     @IBOutlet weak var newUser_TextField: NSTextField!
     @IBOutlet weak var password_TextField: NSSecureTextField!
     
@@ -66,12 +68,12 @@ class ViewController: NSViewController {
             return
         }
 
-        let loggedInUser = Function.shared.currentUser()
+        let loggedInUser = myFunc.currentUser()
         
         // if changing username, make sure new name isn't already in use
         if loggedInUser.lowercased() != newUser_TextField.stringValue.lowercased() {
             do {
-                let newUserRecord =  try Function.shared.getUserRecord(username: newUser_TextField.stringValue.lowercased())
+                let newUserRecord =  try myFunc.getUserRecord(username: newUser_TextField.stringValue.lowercased())
                 alert_dialog(header: "", message: "Sorry, \(newUser_TextField.stringValue.lowercased()) already exists.")
                 newUser_TextField.becomeFirstResponder()
                 return
@@ -81,7 +83,7 @@ class ViewController: NSViewController {
         }
         
         let password     = password_TextField.stringValue
-        if Function.shared.passwordIsCorrect(username: loggedInUser, password: password) {
+        if myFunc.passwordIsCorrect(username: loggedInUser, password: password) {
 
             WriteToLog.shared.message(stringOfText: "Password verified for \(loggedInUser).")
 
@@ -99,10 +101,11 @@ class ViewController: NSViewController {
         }
     }
 
+
     func completeMigration(loggedInUser: String, newUser: String, password: String) {
         
         // see is user is an admin
-        let isAdmin = Function.shared.isAdmin(username: loggedInUser)
+        let isAdmin = myFunc.isAdmin(username: loggedInUser)
         WriteToLog.shared.message(stringOfText: "isAdmin: \(isAdmin)")
         if userType == "current" {
             userType = isAdmin ? "admin":"standard"
@@ -113,7 +116,7 @@ class ViewController: NSViewController {
         }
         WriteToLog.shared.message(stringOfText: "Type of local user to convert to: \(userType).")
         
-        let isMobile = Function.shared.isMobile(username: loggedInUser)
+        let isMobile = myFunc.isMobile(username: loggedInUser)
         if !isMobile {
             WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(loggedInUser)")
             alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(loggedInUser)")
@@ -121,11 +124,11 @@ class ViewController: NSViewController {
         }
         
         WriteToLog.shared.message(stringOfText: "Clean up AuthenticationAuthority")
-        let cleanupResult = Function.shared.aaCleanup(username: loggedInUser)
+        let cleanupResult = myFunc.aaCleanup(username: loggedInUser)
         WriteToLog.shared.message(stringOfText: "Clean up result: \(cleanupResult)")
 
         WriteToLog.shared.message(stringOfText: "Delete Attributes - start")
-        Function.shared.deleteAttributes(username: loggedInUser)
+        myFunc.deleteAttributes(username: loggedInUser)
         
 
 //         reset local user's password if needed
@@ -145,7 +148,7 @@ class ViewController: NSViewController {
     }
     
     func hasSecureToken(username: String) -> Bool {
-        if let userRecord = try? Function.shared.getUserRecord(username: username) /*OdUserRecord(username: username)*/ {
+        if let userRecord = try? myFunc.getUserRecord(username: username) /*OdUserRecord(username: username)*/ {
             guard let aa = try? userRecord.recordDetails(forAttributes: ["dsAttrTypeStandard:AuthenticationAuthority"])["dsAttrTypeStandard:AuthenticationAuthority"] as? [String] else {
                 WriteToLog.shared.message(stringOfText: "Unable to query user for a secure token.")
                 return false
@@ -163,7 +166,7 @@ class ViewController: NSViewController {
 
     func resetUserPassword(username: String, originalPassword: String) {
         sleep(1)
-        if let userRecord = try? Function.shared.getUserRecord(username: username) {
+        if let userRecord = try? myFunc.getUserRecord(username: username) {
             // Reset the password
             do {
                 try userRecord.changePassword(nil, toPassword: originalPassword)
@@ -298,7 +301,7 @@ class ViewController: NSViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let admin = Function.shared.isAdmin(username: NSUserName())
+        let admin = myFunc.isAdmin(username: NSUserName())
         WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
         
         DispatchQueue.main.async { [self] in
@@ -403,7 +406,7 @@ class ViewController: NSViewController {
             if allowNewUsername {
                 self.newUser_TextField.isEditable   = true
             }
-            let newUser = Function.shared.currentUser()
+            let newUser = myFunc.currentUser()
 //            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
 //            newUser = shellResult[0]
             newUser_TextField.stringValue = newUser
