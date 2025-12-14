@@ -18,6 +18,7 @@
 		CE724F422CF15AC900828330 /* WriteToLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F412CF15AC900828330 /* WriteToLog.swift */; };
 		CE724F442CF15C3A00828330 /* TimeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F432CF15C3A00828330 /* TimeDelegate.swift */; };
 		CE724F462CF2705400828330 /* Attributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F452CF2704E00828330 /* Attributes.swift */; };
+		CECC3D6E2EEEFB880068669C /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = CECC3D6D2EEEFB880068669C /* TelemetryDeck */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +43,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CECC3D6E2EEEFB880068669C /* TelemetryDeck in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -145,6 +147,9 @@
 				Base,
 			);
 			mainGroup = B5CA1ABF2090CE0F00C81085;
+			packageReferences = (
+				CECC3D6C2EEEFB880068669C /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+			);
 			productRefGroup = B5CA1AC92090CE0F00C81085 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -332,7 +337,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 3.1.0;
+				MARKETING_VERSION = 3.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -357,7 +362,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 3.1.0;
+				MARKETING_VERSION = 3.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -387,6 +392,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CECC3D6C2EEEFB880068669C /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.11.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CECC3D6D2EEEFB880068669C /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CECC3D6C2EEEFB880068669C /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = B5CA1AC02090CE0F00C81085 /* Project object */;
 }
