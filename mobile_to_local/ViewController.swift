@@ -72,12 +72,11 @@ class ViewController: NSViewController {
         
         // if changing username, make sure new name isn't already in use
         if loggedInUser.lowercased() != newUser_TextField.stringValue.lowercased() {
-            do {
-                let newUserRecord =  try myFunc.getUserRecord(username: newUser_TextField.stringValue.lowercased())
-                alert_dialog(header: "", message: "Sorry, \(newUser_TextField.stringValue.lowercased()) already exists.")
+            if let newUserRecord = myFunc.getUserRecord(username: newUser_TextField.stringValue.lowercased()) {
+                alert_dialog(header: "", message: "Sorry, \(newUserRecord) already exists.")
                 newUser_TextField.becomeFirstResponder()
                 return
-            } catch {
+            } else {
                 WriteToLog.shared.message(stringOfText: "\(loggedInUser) will be migrated to local account \(newUser_TextField.stringValue.lowercased())")
             }
         }

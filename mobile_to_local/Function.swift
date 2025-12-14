@@ -185,14 +185,14 @@ class Function: NSObject {
         return [:]
     }
     
-    func getUserRecord(username: String) throws -> ODRecord? {
+    func getUserRecord(username: String) -> ODRecord? {
         guard let session = ODSession.default() else {
-//            throw NSError(domain: "OpenDirectory", code: 1, userInfo: [NSLocalizedDescriptionKey: "Failed to create Open Directory session."])
+            WriteToLog.shared.message(stringOfText: "Failed to create Open Directory session.")
             return nil
         }
 
         guard let node = try? ODNode(session: session, type: ODNodeType(kODNodeTypeLocalNodes)) else {
-//            throw NSError(domain: "OpenDirectory", code: 2, userInfo: [NSLocalizedDescriptionKey: "Failed to access local directory node."])
+            WriteToLog.shared.message(stringOfText: "Failed to access local directory node.")
             return nil
         }
 
@@ -208,8 +208,7 @@ class Function: NSObject {
         )
 
         guard let results = try? query?.resultsAllowingPartial(false) as? [ODRecord], let userRecord = results.first else {
-            print("User not found: \(username).")
-//            throw NSError(domain: "OpenDirectory", code: 3, userInfo: [NSLocalizedDescriptionKey: "User not found."])
+            WriteToLog.shared.message(stringOfText: "Username, \(username), is available.")
             return nil
         }
         return userRecord
