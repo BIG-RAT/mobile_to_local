@@ -142,8 +142,13 @@ class ViewController: NSViewController {
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent)"])
         
         WriteToLog.shared.message(stringOfText: "Logging the user out.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
-        logMigrationResult(exitValue: exitResult)
+        let task = Process()
+        task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+        task.arguments = ["-KILL", "-u", newUser]
+
+        try? task.run()
+//        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
+//        logMigrationResult(exitValue: exitResult)
         
     }
     

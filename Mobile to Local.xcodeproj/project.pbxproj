@@ -19,6 +19,7 @@
 		CE724F442CF15C3A00828330 /* TimeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F432CF15C3A00828330 /* TimeDelegate.swift */; };
 		CE724F462CF2705400828330 /* Attributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE724F452CF2704E00828330 /* Attributes.swift */; };
 		CECC3D6E2EEEFB880068669C /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = CECC3D6D2EEEFB880068669C /* TelemetryDeck */; };
+		CECC3D722EEEFCA40068669C /* TelemetryDeckConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = CECC3D712EEEFCA40068669C /* TelemetryDeckConfig.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		CE724F412CF15AC900828330 /* WriteToLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WriteToLog.swift; sourceTree = "<group>"; };
 		CE724F432CF15C3A00828330 /* TimeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDelegate.swift; sourceTree = "<group>"; };
 		CE724F452CF2704E00828330 /* Attributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attributes.swift; sourceTree = "<group>"; };
+		CECC3D712EEEFCA40068669C /* TelemetryDeckConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryDeckConfig.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 				CE724F3D2CF054FC00828330 /* Function.swift */,
 				B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */,
 				B579196B25D0F8F900387324 /* LockScreenController.swift */,
+				CECC3D712EEEFCA40068669C /* TelemetryDeckConfig.swift */,
 				CE724F432CF15C3A00828330 /* TimeDelegate.swift */,
 				B5CA1ACD2090CE0F00C81085 /* ViewController.swift */,
 				CE724F412CF15AC900828330 /* WriteToLog.swift */,
@@ -182,6 +185,7 @@
 				B5CA1ACE2090CE0F00C81085 /* ViewController.swift in Sources */,
 				CE724F462CF2705400828330 /* Attributes.swift in Sources */,
 				CE724F422CF15AC900828330 /* WriteToLog.swift in Sources */,
+				CECC3D722EEEFCA40068669C /* TelemetryDeckConfig.swift in Sources */,
 				B579196C25D0F8F900387324 /* LockScreenController.swift in Sources */,
 				B5CA1ACC2090CE0F00C81085 /* AppDelegate.swift in Sources */,
 				CE724F3E2CF0551300828330 /* Function.swift in Sources */,
