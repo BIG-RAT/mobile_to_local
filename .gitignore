@@ -1,3 +1,5 @@
 localOnly/
 .DS_Store
 **/.DS_Store
+
+TelemetryDeckConfig.swift
