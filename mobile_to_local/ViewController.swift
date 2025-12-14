@@ -18,7 +18,6 @@ class ViewController: NSViewController {
     @IBOutlet weak var newUser_TextField: NSTextField!
     @IBOutlet weak var password_TextField: NSSecureTextField!
     
-    var writeToLogQ = DispatchQueue(label: "com.jamf.writeToLogQ", qos: .default)
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
     var userType         = "current"
@@ -291,15 +290,6 @@ class ViewController: NSViewController {
         }
 
 //        print("[showLockWindow] lock window shown")
-    }
-    
-    func writeToLog(theMessage: String) {
-        writeToLogQ.sync {
-            LogFileW?.seekToEndOfFile()
-            let fullMessage = getDateTime(x: 2) + " [Migration]: " + theMessage + "\n"
-            let LogText = (fullMessage as NSString).data(using: String.Encoding.utf8.rawValue)
-            LogFileW?.write(LogText!)
-        }
     }
     
     override func viewDidLoad() {
