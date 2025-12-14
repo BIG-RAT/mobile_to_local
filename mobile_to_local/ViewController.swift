@@ -380,12 +380,6 @@ class ViewController: NSViewController {
                     case "-message":
                         customMessage = CommandLine.arguments[i+1]
                         customMessage = customMessage.replacingOccurrences(of: "\\n", with: "\n")
-//                    case "-listType":
-//                        if ["removelist", "keeplist"].contains(CommandLine.arguments[i+1].lowercased()) {
-//                            listType = CommandLine.arguments[i+1].lowercased()
-//                        } else {
-//                            listType = "keeplist"
-//                        }
                     default:
                         WriteToLog.shared.message(stringOfText: "unknown switch passed: \(CommandLine.arguments[i])")
 //                        print("unknown switch passed: \(CommandLine.arguments[i])")
