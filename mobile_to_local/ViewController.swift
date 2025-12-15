@@ -32,6 +32,7 @@ class ViewController: NSViewController {
     var mode             = "interactive"
     var silent           = false
     var unbind           = true
+    var logoutUser       = false
     var listType         = "keeplist"
     var plistData        = [String:Any]()
     
@@ -151,12 +152,15 @@ class ViewController: NSViewController {
             }
         }
         
-        WriteToLog.shared.message(stringOfText: "Logging the user out.")
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
-        task.arguments = ["-KILL", "-u", newUser]
-
-        try? task.run()
+        WriteToLog.shared.message(stringOfText: "-- Process complete --")
+        if logoutUser {
+            WriteToLog.shared.message(stringOfText: "Logging the user out.")
+            let task = Process()
+            task.executableURL = URL(fileURLWithPath: "/usr/bin/pkill")
+            task.arguments = ["-KILL", "-u", newUser]
+            
+            try? task.run()
+        }
 //        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
 //        logMigrationResult(exitValue: exitResult)
         
@@ -342,6 +346,7 @@ class ViewController: NSViewController {
                 userType         = plistData["userType"] as? String ?? "current"
                 unbind           = plistData["unbind"] as? Bool ?? true
                 mode             = plistData["mode"] as? String ?? "interactive"
+                logoutUser       = plistData["logout"] as? Bool ?? false
                 customMessage    = plistData["customMessage"] as? String ?? """
                     Please provide a name to use for login/unlocking your machine, also enter your current password.
                     
@@ -388,6 +393,10 @@ class ViewController: NSViewController {
                     case "-unbind":
                         if (CommandLine.arguments[i+1].lowercased() == "false") || (CommandLine.arguments[i+1].lowercased() == "no")  {
                             unbind = false
+                        }
+                    case "-logout":
+                        if (CommandLine.arguments[i+1].lowercased() == "true") || (CommandLine.arguments[i+1].lowercased() == "yes")  {
+                            logoutUser = true
                         }
                     case "-message":
                         customMessage = CommandLine.arguments[i+1]
