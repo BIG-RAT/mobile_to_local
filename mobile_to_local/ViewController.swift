@@ -476,7 +476,6 @@ class ViewController: NSViewController {
             let accountTypeArray = shellResult
 
             if accountTypeArray.count != 0 {
-                // disable for testing
                 if accountTypeArray[0] == "" && !debug {
                     NSApplication.shared.mainWindow?.setIsVisible(false)
                     WriteToLog.shared.message(stringOfText: "You are currently logged in with a local account, migration is not necessary.")
