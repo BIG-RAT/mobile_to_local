@@ -5,7 +5,7 @@
 import TelemetryDeck
 
 struct TelemetryDeckConfig {
-    static let appId = "***REMOVED***"
+    static let appId = "<appId>"
     @MainActor static var parameters: [String: String] = [:]
     @MainActor static var analytics: String = "enabled"
 }
