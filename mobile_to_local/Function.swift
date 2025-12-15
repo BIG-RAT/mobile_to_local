@@ -169,7 +169,7 @@ class Function: NSObject {
             
             // Execute the query
             if let results = try query.resultsAllowingPartial(false) as? [ODRecord] {
-                print("results count: \(results.count)")
+//                print("results count: \(results.count)")
                 for record in results {
                     // Get all attributes for the user
                     let attributes = try record.recordDetails(forAttributes: nil)

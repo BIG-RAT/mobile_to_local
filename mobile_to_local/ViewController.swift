@@ -349,6 +349,7 @@ class ViewController: NSViewController {
                 unbind           = plistData["unbind"] as? Bool ?? true
                 mode             = plistData["mode"] as? String ?? "interactive"
                 logoutUser       = plistData["logout"] as? Bool ?? false
+                TelemetryDeckConfig.analytics = plistData["analytics"] as? String ?? "enabled"
                 customMessage    = plistData["customMessage"] as? String ?? """
                     Please provide a name to use for login/unlocking your machine, also enter your current password.
                     
@@ -368,7 +369,7 @@ class ViewController: NSViewController {
             // read commandline args
             var numberOfArgs = 0
 
-            let debug = true
+            let debug = false
 
             numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
             if numberOfArgs > 0 {
@@ -403,6 +404,8 @@ class ViewController: NSViewController {
                     case "-message":
                         customMessage = CommandLine.arguments[i+1]
                         customMessage = customMessage.replacingOccurrences(of: "\\n", with: "\n")
+                    case "-analytics":
+                        TelemetryDeckConfig.analytics = CommandLine.arguments[i+1]
                     default:
                         WriteToLog.shared.message(stringOfText: "unknown switch passed: \(CommandLine.arguments[i])")
 //                        print("unknown switch passed: \(CommandLine.arguments[i])")
@@ -436,7 +439,7 @@ class ViewController: NSViewController {
             } else {
                 fullName_TextField.stringValue = newUser
             }
-
+            
             // Verify we're running with elevated privileges.
             if NSUserName() != "root" && !debug {
                 // disable for testing
@@ -518,6 +521,14 @@ class ViewController: NSViewController {
     }
     
     override func viewDidAppear() {
+        
+        guard let window = self.view.window else { return }
+
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.styleMask.insert(.fullSizeContentView)
+        window.isMovableByWindowBackground = true
+        
         NSApplication.shared.mainWindow?.makeFirstResponder(password_TextField)
     }
 

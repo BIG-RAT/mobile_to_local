@@ -78,14 +78,17 @@ The local account retains the uniqueID of the mobile account, this removes the n
 
 Available switches that can be passed:
 <pre>
--allowNewUsername: whether or not to allow the user to change their current shortname.  Either true of false.
-        -userType: type of account to migrate to.  Either standard or admin.
-          -unbind: whether or not to unbind after migrating.  Either true or false.
+-allowNewUsername: whether or not to allow the user to change their current shortname.  Value is either true or false.
+        -userType: type of account to migrate to.  Value is either standard or admin.
+          -unbind: whether or not to unbind after migrating.  Value is either true or false.
             -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
                    Silent mode cannot be used if the user does not have a secure token.
         -message: override default text displayed on initial window.
+      -analytics: whether or not to send anonymous usage information to aid in developement. Value is either enabled or disabled.
         -listType: Defines how attributes will be removed.  Use either removeList (only available pre v3.0.0) or keepList.
 </pre>
+
+Starting with version 3.2.0 anonymous hardware and OS information will be sent to [TelemetryDeck](https://telemetrydeck.com/) to aid in developement of the app.
 
 #### Examples:
 To allow the user to change their login name launch the app with the -allowNewUsername switch:
