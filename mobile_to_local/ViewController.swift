@@ -160,6 +160,8 @@ class ViewController: NSViewController {
             task.arguments = ["-KILL", "-u", newUser]
             
             try? task.run()
+        } else {
+            NSApplication.shared.terminate(self)
         }
 //        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
 //        logMigrationResult(exitValue: exitResult)
