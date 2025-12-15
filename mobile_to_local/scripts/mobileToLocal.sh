@@ -7,6 +7,7 @@
 ## $2 - type of user to create; standard or admin
 ## $3 - whether or not to unbind - true or false
 ## $4 - whether or not the app runs silently - true or false
+## $5 - new full name
 
 logFile="/private/var/log/mobile.to.local.log"
 dsclBin="/usr/bin/dscl"
@@ -32,10 +33,12 @@ computerName=$(scutil --get ComputerName)
 currentName="$(stat -f%Su /dev/console)"
 
 newName="$1"
+newFullname="$5"
 userType="$2"
 
 log """mobile to local parameters:
                         new username: $1
+                        new fullname: $5
                         type of user to create: $2
                         unbind: $3
                         silent: $4"""
