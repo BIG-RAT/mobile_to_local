@@ -78,20 +78,21 @@ The local account retains the uniqueID of the mobile account, this removes the n
 
 Available switches that can be passed:
 <pre>
--allowNewUsername: whether or not to allow the user to change their current shortname.  Value is either true or false.
-        -userType: type of account to migrate to.  Value is either standard or admin.
-          -unbind: whether or not to unbind after migrating.  Value is either true or false.
+-allowNewUsername: whether or not to allow the user to change their current short name and full name.  Value is either true or false, default is false.
+        -userType: type of account to migrate to.  Value is either standard or admin, default is to keep existing user type.
+          -unbind: whether or not to unbind after migrating.  Value is either true or false, default is true.
+          -logout: whether or not to logout after migrating.  Value is either true or false, default is false.
             -mode: whether or not to prompt the user for input.  If mode is silent the user will not be prompted for input.
-                   Silent mode cannot be used if the user does not have a secure token.
+                   Silent mode cannot be used if the user does not have a secure token, default is to prompt.
         -message: override default text displayed on initial window.
-      -analytics: whether or not to send anonymous usage information to aid in developement. Value is either enabled or disabled.
+      -analytics: whether or not to send anonymous usage information to aid in developement. Value is either enabled or disabled, default is enabled.
         -listType: Defines how attributes will be removed.  Use either removeList (only available pre v3.0.0) or keepList.
 </pre>
 
 Starting with version 3.2.0 anonymous hardware and OS information will be sent to [TelemetryDeck](https://telemetrydeck.com/) to aid in developement of the app.
 
 #### Examples:
-To allow the user to change their login name launch the app with the -allowNewUsername switch:
+To allow the user to change their login name and full name launch the app with the -allowNewUsername switch with a value of true:
 
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -allowNewUsername true```
 
@@ -105,7 +106,7 @@ To specify the type of local account to create and unbind the machine from Activ
 
 Display custom text:
 
-```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -message "Migrating your mobile account\\nEnter your existing password\\n\\nBe sure to save your work and close any applications before migrating."```
+```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local -message "\\nYour account is about to be migrated to a local account.\\n\\nFor your safety please sit down, buckle up, and hold on."```
 
 ![alt text](./mtl_images/customText.png "customText")
 
