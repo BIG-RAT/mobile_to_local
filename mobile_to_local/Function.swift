@@ -9,6 +9,18 @@ import Foundation
 import OpenDirectory
 import SystemConfiguration
 
+struct UserAttributes: Codable {
+    let currentUser: String?
+    var newUser: String?
+    let realname: String?
+    
+    init(currentUser: String?, newUser: String? = nil, realname: String?) {
+        self.currentUser = currentUser
+        self.newUser = newUser
+        self.realname = realname
+    }
+}
+
 class Function: NSObject {
     
     static let shared = Function()
@@ -19,7 +31,7 @@ class Function: NSObject {
         print("username: \(username)")
         
         do {
-            guard let userRecord = try getUserRecord(username: username) else {
+            guard let userRecord = getUserRecord(username: username) else {
                 return ["User not found: \(username)"]
             }
             
@@ -120,7 +132,7 @@ class Function: NSObject {
     
     func deleteAttributes(username: String) {
         let attributes = getAttributes(username: username)
-        guard let theRecord = try? getUserRecord(username: username) else {
+        guard let theRecord = getUserRecord(username: username) else {
             WriteToLog.shared.message(stringOfText: "Unable to get user record.")
             return
         }
@@ -214,6 +226,37 @@ class Function: NSObject {
         return userRecord
     }
 
+    func setRealName(for username: String, to newFullName: String) throws {
+
+        let session = ODSession.default()
+        let node = try ODNode(session: session, type: UInt32(kODNodeTypeLocalNodes))
+
+        // Find the user record
+        let query = try ODQuery(
+            node: node,
+            forRecordTypes: kODRecordTypeUsers,
+            attribute: kODAttributeTypeRecordName,
+            matchType: ODMatchType(kODMatchEqualTo),
+            queryValues: username,
+            returnAttributes: kODAttributeTypeStandardOnly,
+            maximumResults: 1
+        )
+
+        guard
+            let results = try query.resultsAllowingPartial(false) as? [ODRecord],
+            let record = results.first
+        else {
+            throw NSError(domain: "UserNotFound", code: 1)
+        }
+
+        // Update the "RealName" attribute
+        try record.setValue(newFullName, forAttribute: kODAttributeTypeFullName)
+
+        // Save changes
+        try record.synchronize()
+    }
+
+
     func isAdmin(username: String) -> Bool {
         do {
             // Open the local directory
@@ -231,7 +274,7 @@ class Function: NSObject {
             // Check nested groups (GroupMembers attribute resolves nested entries)
             if let nestedGroups = try query.values(forAttribute: kODAttributeTypeGroupMembers) as? [String] {
                 print("nestedGroups: \(nestedGroups)")
-                guard let userRecord = try getUserRecord(username: username) else {
+                guard let userRecord = getUserRecord(username: username) else {
                     return false
                 }
                 let userUUID = try userRecord.values(forAttribute: kODAttributeTypeGUID) as? [String]
@@ -281,7 +324,7 @@ class Function: NSObject {
     
     func passwordIsCorrect(username: String, password: String) -> Bool {
         do {
-            if let userRecord = try getUserRecord(username: username) {
+            if let userRecord = getUserRecord(username: username) {
                 
                 // Attempt to verify the credentials
                 try userRecord.verifyPassword(password)
@@ -340,3 +383,4 @@ extension String {
         }
     }
 }
+

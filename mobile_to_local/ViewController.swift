@@ -15,6 +15,7 @@ class ViewController: NSViewController {
     
     let myFunc = Function.shared
     
+    @IBOutlet weak var fullName_TextField: NSTextField!
     @IBOutlet weak var newUser_TextField: NSTextField!
     @IBOutlet weak var password_TextField: NSSecureTextField!
     
@@ -61,6 +62,8 @@ class ViewController: NSViewController {
         var allowedCharacters = CharacterSet.alphanumerics
         allowedCharacters.insert(charactersIn: "-_.")
         let newUser = newUser_TextField.stringValue
+        let newFullName = fullName_TextField.stringValue
+        
         if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
             WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
             alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
@@ -80,13 +83,13 @@ class ViewController: NSViewController {
             }
         }
         
-        let password     = password_TextField.stringValue
+        let password = password_TextField.stringValue
         if myFunc.passwordIsCorrect(username: loggedInUser, password: password) {
 
             WriteToLog.shared.message(stringOfText: "Password verified for \(loggedInUser).")
 
             DispatchQueue.main.async {
-                self.completeMigration(loggedInUser: loggedInUser, newUser: newUser, password: password)
+                self.completeMigration(loggedInUser: loggedInUser, newUser: newUser, newFullname: newFullName, password: password)
             }
 
             showLockWindow()
@@ -100,7 +103,7 @@ class ViewController: NSViewController {
     }
 
 
-    func completeMigration(loggedInUser: String, newUser: String, password: String) {
+    func completeMigration(loggedInUser: String, newUser: String, newFullname: String, password: String) {
         
         // see is user is an admin
         let isAdmin = myFunc.isAdmin(username: loggedInUser)
@@ -129,7 +132,7 @@ class ViewController: NSViewController {
         myFunc.deleteAttributes(username: loggedInUser)
         
 
-//         reset local user's password if needed
+//      reset local user's password if needed
         if !hasSecureToken(username: newUser) {
             WriteToLog.shared.message(stringOfText: "Reset password")
                 resetUserPassword(username: newUser, originalPassword: password_TextField.stringValue)
@@ -137,7 +140,16 @@ class ViewController: NSViewController {
         }
         
         WriteToLog.shared.message(stringOfText: "Call demobilization script.")
-        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent)"])
+        (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) '\(newFullname)'"])
+        
+        if exitResult == 0 {
+            do {
+                WriteToLog.shared.message(stringOfText: "Setting the user's real name.")
+                try myFunc.setRealName(for: newUser, to: newFullname)
+            } catch {
+                WriteToLog.shared.message(stringOfText: "Failed to set the user's real name: \(error)")
+            }
+        }
         
         WriteToLog.shared.message(stringOfText: "Logging the user out.")
         let task = Process()
@@ -151,7 +163,7 @@ class ViewController: NSViewController {
     }
     
     func hasSecureToken(username: String) -> Bool {
-        if let userRecord = try? myFunc.getUserRecord(username: username) /*OdUserRecord(username: username)*/ {
+        if let userRecord = myFunc.getUserRecord(username: username) /*OdUserRecord(username: username)*/ {
             guard let aa = try? userRecord.recordDetails(forAttributes: ["dsAttrTypeStandard:AuthenticationAuthority"])["dsAttrTypeStandard:AuthenticationAuthority"] as? [String] else {
                 WriteToLog.shared.message(stringOfText: "Unable to query user for a secure token.")
                 return false
@@ -169,7 +181,7 @@ class ViewController: NSViewController {
 
     func resetUserPassword(username: String, originalPassword: String) {
         sleep(1)
-        if let userRecord = try? myFunc.getUserRecord(username: username) {
+        if let userRecord = myFunc.getUserRecord(username: username) {
             // Reset the password
             do {
                 try userRecord.changePassword(nil, toPassword: originalPassword)
@@ -349,7 +361,7 @@ class ViewController: NSViewController {
             // read commandline args
             var numberOfArgs = 0
 
-            //        debug = true
+            let debug = true
 
             numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
             if numberOfArgs > 0 {
@@ -399,16 +411,23 @@ class ViewController: NSViewController {
                 NSApplication.shared.mainWindow?.setIsVisible(true)
             }
             if allowNewUsername {
-                self.newUser_TextField.isEditable   = true
+                self.fullName_TextField.isEditable = true
+                self.newUser_TextField.isEditable  = true
             }
             let newUser = myFunc.currentUser()
-//            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c","stat -f%Su /dev/console"])
-//            newUser = shellResult[0]
+            
             // change for testing
             newUser_TextField.stringValue = newUser
+            
+            let userAtributes = myFunc.getAttributes(username: newUser)
+            if let realNameValues = userAtributes["dsAttrTypeStandard:RealName"], let realName = (realNameValues as? [String])?.first {
+                fullName_TextField.stringValue = "\(realName)"
+            } else {
+                fullName_TextField.stringValue = newUser
+            }
 
             // Verify we're running with elevated privileges.
-            if NSUserName() != "root" {
+            if NSUserName() != "root" && !debug {
                 // disable for testing
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "Assistant must be run with elevated privileges.")
@@ -426,7 +445,7 @@ class ViewController: NSViewController {
 
             let loggedInUserCount = loggedInUserArray.count
 
-            if loggedInUserCount > 1 {
+            if loggedInUserCount > 1 && !debug {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "Other users are currently logged into this machine (fast user switching).")
                 WriteToLog.shared.message(stringOfText: "Logged in users: \(shellResult)")
@@ -444,7 +463,7 @@ class ViewController: NSViewController {
 
             if accountTypeArray.count != 0 {
                 // disable for testing
-                if accountTypeArray[0] == "" {
+                if accountTypeArray[0] == "" && !debug {
                     NSApplication.shared.mainWindow?.setIsVisible(false)
                     WriteToLog.shared.message(stringOfText: "You are currently logged in with a local account, migration is not necessary.")
                     alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
@@ -497,3 +516,4 @@ class ViewController: NSViewController {
 fileprivate func convertFromNSControlStateValue(_ input: NSControl.StateValue) -> Int {
 	return input.rawValue
 }
+
