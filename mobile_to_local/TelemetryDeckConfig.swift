@@ -7,12 +7,15 @@ import TelemetryDeck
 struct TelemetryDeckConfig {
     static let appId = "***REMOVED***"
     @MainActor static var parameters: [String: String] = [:]
+    @MainActor static var analytics: String = "enabled"
 }
 
 extension AppDelegate {
     @MainActor func configureTelemetryDeck() {
         
-        let config = TelemetryDeck.Config(appID: TelemetryDeckConfig.appId)
-        TelemetryDeck.initialize(config: config)
+        if TelemetryDeckConfig.analytics != "disabled" {
+            let config = TelemetryDeck.Config(appID: TelemetryDeckConfig.appId)
+            TelemetryDeck.initialize(config: config)
+        }
     }
 }

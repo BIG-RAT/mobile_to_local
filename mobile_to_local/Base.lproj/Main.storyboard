@@ -261,7 +261,7 @@
                                 </secureTextFieldCell>
                             </secureTextField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MxY-jN-fcB">
-                                <rect key="frame" x="463" y="17" width="62" height="20"/>
+                                <rect key="frame" x="471" y="16" width="62" height="20"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vxp-h9-mjd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -286,7 +286,7 @@ Gw
                                 <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="MigrateAsst" id="NVV-gM-GcC"/>
                             </imageView>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MKp-LH-sXa">
-                                <rect key="frame" x="545" y="16" width="75" height="21"/>
+                                <rect key="frame" x="545" y="16" width="75" height="20"/>
                                 <buttonCell key="cell" type="push" title="Migrate" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="6XM-7M-6j4">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -295,7 +295,7 @@ DQ
 </string>
                                 </buttonCell>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="G11-jN-dZa"/>
+                                    <constraint firstAttribute="height" constant="20" id="G11-jN-dZa"/>
                                     <constraint firstAttribute="width" constant="75" id="zIm-z3-KL6"/>
                                 </constraints>
                                 <connections>
@@ -351,7 +351,7 @@ DQ
                         <constraints>
                             <constraint firstItem="DWd-Be-SFk" firstAttribute="trailing" secondItem="J29-IQ-xyD" secondAttribute="trailing" id="0lA-Gb-oBk"/>
                             <constraint firstItem="DWd-Be-SFk" firstAttribute="bottom" secondItem="T6W-lA-6EZ" secondAttribute="bottom" id="2lm-WU-Kwe"/>
-                            <constraint firstItem="MKp-LH-sXa" firstAttribute="leading" secondItem="MxY-jN-fcB" secondAttribute="trailing" constant="20" id="5G8-15-7lU"/>
+                            <constraint firstItem="MKp-LH-sXa" firstAttribute="leading" secondItem="MxY-jN-fcB" secondAttribute="trailing" constant="12" id="5G8-15-7lU"/>
                             <constraint firstItem="NGg-cR-Ly5" firstAttribute="top" secondItem="c99-j3-P0H" secondAttribute="bottom" constant="10" id="6Ku-E8-AAS"/>
                             <constraint firstItem="c99-j3-P0H" firstAttribute="centerX" secondItem="m2S-Jp-Qdl" secondAttribute="centerX" id="6OY-pa-4b2"/>
                             <constraint firstItem="L2H-tX-wvN" firstAttribute="leading" secondItem="DWd-Be-SFk" secondAttribute="trailing" constant="8" id="7fe-Tk-TZj"/>
