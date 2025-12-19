@@ -456,6 +456,12 @@ class ViewController: NSViewController {
             if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
                 loggedInUserArray.remove(at: index)
             }
+            if let index = loggedInUserArray.firstIndex(of:"_mbsetupus") {
+                loggedInUserArray.remove(at: index)
+            }
+            if let index = loggedInUserArray.firstIndex(of:"") {
+                loggedInUserArray.remove(at: index)
+            }
 
             let loggedInUserCount = loggedInUserArray.count
 
