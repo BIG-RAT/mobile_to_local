@@ -453,15 +453,8 @@ class ViewController: NSViewController {
             (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "w | awk '/console/ {print $1}' | sort | uniq"])
             // remove blank entry in array
             var loggedInUserArray = shellResult.dropLast()
-            if let index = loggedInUserArray.firstIndex(of:"_mbsetupuser") {
-                loggedInUserArray.remove(at: index)
-            }
-            if let index = loggedInUserArray.firstIndex(of:"_mbsetupus") {
-                loggedInUserArray.remove(at: index)
-            }
-            if let index = loggedInUserArray.firstIndex(of:"") {
-                loggedInUserArray.remove(at: index)
-            }
+            loggedInUserArray.removeAll(where: { $0.isEmpty })
+            loggedInUserArray.removeAll(where: { $0.contains("_mbsetupus") })
 
             let loggedInUserCount = loggedInUserArray.count
 
