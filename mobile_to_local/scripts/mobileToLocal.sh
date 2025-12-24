@@ -113,7 +113,7 @@ fi
 ## if we changed shortnames update the RecordName attribute and add the old name as an alias
 if [ "${newName}" != "${currentName}" ];then
     ## get current home directory
-    homeDir=$($dsclBin . -read /Users/"${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
+    homeDir=$($dsclBin . -read "/Users/${currentName}" NFSHomeDirectory | awk -F": " '{ print $2 }')
     log "Current home directory: ${homeDir}"
     
     log "Change in login name has been requested"

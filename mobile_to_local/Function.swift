@@ -84,6 +84,26 @@ class Function: NSObject {
             return ""
         }
     }
+    
+    func loggedInUsers() -> [String] {
+        var users = Set<String>()
+        setutxent()
+        
+        while let entry = getutxent() {
+            if entry.pointee.ut_type == USER_PROCESS {
+                let username = withUnsafePointer(to: entry.pointee.ut_user) {
+                    $0.withMemoryRebound(to: CChar.self, capacity: Int(UT_NAMESIZE)) {
+                        String(cString: $0)
+                    }
+                }
+                users.insert(username)
+            }
+        }
+        
+        endutxent()
+        users.remove("_mbsetupuser")
+        return Array(users)
+    }
 
     func createStaffAliasGroup(username: String) {
         do {

@@ -163,9 +163,6 @@ class ViewController: NSViewController {
         } else {
             NSApplication.shared.terminate(self)
         }
-//        (exitResult, errorResult, shellResult) = shell(cmd: "/usr/bin/sudo", args: ["/bin/launchctl", "reboot", "user"])
-//        logMigrationResult(exitValue: exitResult)
-        
     }
     
     func hasSecureToken(username: String) -> Bool {
@@ -450,12 +447,8 @@ class ViewController: NSViewController {
             }
 
             // Verify we're the only account logged in - start
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "w | awk '/console/ {print $1}' | sort | uniq"])
-            // remove blank entry in array
-            var loggedInUserArray = shellResult.dropLast()
-            loggedInUserArray.removeAll(where: { $0.isEmpty })
-            loggedInUserArray.removeAll(where: { $0.contains("_mbsetupus") })
-
+            var loggedInUserArray = Function.shared.loggedInUsers()
+//
             let loggedInUserCount = loggedInUserArray.count
 
             if loggedInUserCount > 1 && !debug {
@@ -470,7 +463,7 @@ class ViewController: NSViewController {
 
 
             // Verify we're not logged in with a local account
-            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "dscl . -read \"/Users/\(newUser)\" OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard"])
+            (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "dscl . -read '/Users/\(newUser)' OriginalNodeName 2>/dev/null | grep -v dsRecTypeStandard"])
 
             let accountTypeArray = shellResult
 
