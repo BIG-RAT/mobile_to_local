@@ -403,7 +403,7 @@ class ViewController: NSViewController {
                         customMessage = CommandLine.arguments[i+1]
                         customMessage = customMessage.replacingOccurrences(of: "\\n", with: "\n")
                     case "-analytics":
-                        TelemetryDeckConfig.analytics = CommandLine.arguments[i+1]
+                        TelemetryDeckConfig.optOut = CommandLine.arguments[i+1].lowercased() == "disabled"
                     default:
                         WriteToLog.shared.message(stringOfText: "unknown switch passed: \(CommandLine.arguments[i])")
 //                        print("unknown switch passed: \(CommandLine.arguments[i])")
