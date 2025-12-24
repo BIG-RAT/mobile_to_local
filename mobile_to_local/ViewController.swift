@@ -346,7 +346,8 @@ class ViewController: NSViewController {
                 unbind           = plistData["unbind"] as? Bool ?? true
                 mode             = plistData["mode"] as? String ?? "interactive"
                 logoutUser       = plistData["logout"] as? Bool ?? false
-                TelemetryDeckConfig.analytics = plistData["analytics"] as? String ?? "enabled"
+                TelemetryDeckConfig.optOut = (plistData["analytics"] as? String ?? "enabled") == "disabled"
+
                 customMessage    = plistData["customMessage"] as? String ?? """
                     Please provide a name to use for login/unlocking your machine, also enter your current password.
                     
