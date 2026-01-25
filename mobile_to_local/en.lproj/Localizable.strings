@@ -1,0 +1,24 @@
+//
+//  Localizable.strings
+//  Mobile to Local
+//
+//  Created by leslie on 1/24/26.
+//  Copyright © 2026 jamf. All rights reserved.
+//
+
+"text.customMessage" = "Please provide a name to use for login/unlocking your machine, also enter your current password.\n\nSave and close items you are working on.\nClick migrate to convert your mobile account to a local one.";
+
+"text.header" = "Mobile to Local";
+"text.accountSettings" = "Account Settings";
+"text.fullName" = "full name:";
+"text.username" = "logon name:";
+"text.password" = "password:";
+
+"text.numbersLetters" = "Only numbers and letters are allowed in the username.";
+"text.alreadyExists" = "Sorry, %@ already exists.";
+
+"button.cancel" = "Cancel";
+"button.migrate" = "Migrate";
+
+"text.alert" = "Alert";
+"text.run_elevated" = "Assistant must be run with elevated privileges.";

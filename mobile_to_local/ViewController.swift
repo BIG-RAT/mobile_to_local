@@ -15,19 +15,23 @@ class ViewController: NSViewController {
     
     let myFunc = Function.shared
     
+    @IBOutlet weak var header_Label: NSTextField!
+    @IBOutlet weak var accountSettings_Label: NSTextField!
+    @IBOutlet weak var fullName_Label: NSTextField!
+    @IBOutlet weak var username_Label: NSTextField!
+    @IBOutlet weak var password_Label: NSTextField!
+    
     @IBOutlet weak var fullName_TextField: NSTextField!
     @IBOutlet weak var newUser_TextField: NSTextField!
     @IBOutlet weak var password_TextField: NSSecureTextField!
     
+    @IBOutlet weak var cancel_Button: NSButton!
+    @IBOutlet weak var migrate_Button: NSButton!
+    
     var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
 
     var userType         = "current"
-    var customMessage    = """
-        Please provide a name to use for login/unlocking your machine, also enter your current password.
-        
-        Save and close items you are working on.
-        Click migrate to convert your mobile account to a local one.
-        """
+    var customMessage    = "text.customMessage".localized
     var allowNewUsername = false
     var mode             = "interactive"
     var silent           = false
@@ -67,7 +71,7 @@ class ViewController: NSViewController {
         
         if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
             WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
-            alert_dialog(header: "Alert", message: "Only numbers and letters are allowed in the username.")
+            alert_dialog(header: "Alert", message: "test.numbersLetters".localized)
             return
         }
 
@@ -76,7 +80,11 @@ class ViewController: NSViewController {
         // if changing username, make sure new name isn't already in use
         if loggedInUser.lowercased() != newUser_TextField.stringValue.lowercased() {
             if let newUserRecord = myFunc.getUserRecord(username: newUser_TextField.stringValue.lowercased()) {
-                alert_dialog(header: "", message: "Sorry, \(newUserRecord) already exists.")
+                let errorMessage = String(
+                    format: NSLocalizedString("text.alreadyExists".localized, comment: "Username validation error"),
+                    newUserRecord
+                )
+                alert_dialog(header: "", message: errorMessage)
                 newUser_TextField.becomeFirstResponder()
                 return
             } else {
@@ -303,12 +311,20 @@ class ViewController: NSViewController {
                 lockWindow.close()
             }
         }
-
-//        print("[showLockWindow] lock window shown")
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // set labels
+        header_Label.stringValue = "text.header".localized
+        accountSettings_Label.stringValue = "text.accountSettings".localized
+        fullName_Label.stringValue = "text.fullName".localized
+        username_Label.stringValue = "text.username".localized
+        password_Label.stringValue = "text.password".localized
+        
+        cancel_Button.title = "button.cancel".localized
+        migrate_Button.title = "button.migrate".localized
         
         let admin = myFunc.isAdmin(username: NSUserName())
         WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
@@ -348,12 +364,7 @@ class ViewController: NSViewController {
                 logoutUser       = plistData["logout"] as? Bool ?? false
                 TelemetryDeckConfig.optOut = (plistData["analytics"] as? String ?? "enabled") == "disabled"
 
-                customMessage    = plistData["customMessage"] as? String ?? """
-                    Please provide a name to use for login/unlocking your machine, also enter your current password.
-                    
-                    Save and close items you are working on.
-                    Click migrate to convert your mobile account to a local one.
-                    """
+                customMessage    = plistData["customMessage"] as? String ?? "text.customMessage".localized
                 if mode == "silent" {
                     silent = true
                 }
@@ -367,7 +378,7 @@ class ViewController: NSViewController {
             // read commandline args
             var numberOfArgs = 0
 
-            let debug = false
+            let debug = true
 
             numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
             if numberOfArgs > 0 {
@@ -442,13 +453,14 @@ class ViewController: NSViewController {
             if NSUserName() != "root" && !debug {
                 // disable for testing
                 NSApplication.shared.mainWindow?.setIsVisible(false)
-                WriteToLog.shared.message(stringOfText: "Assistant must be run with elevated privileges.")
-                alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
+                WriteToLog.shared.message(stringOfText: "text.run_elevated".localized)
+                alert_dialog(header: "Alert", message: "text.run_elevated".localized)
+//                alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
                 NSApplication.shared.terminate(self)
             }
 
             // Verify we're the only account logged in - start
-            var loggedInUserArray = Function.shared.loggedInUsers()
+            let loggedInUserArray = Function.shared.loggedInUsers()
 //
             let loggedInUserCount = loggedInUserArray.count
 
@@ -531,3 +543,12 @@ fileprivate func convertFromNSControlStateValue(_ input: NSControl.StateValue) -
 	return input.rawValue
 }
 
+extension String {
+    var localized: String {
+        return NSLocalizedString(self, comment: "")
+    }
+    
+    func localized(with arguments: CVarArg...) -> String {
+        return String(format: self.localized, arguments: arguments)
+    }
+}

@@ -235,7 +235,7 @@
                                     <constraint firstAttribute="height" constant="24" id="SSq-Jm-4bY"/>
                                     <constraint firstAttribute="width" constant="308" id="tMG-ue-jGW"/>
                                 </constraints>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="Yzk-Hc-D6l">
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="border" drawsBackground="YES" id="Yzk-Hc-D6l">
                                     <font key="font" metaFont="system" size="16"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="tertiarySystemFillColor" catalog="System" colorSpace="catalog"/>
@@ -261,7 +261,7 @@
                                 </secureTextFieldCell>
                             </secureTextField>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="MxY-jN-fcB">
-                                <rect key="frame" x="471" y="16" width="62" height="20"/>
+                                <rect key="frame" x="467" y="16" width="66" height="20"/>
                                 <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="vxp-h9-mjd">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -271,7 +271,7 @@ Gw
                                 </buttonCell>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="20" id="A4k-LM-KVY"/>
-                                    <constraint firstAttribute="width" constant="62" id="Vmq-fh-p7H"/>
+                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="62" id="Vmq-fh-p7H"/>
                                 </constraints>
                                 <connections>
                                     <action selector="cancel:" target="XfG-lQ-9wD" id="66u-tF-uJu"/>
@@ -371,16 +371,24 @@ DQ
                             <constraint firstItem="8aT-ih-voS" firstAttribute="leading" secondItem="J29-IQ-xyD" secondAttribute="trailing" constant="8" id="hIB-0Q-OWz"/>
                             <constraint firstAttribute="trailing" secondItem="NGg-cR-Ly5" secondAttribute="trailing" constant="18" id="io0-yM-bHu"/>
                             <constraint firstItem="8aT-ih-voS" firstAttribute="top" secondItem="d6y-Uo-ANP" secondAttribute="bottom" constant="12" id="kjc-XH-l1l"/>
+                            <constraint firstItem="J29-IQ-xyD" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="T6W-lA-6EZ" secondAttribute="trailing" constant="4" id="nKD-ya-lFz"/>
                             <constraint firstItem="T6W-lA-6EZ" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="24" id="ns1-H8-I3w"/>
                             <constraint firstItem="U4S-Jf-6Dx" firstAttribute="trailing" secondItem="DWd-Be-SFk" secondAttribute="trailing" id="oH8-8N-nby"/>
                             <constraint firstItem="L2H-tX-wvN" firstAttribute="trailing" secondItem="NGg-cR-Ly5" secondAttribute="trailing" constant="-1" id="qcn-fR-NeZ"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="accountSettings_Label" destination="d6y-Uo-ANP" id="FYO-jh-pZj"/>
+                        <outlet property="cancel_Button" destination="MxY-jN-fcB" id="C4c-Og-eWt"/>
+                        <outlet property="fullName_Label" destination="J29-IQ-xyD" id="z3o-WJ-Hgb"/>
                         <outlet property="fullName_TextField" destination="8aT-ih-voS" id="Nut-TG-O6P"/>
+                        <outlet property="header_Label" destination="c99-j3-P0H" id="aEq-eD-18i"/>
                         <outlet property="introMessage_TextView" destination="P0c-aD-tv6" id="6z9-wh-B7o"/>
+                        <outlet property="migrate_Button" destination="MKp-LH-sXa" id="cpg-9x-aPc"/>
                         <outlet property="newUser_TextField" destination="L2H-tX-wvN" id="jm9-5i-3gj"/>
+                        <outlet property="password_Label" destination="U4S-Jf-6Dx" id="CHb-BF-om8"/>
                         <outlet property="password_TextField" destination="MSE-JM-FnQ" id="8Qf-7y-Ctb"/>
+                        <outlet property="username_Label" destination="DWd-Be-SFk" id="V4D-xP-bC9"/>
                     </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>

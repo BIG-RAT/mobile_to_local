@@ -1,0 +1,24 @@
+//
+//  Localizable.strings
+//  Mobile to Local
+//
+//  Created by leslie on 1/24/26.
+//  Copyright © 2026 jamf. All rights reserved.
+//
+
+"text.customMessage" = "Ange ett namn som ska användas för inloggning/upplåsning av din maskin, och ange även ditt nuvarande lösenord.\n\nSpara och stäng objekt du arbetar med.\nKlicka på migrera för att konvertera ditt mobilkonto till ett lokalt.";
+
+"text.header" = "Mobil till Lokal";
+"text.accountSettings" = "Kontoinställningar";
+"text.fullName" = "fullständiga namn";
+"text.username" = "inloggningsnamn";
+"text.password" = "lösenord";
+
+"test.numbersLetters" = "Endast siffror och bokstäver är tillåtna i användarnamnet.";
+"text.alreadyExists" = "Tyvärr, %@ finns redan.";
+
+"button.cancel" = "Annullera";
+"button.migrate" = "Flytta";
+
+"text.alert" = "Varna";
+"text.run_elevated" = "Assistenten måste köras med förhöjda rättigheter.";
