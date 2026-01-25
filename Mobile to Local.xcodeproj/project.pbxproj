@@ -80,8 +80,8 @@
 			children = (
 				CE5902FC2F25415A000C8D82 /* Localizable.strings */,
 				CE724F452CF2704E00828330 /* Attributes.swift */,
-				CE724F3D2CF054FC00828330 /* Function.swift */,
 				B5CA1ACB2090CE0F00C81085 /* AppDelegate.swift */,
+				CE724F3D2CF054FC00828330 /* Function.swift */,
 				B579196B25D0F8F900387324 /* LockScreenController.swift */,
 				CECC3D732EEFD6EC0068669C /* TelemetryDeckConfig.swift */,
 				CE724F432CF15C3A00828330 /* TimeDelegate.swift */,
