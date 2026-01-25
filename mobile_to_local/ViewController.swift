@@ -95,6 +95,7 @@ class ViewController: NSViewController {
         let password = password_TextField.stringValue
         if myFunc.passwordIsCorrect(username: loggedInUser, password: password) {
 
+            restoreRootKeyboardlayout()
             WriteToLog.shared.message(stringOfText: "Password verified for \(loggedInUser).")
 
             DispatchQueue.main.async {
@@ -206,6 +207,7 @@ class ViewController: NSViewController {
     }
     
     @IBAction func cancel(_ sender: Any) {
+        restoreRootKeyboardlayout()
         NSApplication.shared.terminate(self)
     }
     
@@ -310,6 +312,24 @@ class ViewController: NSViewController {
                 application.runModal(for: lockWindow)
                 lockWindow.close()
             }
+        }
+    }
+    
+    private func restoreRootKeyboardlayout() {
+        let newUser = myFunc.currentUser()
+        let user_plist = "/Users/\(newUser)/Library/Preferences/com.apple.HIToolbox.plist"
+        let root_plist = "/var/root/Library/Preferences/com.apple.HIToolbox.plist"
+        let root_backup_plist = "\(root_plist).mobile_to_local"
+        let root_delete_plist = "\(root_plist).delete"
+        
+        if FileManager.default.fileExists(atPath: root_backup_plist) {
+            WriteToLog.shared.message(stringOfText: "Restoring root keyboard layout")
+            try? FileManager.default.removeItem(atPath: root_plist)
+            try? FileManager.default.moveItem(atPath: root_backup_plist, toPath: root_plist)
+        } else if FileManager.default.fileExists(atPath: root_delete_plist) {
+            WriteToLog.shared.message(stringOfText: "Restoring root keyboard layout to nil")
+            try? FileManager.default.removeItem(atPath: root_plist)
+            try? FileManager.default.removeItem(atPath: root_delete_plist)
         }
     }
     

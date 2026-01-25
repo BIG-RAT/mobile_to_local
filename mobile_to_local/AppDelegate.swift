@@ -10,9 +10,13 @@ import Carbon.HIToolbox
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-        
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         configureTelemetryDeck()
+    }
+
+    func applicationWillTerminate(_ aNotification: Notification) {
+        // Insert code here to tear down your application
     }
     
 }
