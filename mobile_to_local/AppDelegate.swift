@@ -11,6 +11,7 @@ import Carbon.HIToolbox
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
     
+    private let myFunc = Function.shared
     private var targetInputSourceID: String?
     
     func applicationWillFinishLaunching(_ notification: Notification) {
@@ -64,11 +65,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     private func copyUserKeyboardSettingsToRoot() -> Bool {
-        guard let actualUser = ProcessInfo.processInfo.environment["SUDO_USER"] else {
-            print("❌ Could not determine actual user (SUDO_USER not set)")
-            return false
-        }
-        
+//        guard let actualUser = ProcessInfo.processInfo.environment["SUDO_USER"] else {
+//            print("❌ Could not determine actual user (SUDO_USER not set)")
+//            return false
+//        }
+        let actualUser = myFunc.currentUser()
         print("👤 Actual user: \(actualUser)")
         
         let script = """
