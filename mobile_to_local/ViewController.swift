@@ -378,7 +378,7 @@ class ViewController: NSViewController {
             // read commandline args
             var numberOfArgs = 0
 
-            let debug = true
+            let debug = false
 
             numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
             if numberOfArgs > 0 {
