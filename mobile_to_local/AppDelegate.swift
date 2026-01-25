@@ -11,54 +11,120 @@ import Carbon.HIToolbox
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
 
-    private var userInputSourceID: String?
-    
+    private var targetInputSourceID: String?
+
     func applicationWillFinishLaunching(_ notification: Notification) {
-        // Capture the ACTUAL user's input source
-        // This happens before macOS security policies interfere
-        userInputSourceID = captureUserInputSource()
+        targetInputSourceID = getCurrentInputSourceID()
+        print("📝 Captured input source: \(targetInputSourceID ?? "none")")
     }
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        // Restore after a brief delay to ensure system is ready
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            self?.restoreUserInputSource()
-        }
-        
-        // Also restore when window becomes active
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(windowDidBecomeKey),
-            name: NSWindow.didBecomeKeyNotification,
-            object: nil
-        )
+        // Try multiple times with increasing delays
+        attemptRestoreInputSource(attempt: 0)
         configureTelemetryDeck()
     }
+
     
-    @objc private func windowDidBecomeKey(_ notification: Notification) {
-            restoreUserInputSource()
-        }
-        
-    private func captureUserInputSource() -> String? {
-        // Try multiple methods to get the REAL user's input source
-        
-        // Method 1: From current process
-        if let sourceID = getCurrentInputSourceID() {
-            return sourceID
-        }
-        
-        // Method 2: From saved defaults (if previously saved)
-        if let saved = UserDefaults.standard.string(forKey: "LastKnownInputSource") {
-            return saved
-        }
-        
-        // Method 3: From environment or launch arguments
-        if let fromArgs = CommandLine.arguments.first(where: { $0.hasPrefix("--input-source=") }) {
-            return String(fromArgs.dropFirst("--input-source=".count))
-        }
-        
-        return nil
+    func applicationWillTerminate(_ aNotification: Notification) {
+        // Insert code here to tear down your application
     }
+
+    private func attemptRestoreInputSource(attempt: Int) {
+        let delays: [Double] = [0.1, 0.5, 1.0, 2.0]
+        
+        guard attempt < delays.count else {
+            print("❌ Failed to restore input source after all attempts")
+            return
+        }
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delays[attempt]) { [weak self] in
+            guard let self = self, let targetID = self.targetInputSourceID else { return }
+            
+            let currentID = self.getCurrentInputSourceID()
+            print("🔍 Attempt \(attempt + 1): Current=\(currentID ?? "none"), Target=\(targetID)")
+            
+            if currentID == targetID {
+                print("✅ Input source already correct")
+                return
+            }
+            
+            // Try methods in order of preference
+            
+            // Method 1: Carbon API (fastest, but may fail with elevation)
+            if self.setInputSourceViaCarbon(targetID) {
+                print("✅ Restored via Carbon API")
+                return
+            }
+            
+            // Method 2: Shell script (THIS IS WHERE SOLUTION 8 IS CALLED)
+            if self.setInputSourceViaShellScript(targetID) {
+                print("✅ Restored via Shell Script")
+                return
+            }
+            
+            // Try again with next delay
+            self.attemptRestoreInputSource(attempt: attempt + 1)
+        }
+    }
+    
+    // SOLUTION 8 - Shell Script Method
+    private func setInputSourceViaShellScript(_ sourceID: String) -> Bool {
+        // Get the localized name for the input source
+        guard let localizedName = getInputSourceLocalizedName(sourceID) else {
+            print("❌ Could not find localized name for \(sourceID)")
+            return false
+        }
+        
+        // Method A: Try setting via defaults and restart
+        let script = """
+        #!/bin/bash
+        
+        # Get current user's home directory (important when running as root)
+        if [ -n "$SUDO_USER" ]; then
+            USER_HOME=$(eval echo ~$SUDO_USER)
+        else
+            USER_HOME="$HOME"
+        fi
+        
+        # Set the input source
+        defaults write "$USER_HOME/Library/Preferences/com.apple.HIToolbox.plist" AppleSelectedInputSources -array-add "{'InputSourceKind' = 'Keyboard Layout'; 'KeyboardLayout Name' = '\(localizedName)';}"
+        
+        # Restart the input menu
+        killall SystemUIServer 2>/dev/null
+        
+        exit 0
+        """
+        
+        return executeShellScript(script)
+    }
+    
+    private func executeShellScript(_ script: String) -> Bool {
+        let task = Process()
+        task.launchPath = "/bin/bash"
+        task.arguments = ["-c", script]
+        
+        // Capture output for debugging
+        let pipe = Pipe()
+        task.standardOutput = pipe
+        task.standardError = pipe
+        
+        do {
+            try task.run()
+            task.waitUntilExit()
+            
+            let data = pipe.fileHandleForReading.readDataToEndOfFile()
+            if let output = String(data: data, encoding: .utf8), !output.isEmpty {
+                print("📄 Script output: \(output)")
+            }
+            
+            return task.terminationStatus == 0
+        } catch {
+            print("❌ Shell script failed: \(error)")
+            return false
+        }
+    }
+    
+    // Helper functions
     
     private func getCurrentInputSourceID() -> String? {
         guard let inputSource = TISCopyCurrentKeyboardInputSource()?.takeRetainedValue() else {
@@ -69,28 +135,32 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return nil
         }
         
-        let sourceID = Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue() as String
-        
-        // Save for future reference
-        UserDefaults.standard.set(sourceID, forKey: "LastKnownInputSource")
-        
-        return sourceID
+        return Unmanaged<CFString>.fromOpaque(sourceIDPtr).takeUnretainedValue() as String
     }
     
-    private func restoreUserInputSource() {
-        guard let targetSourceID = userInputSourceID else {
-            return
+    private func getInputSourceLocalizedName(_ sourceID: String) -> String? {
+        let inputSourceNSArray = TISCreateInputSourceList(nil, false).takeRetainedValue() as NSArray
+        let inputSourceList = inputSourceNSArray as! [TISInputSource]
+        
+        for inputSource in inputSourceList {
+            guard let idPtr = TISGetInputSourceProperty(inputSource, kTISPropertyInputSourceID) else {
+                continue
+            }
+            
+            let id = Unmanaged<CFString>.fromOpaque(idPtr).takeUnretainedValue() as String
+            
+            if id == sourceID {
+                if let namePtr = TISGetInputSourceProperty(inputSource, kTISPropertyLocalizedName) {
+                    let name = Unmanaged<CFString>.fromOpaque(namePtr).takeUnretainedValue() as String
+                    return name
+                }
+            }
         }
         
-        // Don't change if we're already on the correct layout
-        if getCurrentInputSourceID() == targetSourceID {
-            return
-        }
-        
-        setInputSource(targetSourceID)
+        return nil
     }
     
-    private func setInputSource(_ sourceID: String) {
+    private func setInputSourceViaCarbon(_ sourceID: String) -> Bool {
         let inputSourceNSArray = TISCreateInputSourceList(nil, false).takeRetainedValue() as NSArray
         let inputSourceList = inputSourceNSArray as! [TISInputSource]
         
@@ -103,20 +173,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             
             if id == sourceID {
                 let result = TISSelectInputSource(inputSource)
-                if result == noErr {
-                    print("✅ Successfully restored input source: \(sourceID)")
-                } else {
-                    print("⚠️ Failed to restore input source: \(result)")
-                }
-                break
+                return result == noErr
             }
         }
+        
+        return false
     }
-    
-    func applicationWillTerminate(_ aNotification: Notification) {
-        // Insert code here to tear down your application
-    }
-
-
 }
 
