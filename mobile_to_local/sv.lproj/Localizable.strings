@@ -10,9 +10,9 @@
 
 "text.header" = "Mobil till Lokal";
 "text.accountSettings" = "Kontoinställningar";
-"text.fullName" = "fullständiga namn";
-"text.username" = "inloggningsnamn";
-"text.password" = "lösenord";
+"text.fullName" = "fullständiga namn:";
+"text.username" = "inloggningsnamn:";
+"text.password" = "lösenord:";
 
 "test.numbersLetters" = "Endast siffror och bokstäver är tillåtna i användarnamnet.";
 "text.alreadyExists" = "Tyvärr, %@ finns redan.";

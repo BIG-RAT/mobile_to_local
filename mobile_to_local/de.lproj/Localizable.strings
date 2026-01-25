@@ -1,0 +1,24 @@
+//
+//  Localizable.strings
+//  Mobile to Local
+//
+//  Created by leslie on 1/24/26.
+//  Copyright © 2026 jamf. All rights reserved.
+//
+
+"text.customMessage" = "Bitte geben Sie einen Namen für die Anmeldung/das Entsperren Ihres Computers sowie Ihr aktuelles Passwort ein.\n\nSpeichern und schließen Sie die Elemente, an denen Sie arbeiten.\nKlicken Sie auf Migrieren, um Ihr mobiles Konto in ein lokales Konto umzuwandeln.";
+
+"text.header" = "Mobil zu Lokal";
+"text.accountSettings" = "Kontoeinstellungen";
+"text.fullName" = "vollständiger Name:";
+"text.username" = "Anmeldename:";
+"text.password" = "Passwort:";
+
+"text.numbersLetters" = "Im Benutzernamen sind nur Zahlen und Buchstaben zulässig.";
+"text.alreadyExists" = "Entschuldigung, %@ existiert bereits.";
+
+"button.cancel" = "Abbrechen";
+"button.migrate" = "Migrieren";
+
+"text.alert" = "Warnung";
+"text.run_elevated" = "Der Assistent muss mit erhöhten Rechten ausgeführt werden.";

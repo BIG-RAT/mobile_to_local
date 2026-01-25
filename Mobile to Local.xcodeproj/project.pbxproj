@@ -43,6 +43,12 @@
 		CE724F432CF15C3A00828330 /* TimeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeDelegate.swift; sourceTree = "<group>"; };
 		CE724F452CF2704E00828330 /* Attributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Attributes.swift; sourceTree = "<group>"; };
 		CECC3D732EEFD6EC0068669C /* TelemetryDeckConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryDeckConfig.swift; sourceTree = "<group>"; };
+		CEDE60BC2F26AC6400026287 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Main.strings; sourceTree = "<group>"; };
+		CEDE60BD2F26AC6400026287 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEDE60BE2F26AC6C00026287 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Main.strings; sourceTree = "<group>"; };
+		CEDE60BF2F26AC6C00026287 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CEDE60C02F26AC9300026287 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
+		CEDE60C12F26AC9300026287 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -155,6 +161,9 @@
 				en,
 				Base,
 				sv,
+				fr,
+				de,
+				es,
 			);
 			mainGroup = B5CA1ABF2090CE0F00C81085;
 			packageReferences = (
@@ -209,6 +218,9 @@
 				B5CA1AD22090CE0F00C81085 /* Base */,
 				CE5902F62F253D8D000C8D82 /* sv */,
 				CE5902FA2F253E36000C8D82 /* en */,
+				CEDE60BC2F26AC6400026287 /* fr */,
+				CEDE60BE2F26AC6C00026287 /* de */,
+				CEDE60C02F26AC9300026287 /* es */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -218,6 +230,9 @@
 			children = (
 				CE5902FB2F25415A000C8D82 /* en */,
 				CE5902FE2F25418E000C8D82 /* sv */,
+				CEDE60BD2F26AC6400026287 /* fr */,
+				CEDE60BF2F26AC6C00026287 /* de */,
+				CEDE60C12F26AC9300026287 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -360,7 +375,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = "4.0.0-b1";
 				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -385,7 +400,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 3.3.0;
+				MARKETING_VERSION = "4.0.0-b1";
 				PRODUCT_BUNDLE_IDENTIFIER = "pse.jamf.mobile-to-local";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

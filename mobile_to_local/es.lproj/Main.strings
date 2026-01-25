@@ -1,0 +1,129 @@
+
+/* Class = "NSTextFieldCell"; title = "Account Settings"; ObjectID = "0ir-KE-hg6"; */
+"0ir-KE-hg6.title" = "Account Settings";
+
+/* Class = "NSMenuItem"; title = "Mobile to Local"; ObjectID = "1Xt-HY-uBw"; */
+"1Xt-HY-uBw.title" = "Mobile to Local";
+
+/* Class = "NSMenu"; title = "Speech"; ObjectID = "3rS-ZA-NoH"; */
+"3rS-ZA-NoH.title" = "Speech";
+
+/* Class = "NSMenuItem"; title = "Quit Mobile to Local"; ObjectID = "4sb-4s-VLi"; */
+"4sb-4s-VLi.title" = "Quit Mobile to Local";
+
+/* Class = "NSMenuItem"; title = "Edit"; ObjectID = "5QF-Oa-p0T"; */
+"5QF-Oa-p0T.title" = "Edit";
+
+/* Class = "NSMenuItem"; title = "About Mobile to Local"; ObjectID = "5kV-Vb-QxS"; */
+"5kV-Vb-QxS.title" = "About Mobile to Local";
+
+/* Class = "NSButtonCell"; title = "Migrate"; ObjectID = "6XM-7M-6j4"; */
+"6XM-7M-6j4.title" = "Migrate";
+
+/* Class = "NSMenuItem"; title = "Redo"; ObjectID = "6dh-zS-Vam"; */
+"6dh-zS-Vam.title" = "Redo";
+
+/* Class = "NSMenu"; title = "Main Menu"; ObjectID = "AYu-sK-qS6"; */
+"AYu-sK-qS6.title" = "Main Menu";
+
+/* Class = "NSMenuItem"; title = "Preferences…"; ObjectID = "BOF-NM-1cW"; */
+"BOF-NM-1cW.title" = "Preferences…";
+
+/* Class = "NSMenu"; title = "Help"; ObjectID = "F2S-fz-NVQ"; */
+"F2S-fz-NVQ.title" = "Help";
+
+/* Class = "NSMenuItem"; title = "Mobile to Local Help"; ObjectID = "FKE-Sm-Kum"; */
+"FKE-Sm-Kum.title" = "Mobile to Local Help";
+
+/* Class = "NSWindow"; title = "Migrate"; ObjectID = "IQv-IB-iLA"; */
+"IQv-IB-iLA.title" = "Migrate";
+
+/* Class = "NSMenuItem"; title = "Show All"; ObjectID = "Kd2-mp-pUS"; */
+"Kd2-mp-pUS.title" = "Show All";
+
+/* Class = "NSMenuItem"; title = "Bring All to Front"; ObjectID = "LE2-aR-0XJ"; */
+"LE2-aR-0XJ.title" = "Bring All to Front";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "NMo-om-nkz"; */
+"NMo-om-nkz.title" = "Services";
+
+/* Class = "NSMenuItem"; title = "Minimize"; ObjectID = "OY7-WF-poV"; */
+"OY7-WF-poV.title" = "Minimize";
+
+/* Class = "NSMenuItem"; title = "Hide Mobile to Local"; ObjectID = "Olw-nP-bQN"; */
+"Olw-nP-bQN.title" = "Hide Mobile to Local";
+
+/* Class = "NSMenuItem"; title = "Stop Speaking"; ObjectID = "Oyz-dy-DGm"; */
+"Oyz-dy-DGm.title" = "Stop Speaking";
+
+/* Class = "NSMenuItem"; title = "Zoom"; ObjectID = "R4o-n2-Eq4"; */
+"R4o-n2-Eq4.title" = "Zoom";
+
+/* Class = "NSMenuItem"; title = "Select All"; ObjectID = "Ruw-6m-B2m"; */
+"Ruw-6m-B2m.title" = "Select All";
+
+/* Class = "NSMenu"; title = "Window"; ObjectID = "Td7-aD-5lo"; */
+"Td7-aD-5lo.title" = "Window";
+
+/* Class = "NSTextFieldCell"; title = "logon name:"; ObjectID = "UA3-cY-kQd"; */
+"UA3-cY-kQd.title" = "logon name:";
+
+/* Class = "NSTextFieldCell"; title = "Completing account migration.  \nThis process may take a few minutes, please stand by..."; ObjectID = "VUn-2U-0Wr"; */
+"VUn-2U-0Wr.title" = "Completing account migration.  \nThis process may take a few minutes, please stand by...";
+
+/* Class = "NSMenuItem"; title = "Hide Others"; ObjectID = "Vdr-fp-XzO"; */
+"Vdr-fp-XzO.title" = "Hide Others";
+
+/* Class = "NSMenu"; title = "Edit"; ObjectID = "W48-6f-4Dl"; */
+"W48-6f-4Dl.title" = "Edit";
+
+/* Class = "NSMenuItem"; title = "Paste and Match Style"; ObjectID = "WeT-3V-zwk"; */
+"WeT-3V-zwk.title" = "Paste and Match Style";
+
+/* Class = "NSMenuItem"; title = "Start Speaking"; ObjectID = "Ynk-f8-cLZ"; */
+"Ynk-f8-cLZ.title" = "Start Speaking";
+
+/* Class = "NSMenuItem"; title = "Window"; ObjectID = "aUF-d1-5bR"; */
+"aUF-d1-5bR.title" = "Window";
+
+/* Class = "NSMenuItem"; title = "Undo"; ObjectID = "dRJ-4n-Yzg"; */
+"dRJ-4n-Yzg.title" = "Undo";
+
+/* Class = "NSWindow"; title = "LockScreen"; ObjectID = "e6u-Zc-ppm"; */
+"e6u-Zc-ppm.title" = "LockScreen";
+
+/* Class = "NSTextFieldCell"; title = "password: "; ObjectID = "epx-6X-CTw"; */
+"epx-6X-CTw.title" = "password: ";
+
+/* Class = "NSMenuItem"; title = "Paste"; ObjectID = "gVA-U4-sdL"; */
+"gVA-U4-sdL.title" = "Paste";
+
+/* Class = "NSTextFieldCell"; title = "full name:"; ObjectID = "h16-bS-30x"; */
+"h16-bS-30x.title" = "full name:";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "hz9-B4-Xy5"; */
+"hz9-B4-Xy5.title" = "Services";
+
+/* Class = "NSMenuItem"; title = "Delete"; ObjectID = "pa3-QI-u2k"; */
+"pa3-QI-u2k.title" = "Delete";
+
+/* Class = "NSMenu"; title = "Mobile to Local"; ObjectID = "uQy-DD-JDr"; */
+"uQy-DD-JDr.title" = "Mobile to Local";
+
+/* Class = "NSMenuItem"; title = "Cut"; ObjectID = "uRl-iY-unG"; */
+"uRl-iY-unG.title" = "Cut";
+
+/* Class = "NSButtonCell"; title = "Cancel"; ObjectID = "vxp-h9-mjd"; */
+"vxp-h9-mjd.title" = "Cancel";
+
+/* Class = "NSMenuItem"; title = "Help"; ObjectID = "wpr-3q-Mcd"; */
+"wpr-3q-Mcd.title" = "Help";
+
+/* Class = "NSMenuItem"; title = "Copy"; ObjectID = "x3v-GG-iWU"; */
+"x3v-GG-iWU.title" = "Copy";
+
+/* Class = "NSMenuItem"; title = "Speech"; ObjectID = "xrE-MZ-jX0"; */
+"xrE-MZ-jX0.title" = "Speech";
+
+/* Class = "NSTextFieldCell"; title = "Mobile to Local"; ObjectID = "zwV-6D-D63"; */
+"zwV-6D-D63.title" = "Mobile to Local";
