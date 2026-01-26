@@ -15,7 +15,15 @@
 "text.password" = "Passwort:";
 
 "text.numbersLetters" = "Im Benutzernamen sind nur Zahlen und Buchstaben zulässig.";
-"text.alreadyExists" = "Entschuldigung, %@ existiert bereits.";
+"text.alreadyExists"  = "Entschuldigung, %@ existiert bereits.";
+"text.verify"         = "Das Passwort für %@ kann nicht überprüft werden. Bitte geben Sie das Passwort erneut ein.";
+"text.localAccount"   = "Sie sind nicht mit einem mobilen Konto angemeldet: %@";
+"text.accountExists"  = "Das Konto %@ existiert bereits und gehört einem anderen Benutzer.";
+"text.errorUnknown"   = "Ein unbekannter Fehler ist aufgetreten: %@";
+"text.argError"       = "Ein Argumentfehler ist aufgetreten - Wenden Sie sich an die IT-Abteilung, um Hilfe zu erhalten.";
+"text.fus"            = "Andere Benutzer sind derzeit bei diesem Computer angemeldet (schneller Benutzerwechsel). Sie müssen abgemeldet sein, bevor die Kontomigration stattfinden kann.";
+"text.notNecessary"   = "Sie sind derzeit mit einem lokalen Konto angemeldet, eine Migration ist nicht erforderlich.";
+"text.missingInfo"    = "Kontoinformationen können nicht gefunden werden. Möglicherweise sind Sie mit einem netzwerkverwalteten Konto angemeldet.";
 
 "button.cancel" = "Abbrechen";
 "button.migrate" = "Migrieren";

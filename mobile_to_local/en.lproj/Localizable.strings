@@ -15,7 +15,15 @@
 "text.password" = "password:";
 
 "text.numbersLetters" = "Only numbers and letters are allowed in the username.";
-"text.alreadyExists" = "Sorry, %@ already exists.";
+"text.alreadyExists"  = "Sorry, %@ already exists.";
+"text.verify"         = "Unable to verify password for %@. Please re-enter the password.";
+"text.localAccount"   = "You are not logged in with a mobile account: %@";
+"text.accountExists"  = "Account %@ already exists and belongs to another user.";
+"text.errorUnknown"   = "An unknown error has occured: %@";
+"text.argError"       = "Argument error occured - Contact IT for help.";
+"text.fus"            = "Other users are currently logged into this machine (fast user switching). They must be logged out before account migration can take place.";
+"text.notNecessary"   = "You are currently logged in with a local account, migration is not necessary.";
+"text.missingInfo"    = "Unable to locate account information. You may be logged in with a network managed account.";
 
 "button.cancel" = "Cancel";
 "button.migrate" = "Migrate";

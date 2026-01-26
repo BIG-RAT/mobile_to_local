@@ -15,7 +15,15 @@
 "text.password" = "contraseña:";
 
 "text.numbersLetters" = "Solo se permiten números y letras en el nombre de usuario.";
-"text.alreadyExists" = "Lo sentimos, %@ ya existe.";
+"text.alreadyExists"  = "Lo sentimos, %@ ya existe.";
+"text.verify"         = "No se puede verificar la contraseña para %@. Vuelva a ingresar la contraseña.";
+"text.localAccount"   = "No ha iniciado sesión con una cuenta móvil: %@";
+"text.accountExists"  = "La cuenta %@ ya existe y pertenece a otro usuario.";
+"text.errorUnknown"   = "Se ha producido un error desconocido: %@";
+"text.argError"       = "Se ha producido un error de argumento - Contacte a TI para obtener ayuda.";
+"text.fus"            = "Otros usuarios están actualmente conectados a esta máquina (cambio rápido de usuario). Deben cerrar sesión antes de que pueda realizarse la migración de cuenta.";
+"text.notNecessary"   = "Actualmente ha iniciado sesión con una cuenta local, la migración no es necesaria.";
+"text.missingInfo"    = "No se puede localizar la información de la cuenta. Es posible que haya iniciado sesión con una cuenta administrada por red.";
 
 "button.cancel" = "Cancelar";
 "button.migrate" = "Migrar";

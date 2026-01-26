@@ -15,7 +15,15 @@
 "text.password" = "mot de passe:";
 
 "text.numbersLetters" = "Seuls les chiffres et les lettres sont autorisés dans le nom d'utilisateur.";
-"text.alreadyExists" = "Désolé, %@ existe déjà.";
+"text.alreadyExists"  = "Désolé, %@ existe déjà.";
+"text.verify"         = "Impossible de vérifier le mot de passe pour %@. Veuillez saisir à nouveau le mot de passe.";
+"text.localAccount"   = "Vous n'êtes pas connecté avec un compte mobile : %@";
+"text.accountExists"  = "Le compte %@ existe déjà et appartient à un autre utilisateur.";
+"text.errorUnknown"   = "Une erreur inconnue s'est produite : %@";
+"text.argError"       = "Une erreur d'argument s'est produite - Contactez le service informatique pour obtenir de l'aide.";
+"text.fus"            = "D'autres utilisateurs sont actuellement connectés à cette machine (changement rapide d'utilisateur). Ils doivent être déconnectés avant que la migration du compte puisse avoir lieu.";
+"text.notNecessary"   = "Vous êtes actuellement connecté avec un compte local, la migration n'est pas nécessaire.";
+"text.missingInfo"    = "Impossible de localiser les informations du compte. Vous êtes peut-être connecté avec un compte géré par le réseau.";
 
 "button.cancel" = "Annuler";
 "button.migrate" = "Migrer";

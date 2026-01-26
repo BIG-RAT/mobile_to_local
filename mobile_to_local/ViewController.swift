@@ -71,7 +71,7 @@ class ViewController: NSViewController {
         
         if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
             WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
-            alert_dialog(header: "Alert", message: "test.numbersLetters".localized)
+            alert_dialog(header: "text.alert".localized, message: "test.numbersLetters".localized)
             return
         }
 
@@ -84,7 +84,7 @@ class ViewController: NSViewController {
                     format: NSLocalizedString("text.alreadyExists".localized, comment: "Username validation error"),
                     newUserRecord
                 )
-                alert_dialog(header: "", message: errorMessage)
+                alert_dialog(header: "text.alert".localized, message: errorMessage)
                 newUser_TextField.becomeFirstResponder()
                 return
             } else {
@@ -106,7 +106,11 @@ class ViewController: NSViewController {
 
         } else {
             WriteToLog.shared.message(stringOfText: "Unable to verify password for \(loggedInUser).")
-            alert_dialog(header: "Alert", message: "Unable to verify password for \(loggedInUser).  Please re-enter the password.")
+            let errorMessage = String(
+                format: NSLocalizedString("text.verify".localized, comment: "Password validation error"),
+                loggedInUser
+            )
+            alert_dialog(header: "text.alert".localized, message: errorMessage)
             view.window?.makeKeyAndOrderFront(self)
             return
         }
@@ -130,7 +134,11 @@ class ViewController: NSViewController {
         let isMobile = myFunc.isMobile(username: loggedInUser)
         if !isMobile {
             WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(loggedInUser)")
-            alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(loggedInUser)")
+            let errorMessage = String(
+                format: NSLocalizedString("text.localAccount".localized, comment: ""),
+                loggedInUser
+            )
+            alert_dialog(header: "text.alert".localized, message: errorMessage)
             NSApplication.shared.terminate(self)
         }
         
@@ -244,7 +252,11 @@ class ViewController: NSViewController {
         case 244:
             WriteToLog.shared.message(stringOfText: "Account \(newUser) already exists and belongs to another user.")
             if !silent {
-                alert_dialog(header: "Alert", message: "Account \(newUser) already exists and belongs to another user.")
+                let error244 = String(
+                    format: NSLocalizedString("text.accountExists".localized, comment: ""),
+                    newUser
+                )
+                alert_dialog(header: "text.alert".localized, message: error244)
             } else {
                 NSApplication.shared.terminate(self)
             }
@@ -252,7 +264,11 @@ class ViewController: NSViewController {
         case 232:
             WriteToLog.shared.message(stringOfText: "You are not logged in with a mobile account: \(newUser)")
             if !silent {
-                alert_dialog(header: "Alert", message: "You are not logged in with a mobile account: \(newUser)")
+                let error232 = String(
+                    format: NSLocalizedString("text.localAccount".localized, comment: ""),
+                    newUser
+                )
+                alert_dialog(header: "text.alert".localized, message: error232)
             } else {
                 NSApplication.shared.terminate(self)
             }
@@ -260,7 +276,11 @@ class ViewController: NSViewController {
         default:
             WriteToLog.shared.message(stringOfText: "An unknown error has occured: \(exitResult).")
             if !silent {
-                alert_dialog(header: "Alert", message: "An unknown error has occured: \(exitResult).")
+                let errorUnknown = String(
+                    format: NSLocalizedString("text.errorUnknown".localized, comment: ""),
+                    exitResult
+                )
+                alert_dialog(header: "text.alert".localized, message: errorUnknown)
             } else {
                 NSApplication.shared.terminate(self)
             }
@@ -404,7 +424,7 @@ class ViewController: NSViewController {
             if numberOfArgs > 0 {
                 if (numberOfArgs % 2) != 0 {
                     WriteToLog.shared.message(stringOfText: "Argument error occured - Contact IT for help.")
-                    alert_dialog(header: "Alert", message: "Argument error occured - Contact IT for help.")
+                    alert_dialog(header: "text.alert".localized, message: "text.argError".localized)
                     NSApplication.shared.terminate(self)
                 }
 
@@ -474,8 +494,7 @@ class ViewController: NSViewController {
                 // disable for testing
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "text.run_elevated".localized)
-                alert_dialog(header: "Alert", message: "text.run_elevated".localized)
-//                alert_dialog(header: "Alert", message: "Assistant must be run with elevated privileges.")
+                alert_dialog(header: "text.alert".localized, message: "text.run_elevated".localized)
                 NSApplication.shared.terminate(self)
             }
 
@@ -488,7 +507,7 @@ class ViewController: NSViewController {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "Other users are currently logged into this machine (fast user switching).")
                 WriteToLog.shared.message(stringOfText: "Logged in users: \(shellResult)")
-                alert_dialog(header: "Alert", message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
+                alert_dialog(header: "text.alert".localized, message: "Other users are currently logged into this machine (fast user switching).  They must be logged out before account migration can take place.")
                 NSApplication.shared.terminate(self)
             }
             // Verify we're the only account logged in - end
@@ -504,14 +523,14 @@ class ViewController: NSViewController {
                 if accountTypeArray[0] == "" && !debug {
                     NSApplication.shared.mainWindow?.setIsVisible(false)
                     WriteToLog.shared.message(stringOfText: "You are currently logged in with a local account, migration is not necessary.")
-                    alert_dialog(header: "Alert", message: "You are currently logged in with a local account, migration is not necessary.")
+                    alert_dialog(header: "text.alert".localized, message: "text.notNecessary".localized)
                     NSApplication.shared.terminate(self)
                 }
             } else {
                 NSApplication.shared.mainWindow?.setIsVisible(false)
                 WriteToLog.shared.message(stringOfText: "\(errorResult[0])")
                 WriteToLog.shared.message(stringOfText: "Unable to locate account information.  You may be logged in with a network managed account.")
-                alert_dialog(header: "Alert", message: "Unable to locate account information.  You may be logged in with a network managed account.")
+                alert_dialog(header: "text.alert".localized, message: "text.missingInfo".localized)
                 NSApplication.shared.terminate(self)
             }
             
