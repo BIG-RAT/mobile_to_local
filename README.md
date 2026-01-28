@@ -5,7 +5,8 @@
 
 Migrate mobile Active Directory account to a local account.<br>
 Requires 10.15 or later.<br>
-Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/latest/download/Mobile.to.Local.zip)
+Download: [Mobile to Local](https://github.com/BIG-RAT/mobile_to_local/releases/latest/download/Mobile.to.Local.zip)<br>
+Beta download with language support: [Mobile to Local Beta](https://github.com/BIG-RAT/mobile_to_local/releases/tag/v4.0.0-b1)<br>
 
 The application submits basic hardware, OS, and jamfStatus application usage to [TelemetryDeck](https://telemetrydeck.com) by default. The data is sent anonymously and can be disabled by setting the -analytics switch (see switches below) to 'disabled'.
 
