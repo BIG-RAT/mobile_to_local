@@ -6,27 +6,27 @@
 //  Copyright © 2026 jamf. All rights reserved.
 //
 
-"text.customMessage" = "Ange ett namn som ska användas för inloggning/upplåsning av din maskin, och ange även ditt nuvarande lösenord.\n\nSpara och stäng objekt du arbetar med.\nKlicka på migrera för att konvertera ditt mobilkonto till ett lokalt.";
+"text.customMessage" = "Ange ett namn som ska användas för inloggning/upplåsning av din dator, och ange även ditt nuvarande lösenord.\n\nSpara och stäng allt du arbetar med.\nKlicka på migrera för att konvertera ditt mobila konto till ett lokalt.";
 
-"text.header" = "Mobil till Lokal";
+"text.header" = "Mobilt till Lokalt konto";
 "text.accountSettings" = "Kontoinställningar";
-"text.fullName" = "fullständiga namn:";
-"text.username" = "inloggningsnamn:";
-"text.password" = "lösenord:";
+"text.fullName" = "Fullständigt namn:";
+"text.username" = "Användarnamn:";
+"text.password" = "Lösenord:";
 
 "text.numbersLetters" = "Endast siffror och bokstäver är tillåtna i användarnamnet.";
 "text.alreadyExists"  = "Tyvärr, %@ finns redan.";
-"text.verify"         = "Kan inte verifiera lösenordet för %@. Ange lösenordet igen.";
+"text.verify"         = "Kunde inte verifiera lösenordet för %@. Ange lösenordet igen.";
 "text.localAccount"   = "Du är inte inloggad med ett mobilt konto: %@";
 "text.accountExists"  = "Kontot %@ finns redan och tillhör en annan användare.";
 "text.errorUnknown"   = "Ett okänt fel har inträffat: %@";
-"text.argError"       = "Ett argumentfel har inträffat - Kontakta IT för hjälp.";
-"text.fus"            = "Andra användare är för närvarande inloggade på denna maskin (snabbt användarskifte). De måste loggas ut innan kontomigrering kan äga rum.";
+"text.argError"       = "Ett fel inträffade - Kontakta IT för hjälp.";
+"text.fus"            = "Andra användare är för närvarande inloggade på denna dator (snabbt användarbyte). De måste logga ut innan kontomigrering kan äga rum.";
 "text.notNecessary"   = "Du är för närvarande inloggad med ett lokalt konto, migrering är inte nödvändig.";
 "text.missingInfo"    = "Kan inte hitta kontoinformation. Du kan vara inloggad med ett nätverkshanterat konto.";
 
-"button.cancel" = "Annullera";
-"button.migrate" = "Flytta";
+"button.cancel" = "Avbryt";
+"button.migrate" = "Migrera";
 
-"text.alert" = "Varna";
-"text.run_elevated" = "Assistenten måste köras med förhöjda rättigheter.";
+"text.alert" = "Varning";
+"text.run_elevated" = "Assistenten måste köras med administrativa rättigheter.";
