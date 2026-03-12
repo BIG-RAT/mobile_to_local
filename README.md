@@ -15,9 +15,11 @@ Wanted to create an easy to use method to migrate mobile accounts to local accou
 ![alt text](./mtl_images/main.png "Mobile to Local")
 
 The app must be launched with elevated privileges, as a result there may be keyboard layout issues if using a non-english layout.<br><br>
-To resolve this be sure to run (as root) the keyboardLayout.sh script prior to running the Mobile to Local application. The script will copy the user's keyboard layout to root. Running the Mobile to Local application will restore the root keyboard layout, if present.
+To resolve this be sure to run (as root) the keyboardLayout.sh script prior to running the Mobile to Local application. The script will copy the user's keyboard layout to root. Running the Mobile to Local application will restore the root keyboard layout, if present.<br><br>
 
-Launch Mobile to Local with elevated privileges:<br><br>
+Any language should be support for the keyboard layout, the UI supports English, French, German, Spanish, and Swedish.<br> 
+
+Launch Mobile to Local with elevated privileges:<br>
 ```sudo /path/to/Mobile\ to\ Local.app/Contents/MacOS/Mobile\ to\ Local```
 
 
