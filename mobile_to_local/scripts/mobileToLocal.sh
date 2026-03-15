@@ -32,8 +32,8 @@ computerName=$(scutil --get ComputerName)
 ## get logged in username and UniqueID (id can no longer be reset)
 currentName="$(stat -f%Su /dev/console)"
 
-newName="$1"
-newFullname="$5"
+newName="${1}"
+newFullname="${5}"
 userType="$2"
 
 log """mobile to local parameters:
@@ -59,7 +59,7 @@ log "adding built-in group staff to $staffAlias"
 /usr/sbin/dseditgroup -o edit -a staff -t group $staffAlias
 
 ## set the unbind var; 'true' or 'false'
-unbind="$3"
+unbind="${3:-true}"
 if [ "${unbind}" = "true" ];then
     log "machine will be unbound from Active Directory"
 else
@@ -86,7 +86,7 @@ fi
 /bin/rm -f "/Users/${currentName}/.account" || true
 
 pid=$(ps -ax | grep opendir | grep -v grep | awk '/ / {print $1}')
-echo "restarting opendirectoryd with pid $pid"
+log "restarting opendirectoryd with pid $pid"
 killall opendirectoryd
 sleep 1
 ## wait for opendirectoryd to start back up
@@ -95,7 +95,7 @@ while [ "$pid" = "" ];do
     sleep 1
     pid=$(ps -ax | grep opendir | grep -v grep | awk '/ / {print $1}')
 done
-echo "opendirectoryd restarted with pid $pid"
+log "opendirectoryd restarted with pid $pid"
 
 ## add to the admins group, if appropriate
 if [ "$userType" = "admin" ];then
@@ -122,3 +122,5 @@ if [ "${newName}" != "${currentName}" ];then
     log "adding alias for old username: ${currentName}"
     $dsclBin . -append "/Users/${newName}" RecordName "${currentName}"
 fi
+
+log "mobileToLocal shell script complete"

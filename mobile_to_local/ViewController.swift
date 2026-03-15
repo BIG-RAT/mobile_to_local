@@ -28,7 +28,7 @@ class ViewController: NSViewController {
     @IBOutlet weak var cancel_Button: NSButton!
     @IBOutlet weak var migrate_Button: NSButton!
     
-    var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
+    var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: logFilePath)
 
     var userType         = "current"
     var customMessage    = "text.customMessage".localized
@@ -370,24 +370,25 @@ class ViewController: NSViewController {
         WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
         
         DispatchQueue.main.async { [self] in
-            if !FileManager.default.fileExists(atPath: "/private/var/log/mobile.to.local.log") {
+            if !FileManager.default.fileExists(atPath: logFilePath) {
                 var secondsWaited = 0
-                FileManager.default.createFile(atPath: "/private/var/log/mobile.to.local.log", contents: nil, attributes: [.ownerAccountID:0, .groupOwnerAccountID:0, .posixPermissions:0o644])
-                while !FileManager.default.fileExists(atPath: "/private/var/log/mobile.to.local.log") {
+                FileManager.default.createFile(atPath: logFilePath, contents: nil, attributes: [.ownerAccountID:0, .groupOwnerAccountID:0, .posixPermissions:0o644])
+                while !FileManager.default.fileExists(atPath: logFilePath) {
                     if secondsWaited < 10 {
                         secondsWaited+=1
                     } else {
                         break
                     }
                 }
-                LogFileW = FileHandle(forUpdatingAtPath: "/private/var/log/mobile.to.local.log")
-                if FileManager.default.isWritableFile(atPath: "/private/var/log/mobile.to.local.log") {
+                LogFileW = FileHandle(forUpdatingAtPath: logFilePath)
+                if FileManager.default.isWritableFile(atPath: logFilePath) {
                     print("log is writeable")
                 } else {
                     print("log is not writeable")
                 }
                 WriteToLog.shared.message(stringOfText: "New log file created.")
             }
+            WriteToLog.shared.message(stringOfText: "Launching Mobile to Local app.")
             
             // read environment settings - start
             if FileManager.default.fileExists(atPath: "/Library/Managed Preferences/pse.jamf.mobile-to-local.plist") {
@@ -538,7 +539,7 @@ class ViewController: NSViewController {
                 if hasSecureToken(username: newUser) {
                     self.showLockWindow()
                     
-                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent)"])
+                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) ''"])
                     
                     logMigrationResult(exitValue: exitResult, newUser: newUser)
                 } else {
