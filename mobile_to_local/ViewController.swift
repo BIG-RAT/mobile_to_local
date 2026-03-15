@@ -114,9 +114,8 @@ class ViewController: NSViewController {
         }
     }
 
-
     func completeMigration(loggedInUser: String, newUser: String, newFullname: String, password: String) {
-        
+ 
         // see is user is an admin
         let isAdmin = myFunc.isAdmin(username: loggedInUser)
         WriteToLog.shared.message(stringOfText: "isAdmin: \(isAdmin)")
@@ -153,7 +152,6 @@ class ViewController: NSViewController {
         WriteToLog.shared.message(stringOfText: "updated AuthenticationAuthority: \(authenticationAuthority ?? [])")
         WriteToLog.shared.message(stringOfText: "updated AltSecurityIdentities: \(altSecurityIdentities ?? [])")
         
-
 //      reset local user's password if needed
         if !hasSecureToken(username: newUser) {
             WriteToLog.shared.message(stringOfText: "Reset password")
@@ -542,9 +540,11 @@ class ViewController: NSViewController {
                 if hasSecureToken(username: newUser) {
                     self.showLockWindow()
                     
-                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) ''"])
+                    completeMigration(loggedInUser: newUser, newUser: newUser, newFullname: "", password: "")
                     
-                    logMigrationResult(exitValue: exitResult, newUser: newUser)
+//                    (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) ''"])
+//                    
+//                    logMigrationResult(exitValue: exitResult, newUser: newUser)
                 } else {
                     WriteToLog.shared.message(stringOfText: "\(newUser) does not have a secure token, cannot run silently.")
                 }
