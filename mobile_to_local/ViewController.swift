@@ -163,11 +163,13 @@ class ViewController: NSViewController {
         (exitResult, errorResult, shellResult) = shell(cmd: "/bin/bash", args: ["-c", "'\(migrationScript)' '\(newUser)' \(userType) \(unbind) \(silent) '\(newFullname)'"])
         
         if exitResult == 0 {
-            do {
-                WriteToLog.shared.message(stringOfText: "Setting the user's real name.")
-                try myFunc.setRealName(for: newUser, to: newFullname)
-            } catch {
-                WriteToLog.shared.message(stringOfText: "Failed to set the user's real name: \(error)")
+            if !newFullname.isEmpty {
+                do {
+                    WriteToLog.shared.message(stringOfText: "Setting the user's real name.")
+                    try myFunc.setRealName(for: newUser, to: newFullname)
+                } catch {
+                    WriteToLog.shared.message(stringOfText: "Failed to set the user's real name: \(error)")
+                }
             }
         }
         

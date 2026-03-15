@@ -38,9 +38,9 @@ newFullname="${5}"
 userType="$2"
 
 log """mobile to local parameters:
-                        new username: $1
-                        new fullname: $5
-                        type of user to create: $2
+                        new username: ${newName}
+                        new fullname: ${newFullname}
+                        type of user to create: $userType
                         unbind: $3
                         silent: $4"""
 
