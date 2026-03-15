@@ -27,8 +27,6 @@ class ViewController: NSViewController {
     
     @IBOutlet weak var cancel_Button: NSButton!
     @IBOutlet weak var migrate_Button: NSButton!
-    
-    var LogFileW: FileHandle? = FileHandle(forUpdatingAtPath: logFilePath)
 
     var userType         = "current"
     var customMessage    = "text.customMessage".localized
@@ -148,6 +146,12 @@ class ViewController: NSViewController {
 
         WriteToLog.shared.message(stringOfText: "Delete Attributes - start")
         myFunc.deleteAttributes(username: loggedInUser)
+        
+        let modifiedRecord = myFunc.getAttributes(username: loggedInUser)
+        let authenticationAuthority = modifiedRecord["dsAttrTypeStandard:AuthenticationAuthority"] as? [String]
+        let altSecurityIdentities = modifiedRecord["dsAttrTypeStandard:AltSecurityIdentities"] as? [String]
+        WriteToLog.shared.message(stringOfText: "updated AuthenticationAuthority: \(authenticationAuthority ?? [])")
+        WriteToLog.shared.message(stringOfText: "updated AltSecurityIdentities: \(altSecurityIdentities ?? [])")
         
 
 //      reset local user's password if needed
@@ -367,7 +371,6 @@ class ViewController: NSViewController {
         migrate_Button.title = "button.migrate".localized
         
         let admin = myFunc.isAdmin(username: NSUserName())
-        WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
         
         DispatchQueue.main.async { [self] in
             if !FileManager.default.fileExists(atPath: logFilePath) {
@@ -380,7 +383,6 @@ class ViewController: NSViewController {
                         break
                     }
                 }
-                LogFileW = FileHandle(forUpdatingAtPath: logFilePath)
                 if FileManager.default.isWritableFile(atPath: logFilePath) {
                     print("log is writeable")
                 } else {
@@ -389,6 +391,7 @@ class ViewController: NSViewController {
                 WriteToLog.shared.message(stringOfText: "New log file created.")
             }
             WriteToLog.shared.message(stringOfText: "Launching Mobile to Local app.")
+            WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
             
             // read environment settings - start
             if FileManager.default.fileExists(atPath: "/Library/Managed Preferences/pse.jamf.mobile-to-local.plist") {

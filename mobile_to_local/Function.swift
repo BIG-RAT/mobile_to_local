@@ -124,8 +124,6 @@ class Function: NSObject {
             print("Group '\(groupRecordName)' created successfully.")
             try groupRecord.setValue(primaryGroupId, forAttribute: kODAttributeTypePrimaryGroupID)
             
-            
-            
             // Fetch the built-in group
             let builtInGroupName = "staff"
             guard let builtInGroupRecord = try? node.record(withRecordType: kODRecordTypeGroups, name: builtInGroupName, attributes: nil) else {

@@ -7,9 +7,9 @@
 
 import Foundation
 
-let logFilePath = "/Users/Shared/mobile.to.local.log"
-//let logFilePath = "/private/var/log/mobile.to.local.log"
-var logFileW = FileHandle(forUpdatingAtPath: logFilePath)
+//let logFilePath = "/Users/Shared/mobile.to.local.log"
+let logFilePath = "/private/var/log/mobile.to.local.log"
+var logFileW: FileHandle? = FileHandle(forUpdatingAtPath: logFilePath)
 
 class WriteToLog {
     
