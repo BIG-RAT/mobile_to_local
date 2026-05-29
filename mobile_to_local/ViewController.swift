@@ -63,12 +63,18 @@ class ViewController: NSViewController {
     
     @IBAction func migrate(_ sender: Any) {
         var allowedCharacters = CharacterSet.alphanumerics
-        allowedCharacters.insert(charactersIn: "-_.")
         let newUser = newUser_TextField.stringValue
         let newFullName = fullName_TextField.stringValue
         
-        if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil || newUser == "" {
-            WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers and letters are allowed in the username.")
+        if newUser.isEmpty {
+            WriteToLog.shared.message(stringOfText: "Username cannot be empty.")
+            alert_dialog(header: "text.alert".localized, message: "test.numbersLetters".localized)
+            return
+        }
+        
+        allowNewUsername ? allowedCharacters.insert(charactersIn: "-_."):allowedCharacters.insert(charactersIn: "-_. ")
+        if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil {
+            WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers, letters, -, _ and . are allowed in the username.")
             alert_dialog(header: "text.alert".localized, message: "test.numbersLetters".localized)
             return
         }
@@ -422,7 +428,7 @@ class ViewController: NSViewController {
             // read commandline args
             var numberOfArgs = 0
 
-            let debug = false
+            let debug = true //false
 
             numberOfArgs = CommandLine.arguments.count - 1  // subtract 1 as the first argument is the app itself
             if numberOfArgs > 0 {
