@@ -21,6 +21,15 @@ struct UserAttributes: Codable {
     }
 }
 
+@MainActor struct AppInfo {
+    static let dict          = Bundle.main.infoDictionary!
+    static let version       = dict["CFBundleShortVersionString"] as! String
+    static let build         = Bundle.main.infoDictionary!["CFBundleVersion"] as! String
+    static let name          = dict["CFBundleExecutable"] as! String
+    static let displayname   = dict["CFBundleDisplayName"] as! String
+    static let appSupport    = NSHomeDirectory() + "/Library/Application Support/"
+}
+
 class Function: NSObject {
     
     static let shared = Function()

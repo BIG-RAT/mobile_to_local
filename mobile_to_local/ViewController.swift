@@ -396,7 +396,12 @@ class ViewController: NSViewController {
                 }
                 WriteToLog.shared.message(stringOfText: "New log file created.")
             }
-            WriteToLog.shared.message(stringOfText: "Launching Mobile to Local app.")
+            
+            let osVersion = ProcessInfo.processInfo.operatingSystemVersionString
+            WriteToLog.shared.message(stringOfText: "-------------------------------------------------------")
+            WriteToLog.shared.message(stringOfText: "    Mobile to Local: v\(AppInfo.version) Build: \(AppInfo.build)")
+            WriteToLog.shared.message(stringOfText: "              macOS: \(osVersion)")
+            WriteToLog.shared.message(stringOfText: "-------------------------------------------------------")
             WriteToLog.shared.message(stringOfText: "\(NSUserName()) is an admin: \(admin)")
             
             // read environment settings - start
