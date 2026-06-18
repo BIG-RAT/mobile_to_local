@@ -72,8 +72,8 @@ class ViewController: NSViewController {
             return
         }
         
-        allowNewUsername ? allowedCharacters.insert(charactersIn: "-_."):allowedCharacters.insert(charactersIn: "-_. ")
-        if newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil {
+        allowedCharacters.insert(charactersIn: "-_. ")
+        if allowNewUsername && newUser.rangeOfCharacter(from: allowedCharacters.inverted) != nil {
             WriteToLog.shared.message(stringOfText: "Invalid username: \(newUser).  Only numbers, letters, -, _ and . are allowed in the username.")
             alert_dialog(header: "text.alert".localized, message: "test.numbersLetters".localized)
             return
